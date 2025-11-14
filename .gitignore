@@ -1,0 +1,17 @@
+.idea/
+.venv/
+.vscode/
+.env
+.env.*
+.*.env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.so
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+__pypackages__/
