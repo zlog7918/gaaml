@@ -34,16 +34,34 @@ Celem pracy jest zbudowanie biblioteki,
 która automatyzuje proces dobierania przez wspomniany algorytm genetyczny.
 
 \section{Zakres}
-\begin{itemize}
-  \setlength{\itemsep}{0pt}
-  \setlength{\parskip}{0pt}
-  \item Optymalizacja odbywająca się względem podanych przez użytkownika danych testowych pod postacią tablic biblioteki \texttt{numpy}
-  \item Algorytm genetyczny obejmujący: osobników, selekcję, krzyżowanie i mutację
-  \item Definicja sposobu kodowania architektury sieci neuronowej jako genomu
-  \item Mechanizm trenowania i walidacji osobników na podstawie dostarczonych danych
-  \item Przeprowadzenie eksperymentów porównawczych na wybranych zbiorach danych
-  \item Optymalne parametry dla algorytmu genetycznego, które w bibliotece będą widniały jako wartości domyślne
-\end{itemize}
+Program powininen optymalizować architekturę sieci neuronowej wraz
+z jej parametrami uczenia.
+
+\noindent
+Przez architekturę sieci, w niniejszym dokumencie, rozumie się liczbę warstw,
+liczbę neuronów w każdej z warstw oraz funkcje aktywacji dla każdej z warstw.
+A przez parametry uczenia rozumie się rodzaj optymalizatora,
+wskaźnik uczenia się, funkcję straty, oraz liczbę epok.
+
+\noindent
+Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych przez użytkownika,
+za pomocą algorytmu genetycznego.
+Implementacja algorytmu genetycznego będzie obejmowała:
+osobników, selekcję, krzyżowanie i mutację.
+
+\noindent
+Każdy osobnik będzie przechowywał jednoznaczny kod genetyczny, to znaczy,
+że dany kod genetyczny za każdym razem doprowadzi do takiej samej architektury
+wraz z takimi samymi parametrami uczenia.
+
+\noindent
+Zostaną przeprowadzone eksperymenty, gdzie będzie spradzane
+czy automatycznie dobrane sieci są lepszej lub takiej samej jakości
+jak te dobrane manualnie.
+
+\noindent
+Zostaną określone domyślne parametry dla algorytmu genetycznego,
+które będą możliwie najkorzystniejsze dla optymalizacji architektur sieci neuronowych.
 
 \section{Wstęp teoretyczny}
 \subsection{Sieć neuronowa}
