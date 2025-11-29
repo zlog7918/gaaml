@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[margin=1.5cm]{geometry}
+\usepackage{graphicx}
 
 \title{Pracy inżynierska "Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych"}
 \author{Szymon Wasążnik\\325522}
@@ -73,11 +74,31 @@ oraz synapsów (w terminologi angielskiej występują one pod nazwą \textit{edg
 \noindent
 Obecnie sieci neuronowe są mocno rozwijanym działem informatyki.
 Z tego powodu powstało wiele typów sieci,
-które można uogólnić do kategorii jednokierunkowa sieć neuronowa (ang. \textit{feedforward neural networks}) oraz rekurencyjna sieć neuronowa (ang. \textit{recurrent neural networks}).
-W angielskiej literaturze można spotkać jeszcze następujące typy sieci: recursive neural network, feedback neural network.
-W niniejszym dokumencie sieci neuronowe odnoszą się do jednokierunkowej sieci neuronowej (FNN).
+które można uogólnić do kategorii jednokierunkowa sieć neuronowa
+(ang. \textit{feedforward neural networks})
+oraz rekurencyjna sieć neuronowa (ang. \textit{recurrent neural networks}).
+W angielskiej literaturze można spotkać jeszcze następujące typy sieci:
+recursive neural network, feedback neural network.
+W niniejszym dokumencie sieci neuronowe odnoszą się
+do jednokierunkowej sieci neuronowej (FNN),
+a dokładniej do jej szczególnego przypadku nazwanego
+wielowarstwowym perceptronem (ang. \textit{multilayer perceptron}).
+Jego cechą charakterystyczną jest brak synapsów między warstwami,
+które nie są "obok siebie".
+Oznacza to, że obie poniższe sieci są jednokierunkowe,
+ale tylko ta po prawej jest wielowarstwowym perceptronem (MLP):
 
-Można w niej wyróżnić trzy warstwy: wejściową, ukrytą i wyjściową.
+\noindent
+\begin{center}
+  \includegraphics[trim={0 0 0 0}, width=4cm, clip]{fnn.png}
+  \includegraphics[trim={0 0 0 0}, width=3.25cm, clip]{fnn_mlp.png}
+\end{center}
+
+\noindent
+W MLP można wyróżnić trzy warstwy: wejściową, ukrytą i wyjściową.
+Ponieważ wejściowa warstwa musi być wielkości danych wejściowych,
+a warstwa wyjściowa - wyjściowych,
+to algorytm musi zajmować się tylko warstwą ukrytą.
 
 \subsection{Architektura sieci neuronowej}
 \subsection{Podejście genetyczne do rozwijania architektury}
