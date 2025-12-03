@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[margin=1.5cm]{geometry}
+\usepackage{minted}
 \usepackage{graphicx}
 
 \title{Praca inżynierska "Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych"}
@@ -43,7 +44,7 @@ Dane będą przyjmowane w postaci tabel pakietu \texttt{numpy}.
 Przez architekturę sieci, w niniejszym dokumencie, rozumie się liczbę warstw,
 liczbę neuronów w każdej z warstw oraz funkcje aktywacji dla każdej z warstw.
 A przez parametry uczenia rozumie się rodzaj optymalizatora,
-wskaźnik uczenia się, funkcję straty, oraz liczbę epok.
+wskaźnik uczenia się oraz liczbę epok.
 
 \noindent
 Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych przez użytkownika,
@@ -115,9 +116,51 @@ a procesu oceniania jej przystosowania.
 \subsection{Podejście genetyczne do rozwijania architektury}
 Algorytmem, który zostanie wykorzystany do optymalizacji
 architektury sieci neuronowej, jest algorytm genetyczny.
-Opiera się on na mechaniźmie zaobserwowanym w przyrodzie,
+Opiera się on na mechanizmie zaobserwowanym w przyrodzie,
 zwanym ewolucją, gdzie poprzez krzyżowanie i mutację
 następuje powstawanie nowych osobników,
 które całościowo jako populacja są coraz lepiej przystosowane.
+
+\noindent
+W niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
+architekturę sieci i jej parametry uczenia.
+\begin{minted}[frame=single]{python3}
+  gen=(
+    '000000010000010010110001010100010111111111110000110010',
+    [64,32,8,16,4],
+    [0,1,0,2,1]
+  )
+\end{minted}
+Powyższy kod genetyczny reprezentuje następujący fenotyp:
+\begin{minted}[frame=single]{python3}
+  # fenotyp=(
+  #   ilość ukrytych warstw: 1-1024,
+  #   ziarno generatora liczby neuronów: 0-1023,
+  #   ziarno generatora typów aktywacji: 0-1023,
+  #   optymalizator: 0->SGD, 1->Adam,
+  #   wskaźnik uczenia się (learning rate): 1/2^13-1.0,
+  #   liczba epok: 1-1024,
+  #   ilość neuronów w warstwach: lista[2-1 073 741 825],
+  #   typy aktywacji w warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
+  # )
+  # gen=(
+  #   '|0000000100|0001001011|0001010100|0|0001001100101|0000110001|',
+  # #  |   4+1    |    75    |    84    |0|    613+1   |   49+1   |
+  # #  |    5     |    75    |    84    |0|  614/2^13  |    50    |
+  # #  |    5     |    75    |    84    |0| .074951172 |    50    |
+  #   [64,32,8,16,4],
+  #   [0,1,0,2,1]
+  # )
+  fenotyp=(
+    5,
+    75,
+    84,
+    0,
+    0.074951172,
+    50,
+    [64, 32, 8, 16, 4],
+    [0, 1, 0, 2, 1],
+  )
+\end{minted}
 
 \end{document}

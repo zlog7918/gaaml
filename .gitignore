@@ -21,3 +21,4 @@ __pypackages__/
 *.log
 *.pdf
 *.synctex.gz
+_minted-*/
