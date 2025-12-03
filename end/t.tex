@@ -1,4 +1,4 @@
-\documentclass[a4paper, 11pt]{article}
+\documentclass[a4paper, 12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[margin=1.5cm]{geometry}
@@ -12,13 +12,13 @@
 \maketitle
 \section{Cel}
 Celem pracy jest opracowanie biblioteki w języku Python,
-która umożliwi automatyczne optymalizowanie sieci neuronowej
+która umożliwi automatyczne optyma\-lizowanie sieci neuronowej
 pod względem architektury sieci na podstawie danych treningowych i walidacyjnych.
 Optymalizowanie będzie odbywać się dzięki algorytmowi genetycznemu.
 
 \section{Opis problematyki}
 Dobór architektury sieci neuronowej i parametrów uczenia jest procesem,
-wymagającym doświadczenia oraz licznych eksperymentów.
+wymagającym doświa\-dczenia oraz licznych eksperymentów.
 W praktyce trzeba testować wiele konfiguracji warstw,
 liczby neuronów, funkcji aktywacji czy parametrów uczenia.
 Do tego najlepiej testować daną konfigurację kilka razy,
@@ -49,20 +49,19 @@ wskaźnik uczenia się, funkcję straty, oraz liczbę epok.
 Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych przez użytkownika,
 za pomocą algorytmu genetycznego.
 Implementacja algorytmu genetycznego będzie obejmowała:
-osobników, selekcję, krzyżowanie i mutację.
+oso\-bników, selekcję, krzyżowanie i mutację.
 
 \noindent
 Każdy osobnik będzie przechowywał jednoznaczny kod genetyczny, to znaczy,
 że dany kod genetyczny za każdym razem doprowadzi do takiej samej architektury
 wraz z takimi samymi parametrami uczenia.
 
+\newpage
 \noindent
 Zostaną przeprowadzone eksperymenty, gdzie będzie spradzane
 czy automatycznie dobrane sieci są lepszej lub takiej samej jakości
 jak te dobrane manualnie.
-
-\noindent
-Zostaną określone domyślne parametry dla algorytmu genetycznego,
+Oraz zostaną określone domyślne parametry dla algorytmu genetycznego,
 które będą możliwie najkorzystniejsze dla optymalizacji architektur sieci neuronowych.
 
 \section{Wstęp teoretyczny}
@@ -101,6 +100,24 @@ a warstwa wyjściowa - danych wyjściowych,
 to algorytm musi zajmować się tylko warstwami ukrytymi.
 
 \subsection{Architektura sieci neuronowej}
+Architektura sieci, w rozumieniu niniejszego dokumentu,
+to: liczba warstw ukrytych, liczba neuronów w każdej z warstw,
+i funkcja aktywacji każdej z warstw.
+
+\noindent
+Nie zalicza się natomiast do niej liczby synapsów,
+ponieważ warstwy są między sobą w pełni połą\-czone.
+Nie zalicza się również do architektury wag synapsów
+- są określane w procesie ucze\-nia~się.
+Z tego powodu nie są częścią architektury,
+a procesu oceniania jej przystosowania.
 
 \subsection{Podejście genetyczne do rozwijania architektury}
+Algorytmem, który zostanie wykorzystany do optymalizacji
+architektury sieci neuronowej, jest algorytm genetyczny.
+Opiera się on na mechaniźmie zaobserwowanym w przyrodzie,
+zwanym ewolucją, gdzie poprzez krzyżowanie i mutację
+następuje powstawanie nowych osobników,
+które całościowo jako populacja są coraz lepiej przystosowane.
+
 \end{document}
