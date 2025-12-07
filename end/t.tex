@@ -121,47 +121,108 @@ zwanym ewolucją, gdzie poprzez krzyżowanie i mutację
 następuje powstawanie nowych osobników,
 które całościowo jako populacja są coraz lepiej przystosowane.
 
-\noindent
+\subsubsection{Kod genetyczny osobnika}
 W niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
 architekturę sieci i jej parametry uczenia.
-\begin{minted}[frame=single]{python3}
-  gen=(
-    '000000010000010010110001010100000010011001010000110010',
-    [64,32,8,16,4],
-    [0,1,0,2,1]
-  )
-\end{minted}
-Powyższy kod genetyczny reprezentuje następujący fenotyp:
-\begin{minted}[frame=single]{python3}
-  # fenotyp=(
-  #   ilość ukrytych warstw: 1-1024,
-  #   ziarno generatora liczby neuronów: 0-1023,
-  #   ziarno generatora typów aktywacji: 0-1023,
-  #   optymalizator: 0->SGD, 1->Adam,
-  #   wskaźnik uczenia się (learning rate): 1/2^13-1.0 [13bit],
-  # ? wskaźnik uczenia się (learning rate): 1/2^13-0.5 [12bit],
-  #   liczba epok: 1-1024,
-  #   ilość neuronów w warstwach: lista[2-1 073 741 825],
-  #   typy aktywacji w warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
-  # )
-  # gen=(
-  #   '|0000000100|0001001011|0001010100|0|0001001100101|0000110001|',
-  # #  |   4+1    |    75    |    84    |0|    613+1    |   49+1   |
-  # #  |    5     |    75    |    84    |0|  614/2^13   |    50    |
-  # #  |    5     |    75    |    84    |0| 0.074951172 |    50    |
-  #   [64,32,8,16,4],
-  #   [0,1,0,2,1]
-  # )
-  fenotyp=(
-    5,
-    75,
-    84,
-    0,
-    0.074951172,
-    50,
-    [64, 32, 8, 16, 4],
-    [0, 1, 0, 2, 1],
-  )
-\end{minted}
+Kod genetyczny będzie składał się z trzech części:
+\begin{itemize}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+  \item Część binarna:
+    \begin{itemize}
+      \setlength{\itemsep}{0pt}
+      \setlength{\parskip}{0pt}
+      \item liczba warstw ukrytych: 7 bitów (1-128)
+      \item ziarno generatora liczby neuronów: 10 bitów (0-1023)
+      \item ziarno generatora typów aktywacji: 10 bitów (0-1023)
+      \item optymalizator: 1 bit (0->SGD, 1->Adam)
+      \item wskaźnik uczenia się (learning rate): 13 bitów ($2^{-13}$ - $1.0$)
+      \item ? wskaźnik uczenia się (learning rate): 12 bitów ($2^{-13}$ - $0.5$)
+      \item liczba epok: 10 bitów (1-1024)
+    \end{itemize}
+  \item Część list - generowane po części binarnej;
+    długości list są nie mniejsze niż liczba warstw ukrytych,
+    przy czym długości wygenerowanych są równe tej liczbie:
+    \begin{itemize}
+      \setlength{\itemsep}{0pt}
+      \setlength{\parskip}{0pt}
+      \item lista ilości neuronów w warstwach ukrytych -\\
+        \hspace*{1em}zawiera liczby z zakresu 2-1 048 577\\
+        \hspace*{1em}każdy element składa się z 20 bitów.
+      \item lista typów aktywacji w warstwach ukrytych -\\
+        \hspace*{1em}zawiera liczby: 0->relu, 1->tanh, 2->sigmoid\\
+        \hspace*{1em}każdy element składa się z 2 bitów.
+    \end{itemize}
+\end{itemize}
+Ważnym mechanizmem podczas czytania kodu genetycznego
+w celu utworzenia fenotypu są ziarna generatora.
 
+\noindent
+Jeżeli liczba warstw ukrytych z części binarnej,
+wynosiłoby więcej niż liczba elementów w listach,
+to należy uzupełnić listy ilości neuronów
+i typów aktywacji do danej liczby elementów do czego zostanie
+użyty generator z odpowiednim ziarnem.
+Następnie kod genetyczny zostanie uaktualniony o nowe elementy list.
+
+\noindent
+Jeżeli liczba warstw ukrytych jest mniejsza niż liczba elementów w listach,
+to nadmiarowe elementy zostaną zignorowane w fenotypie.
+
+\subsubsection{Selekcja}
+Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowania.
+
+\subsubsection{Krzyżowanie}
+Krzyżowanie będzie odbywało się różnie dla części binarnej
+i listowej kodu genetycznego.
+W przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
+gdzie losowo zostanie wybrany punkt podziału i
+części kodu genetycznego zostaną zamienione między dwoma rodzicami.
+W przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
+gdzie losowo są wybrane punkty podziału w obu listach.
+
+\subsubsection{Mutacja}
+
+\section{Implementacja}
+Implementacja zostanie wykonana w języku Python.
+
+% \begin{minted}[frame=single]{python3}
+%   gen=(
+%     '000000010000010010110001010100000010011001010000110010',
+%     [64,32,8,16,4],
+%     [0,1,0,2,1]
+%   )
+% \end{minted}
+% Powyższy kod genetyczny reprezentuje następujący fenotyp:
+% \begin{minted}[frame=single]{python3}
+%   # fenotyp=(
+%   #   ilość ukrytych warstw: 1-1024,
+%   #   ziarno generatora liczby neuronów: 0-1023,
+%   #   ziarno generatora typów aktywacji: 0-1023,
+%   #   optymalizator: 0->SGD, 1->Adam,
+%   #   wskaźnik uczenia się (learning rate): 1/2^13-1.0 [13bit],
+%   # ? wskaźnik uczenia się (learning rate): 1/2^13-0.5 [12bit],
+%   #   liczba epok: 1-1024,
+%   #   ilość neuronów w warstwach: lista[2-1 048 577],
+%   #   typy aktywacji w warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
+%   # )
+%   # gen=(
+%   #   '|0000000100|0001001011|0001010100|0|0001001100101|0000110001|',
+%   # #  |   4+1    |    75    |    84    |0|    613+1    |   49+1   |
+%   # #  |    5     |    75    |    84    |0|  614/2^13   |    50    |
+%   # #  |    5     |    75    |    84    |0| 0.074951172 |    50    |
+%   #   [64,32,8,16,4],
+%   #   [0,1,0,2,1]
+%   # )
+%   fenotyp=(
+%     5,
+%     75,
+%     84,
+%     0,
+%     0.074951172,
+%     50,
+%     [64, 32, 8, 16, 4],
+%     [0, 1, 0, 2, 1],
+%   )
+% \end{minted}
 \end{document}
