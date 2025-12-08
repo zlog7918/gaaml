@@ -250,7 +250,10 @@ Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
 pięciu sieci o parametrach i z parametrami wynikającymi
 z fenotypu osobnika.
 Obliczone dokładności na danych testowych zostaną uśrednione
-i przekształcone na przystosowanie.
+i przekształcone na przystosowanie za pomocą wzoru:
+$$
+\mbox{fit} = \frac{\mbox{dokładność}}{1 - \mbox{dokładność}} % TODO: change it
+$$
 
 \noindent\\
 Jeżeli użytkownik poda tylko dane treningowe i testowe, to:\\
@@ -258,14 +261,14 @@ Uczenie będzie odbywało się na tylko danych treningowych.
 Po zakończeniu uczenia zostanie obliczona dokładność na danych testowych.
 Zwrócona sieć będzie tą z ostatniej epoki uczenia.
 
-\noindent
+\noindent\\
 Jeżeli użytkownik poda dodatkowo dane walidacyjne, to:\\
 Uczenie będzie odbywało się na danych treningowych,
 a po każdej epoce będzie sprawdzana dokładność na danych walidacyjnych.
 Zwrócona sieć będzie tą z epoki,
-która dała najlepszą dokładność na danych walidacyjnych.z 
-Jeżeli dokładność ta będzie posiadała kilka epok mających
-taką samą wartość, to zostanie wybrana ta z najwcześniejszej epoki. % może lepsze z późniejszej?
+która dała najlepszą dokładność na danych walidacyjnych.
+Jeżeli dokładność ta będzie reprezentowana przez kilka epok,
+to zostanie wybrana ta z najwcześniejszej epoki. % może lepsze z najpóźniejszej?
 
 \section{Implementacja}
 Implementacja zostanie wykonana w języku Python.
