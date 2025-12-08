@@ -171,6 +171,8 @@ to nadmiarowe elementy zostaną zignorowane w fenotypie.
 
 \subsubsection{Selekcja}
 Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowania.
+W przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
+to zostanie użyta selekcja losowa.
 
 \subsubsection{Krzyżowanie}
 Krzyżowanie będzie odbywało się różnie dla części binarnej
@@ -240,7 +242,8 @@ jednego elementu listy jako 6 bitów):
 
 \subsubsection{Mutacja}
 Mutacja będzie odbywała się przez odwracanie losowych bitów.
-Bit do odwrócenia będzie wybierany z prawdopodobieństwem
+Decyzja o mutacji będzie podejmowana dla każdego bitu
+z osobna z ustalonym prawdopodobieństwem mutacji.
 
 \section{Implementacja}
 Implementacja zostanie wykonana w języku Python.
