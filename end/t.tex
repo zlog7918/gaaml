@@ -245,6 +245,28 @@ Mutacja będzie odbywała się przez odwracanie losowych bitów.
 Decyzja o mutacji będzie podejmowana dla każdego bitu
 z osobna z ustalonym prawdopodobieństwem mutacji.
 
+\subsubsection{Ocena przystosowania}
+Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
+pięciu sieci o parametrach i z parametrami wynikającymi
+z fenotypu osobnika.
+Obliczone dokładności na danych testowych zostaną uśrednione
+i przekształcone na przystosowanie.
+
+\noindent\\
+Jeżeli użytkownik poda tylko dane treningowe i testowe, to:\\
+Uczenie będzie odbywało się na tylko danych treningowych.
+Po zakończeniu uczenia zostanie obliczona dokładność na danych testowych.
+Zwrócona sieć będzie tą z ostatniej epoki uczenia.
+
+\noindent
+Jeżeli użytkownik poda dodatkowo dane walidacyjne, to:\\
+Uczenie będzie odbywało się na danych treningowych,
+a po każdej epoce będzie sprawdzana dokładność na danych walidacyjnych.
+Zwrócona sieć będzie tą z epoki,
+która dała najlepszą dokładność na danych walidacyjnych.z 
+Jeżeli dokładność ta będzie posiadała kilka epok mających
+taką samą wartość, to zostanie wybrana ta z najwcześniejszej epoki. % może lepsze z późniejszej?
+
 \section{Implementacja}
 Implementacja zostanie wykonana w języku Python.
 
