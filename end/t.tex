@@ -3,7 +3,19 @@
 \usepackage[T1]{fontenc}
 \usepackage[margin=1.5cm]{geometry}
 \usepackage{minted}
+\usepackage{natbib}
 \usepackage{graphicx}
+\usepackage[
+  % colorlinks=true,
+  % allcolors=black,
+  allbordercolors={0 0 0},
+  pdfborderstyle={/S/U/W 1},
+]{hyperref}
+
+\renewcommand{\contentsname}{Spis treści}
+\newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
+\renewcommand{\bibsection}{\section{Bibliografia}}
+\bibliographystyle{plain}
 
 \title{Praca inżynierska "Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych"}
 \author{Szymon Wasążnik\\325522}
@@ -11,6 +23,8 @@
 
 \begin{document}
 \maketitle
+\tableofcontents
+\newpage
 \section{Cel}
 Celem pracy jest opracowanie biblioteki w języku Python,
 która umożliwi automatyczne optyma\-lizowanie sieci neuronowej
@@ -183,8 +197,9 @@ części kodu genetycznego zostaną zamienione między dwoma rodzicami.
 
 \noindent\\
 W przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
-gdzie losowo są wybrane punkty podziału w obu listach.
-Natomiast o ile pierwszy punkt podziału jest wybierany z pełnego zakresu
+gdzie losowo są wybrane punkty podziału w obu listach\,\sscite{synapsing_varlen_crossover}.
+Natomiast jest on inny od opisanego w przypisie algorytmu,
+ponieważ o ile pierwszy punkt podziału jest wybierany z pełnego zakresu
 (biorąc pod uwagę wszystkie bity listy),
 to punkt podziału drugiej listy jest wybierany na podstawie
 wylosowanego elementu listy, by zachować spójność długości list.
@@ -312,4 +327,6 @@ Implementacja zostanie wykonana w języku Python.
 %     [0, 1, 0, 2, 1],
 %   )
 % \end{minted}
+
+\bibliography{references}
 \end{document}

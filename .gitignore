@@ -19,6 +19,10 @@ __pypackages__/
 # tex
 *.aux
 *.log
+*.bbl
+*.blg
+*.toc
+*.out
 *.pdf
 *.synctex.gz
 _minted-*/
