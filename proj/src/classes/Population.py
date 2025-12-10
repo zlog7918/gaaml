@@ -5,7 +5,7 @@ from . import utils as util
 class Population(t.Generic[util.IndividualType, util.CpType]):
   population: list[util.IndividualType]
   _get_cp: t.Callable[[util.IndividualType, util.IndividualType], util.CpType]
-  _crossover: t.Callable[[util.IndividualType, util.IndividualType, util.CpType], util.IndividualType]
+  _crossover: t.Callable[[util.IndividualType, util.IndividualType, util.CpType], tuple[util.IndividualType, util.IndividualType]]
   fitness: t.Callable[[util.IndividualType], float]
   fitnesses: list[float]
   cross_rate: float
@@ -14,7 +14,7 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
     self,
     pop_num: int,
     individual_gen: t.Callable[[], util.IndividualType],
-    crossover: t.Callable[[util.IndividualType, util.IndividualType, util.CpType], util.IndividualType],
+    crossover: t.Callable[[util.IndividualType, util.IndividualType, util.CpType], tuple[util.IndividualType, util.IndividualType]],
     crossover_point: t.Callable[[util.IndividualType, util.IndividualType], util.CpType],
     fitness: t.Callable[[util.IndividualType], float],
     cross_rate: float,
@@ -53,10 +53,7 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
   def crossover(self, parent1: util.IndividualType, parent2: util.IndividualType) -> tuple[util.IndividualType, util.IndividualType]:
     if rand.random()<self.cross_rate:
       cp=self._get_cp(parent1, parent2)
-      return (
-        self._crossover(parent1, parent2, cp),
-        self._crossover(parent2, parent1, cp),
-      )
+      return self._crossover(parent1, parent2, cp)
     return parent1, parent2
 
   def next_generation(self) -> None:
