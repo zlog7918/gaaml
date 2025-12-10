@@ -5,11 +5,12 @@ from . import utils as util
 from .Individual import Individual
 
 class GenIndividual(Individual[str]):
+  CPType=int
   @t.overload
   def __init__(self, num_gens: int, /): ...
   @t.overload
-  def __init__(self, a: GenIndividual, b: GenIndividual, /, cross_point: int): ...
-  def __init__(self, a: int|GenIndividual, b: GenIndividual|None=None, cross_point: int|None=None):
+  def __init__(self, a: GenIndividual, b: GenIndividual, /, cross_point: CPType): ...
+  def __init__(self, a: int|GenIndividual, b: GenIndividual|None=None, /, cross_point: CPType|None=None):
     if isinstance(a, int):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return
@@ -29,9 +30,9 @@ class GenIndividual(Individual[str]):
 
   _GI=t.TypeVar('_GI', bound=GenIndividual)
   @classmethod
-  def get_cp(cls: type[_GI], a: _GI, _: _GI) -> int:
+  def get_cp(cls: type[_GI], a: _GI, _: _GI) -> CPType:
     return rnd.randint(0, len(a.gen))
 
   @classmethod
-  def crossover(cls: type[_GI], a: _GI, b: _GI, cp: int) -> tuple[_GI, _GI]:
+  def crossover(cls: type[_GI], a: _GI, b: _GI, cp: CPType) -> tuple[_GI, _GI]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=cp))

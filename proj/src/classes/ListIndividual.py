@@ -5,12 +5,13 @@ from . import utils as util
 from .Individual import Individual
 
 class ListIndividual(Individual[str]):
+  CPType=tuple[int, int]
   item_size: int
   @t.overload
   def __init__(self, num_gens: int, item_size: int, /): ...
   @t.overload
-  def __init__(self, a: ListIndividual, b: ListIndividual, /, cross_point: tuple[int, int]): ...
-  def __init__(self, a: int|ListIndividual, b: int|ListIndividual, /, cross_point: tuple[int, int]|None=None):
+  def __init__(self, a: ListIndividual, b: ListIndividual, /, cross_point: CPType): ...
+  def __init__(self, a: int|ListIndividual, b: int|ListIndividual, /, cross_point: CPType|None=None):
     if isinstance(a, int) and isinstance(b, int):
 
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
@@ -33,7 +34,7 @@ class ListIndividual(Individual[str]):
 
   _VGI=t.TypeVar('_VGI', bound=ListIndividual)
   @classmethod
-  def get_cp(cls: type[_VGI], a: _VGI, b: _VGI) -> tuple[int, int]:
+  def get_cp(cls: type[_VGI], a: _VGI, b: _VGI) -> CPType:
     if a.item_size!=b.item_size:
       raise Exception('First and second solution do not have equal gen size')
     ia=rnd.randint(0, len(a.gen))
@@ -44,5 +45,5 @@ class ListIndividual(Individual[str]):
     return ia, ib
 
   @classmethod
-  def crossover(cls: type[_VGI], a: _VGI, b: _VGI, cp: tuple[int, int]) -> tuple[_VGI, _VGI]:
+  def crossover(cls: type[_VGI], a: _VGI, b: _VGI, cp: CPType) -> tuple[_VGI, _VGI]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=(cp[1], cp[0])))
