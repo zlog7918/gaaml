@@ -26,3 +26,12 @@ class GenIndividual(Individual[str]):
     # self.gen[i]=str(1-int(self.gen[i]))
     bit='0' if self.gen[i]=='1' else '1'
     self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
+
+  _GI=t.TypeVar('_GI', bound=GenIndividual)
+  @classmethod
+  def get_cp(cls: type[_GI], a: _GI, _: _GI) -> int:
+    return rnd.randint(0, len(a.gen))
+
+  @classmethod
+  def crossover(cls: type[_GI], a: _GI, b: _GI, cp: int) -> tuple[_GI, _GI]:
+    return (cls(a, b, cross_point=cp), cls(b, a, cross_point=cp))
