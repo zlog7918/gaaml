@@ -19,8 +19,14 @@ class MaxIntsIndividual(Individual[GenIndividual]):
     else:
       if b is None or cross_point is None:
         raise Exception('Illegal argument options')
+      if a.shema!=b.shema:
+        raise Exception('First and second solution do not have equal configuration')
       super().__init__(GenIndividual(a.gen, b.gen, cross_point=cross_point))
       self.shema=a.shema
+    self._update_fenotype()
+
+  def mutate(self) -> None:
+    self.gen.mutate()
     self._update_fenotype()
 
   def _update_fenotype(self) -> None:
@@ -33,10 +39,6 @@ class MaxIntsIndividual(Individual[GenIndividual]):
         max_v,
       )
       g_idx+=l
-
-  def mutate(self) -> None:
-    self.gen.mutate()
-    self._update_fenotype()
 
   _MII=t.TypeVar('_MII', bound=MaxIntsIndividual)
   @classmethod

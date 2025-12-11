@@ -18,25 +18,27 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
         raise Exception('Illegal argument options')
+      if a.shema!=b.shema:
+        raise Exception('First and second solution do not have equal configuration')
       super().__init__(ListIndividual(a.gen, b.gen, cross_point=cross_point))
       self.shema=a.shema
+    self._update_fenotype()
+
+  def mutate(self) -> None:
+    self.gen.mutate()
     self._update_fenotype()
 
   def _update_fenotype(self) -> None:
     self.fenotype: list[int]=[]
     l, min_v, max_v=self.shema
-    for i in range(0, len(self.gen.gen), l):
+    for idx in range(0, len(self.gen.gen), l):
       self.fenotype.append(
         util.correct_gen_to_min_max(
-          self.gen.gen[i:i+l],
+          self.gen.gen[idx:idx+l],
           min_v,
           max_v,
         )
       )
-
-  def mutate(self) -> None:
-    self.gen.mutate()
-    self._update_fenotype()
 
   _VGI=t.TypeVar('_VGI', bound=MaxIntsListIndividual)
   @classmethod
