@@ -30,6 +30,20 @@ def get_i_in_range(l: list[float], v: float) -> int:
   i=_center_of_range(p, k)
   return i
 
+def correct_gen_to_min_max(gen: str, min_v: int, max_v: int) -> int:
+  l=len(gen)
+  max_gen=int_to_bin(max_v-min_v, l)
+  correct_gens: t.Callable[[str, str], bool]=lambda g, max_g: int(g, base=2)<=int(max_g, base=2)
+  if not correct_gens(gen, max_gen):
+    for i, org_1gen, max_1gen in zip(range(l), gen, max_gen):
+      if org_1gen==max_1gen:
+        continue
+      # gen[i]='0'
+      gen=f'{gen[:i]}0{gen[i+1:]}'
+      if correct_gens(gen, max_gen):
+        break
+  return int(gen, base=2)+min_v
+
 def int_to_bin(value: int, length: int|None) -> str:
   b=bin(value)[2:]
   return b if length is None else b.zfill(length)
