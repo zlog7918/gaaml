@@ -8,12 +8,12 @@ class ListIndividual(Individual[str]):
   CPType=tuple[int, int]
   item_size: int
   @t.overload
-  def __init__(self, num_gens: int, item_size: int, /): ...
+  def __init__(self, num_items: int, item_size: int, /): ...
   @t.overload
   def __init__(self, a: ListIndividual, b: ListIndividual, /, cross_point: CPType): ...
   def __init__(self, a: int|ListIndividual, b: int|ListIndividual, /, cross_point: CPType|None=None):
     if isinstance(a, int) and isinstance(b, int):
-
+      a=a*b
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       self.item_size=b
       return
