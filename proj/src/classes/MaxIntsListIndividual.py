@@ -1,6 +1,5 @@
 from __future__ import annotations
 import typing as t
-import random as rnd
 from . import utils as util
 from .Individual import Individual
 from .ListIndividual import ListIndividual
@@ -9,10 +8,10 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
   GenShemaType=tuple[int, int, int]
   CPType=ListIndividual.CPType
   @t.overload
-  def __init__(self, num_gens: int, shema: GenShemaType, /): ...
+  def __init__(self, num_items: int, shema: GenShemaType, /): ...
   @t.overload
-  def __init__(self, a: MaxIntsListIndividual, b: MaxIntsListIndividual, /, cross_point: CPType): ...
-  def __init__(self, a: int|MaxIntsListIndividual, b: GenShemaType|MaxIntsListIndividual, /, cross_point: CPType|None=None):
+  def __init__(self, a: MaxIntsListIndividual, b: MaxIntsListIndividual, /, *, cross_point: CPType): ...
+  def __init__(self, a: int|MaxIntsListIndividual, b: GenShemaType|MaxIntsListIndividual, /, *, cross_point: CPType|None=None):
     if isinstance(a, int) and isinstance(b, tuple):
       self.shema=b
       super().__init__(ListIndividual(a, self.shema[0]))

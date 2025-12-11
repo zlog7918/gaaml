@@ -1,19 +1,18 @@
 from __future__ import annotations
 import typing as t
-import random as rnd
 from . import utils as util
 from .Individual import Individual
 from .GenIndividual import GenIndividual
 
 class MaxIntsIndividual(Individual[GenIndividual]):
-  GenShemaType=list[tuple[str, tuple[int, int, int]]]
+  GenShemaType=tuple[tuple[str, tuple[int, int, int]], ...]
   CPType=GenIndividual.CPType
   @t.overload
   def __init__(self, gen_shema: GenShemaType, /): ...
   @t.overload
-  def __init__(self, a: MaxIntsIndividual, b: MaxIntsIndividual, /, cross_point: CPType): ...
-  def __init__(self, a: GenShemaType|MaxIntsIndividual, b: MaxIntsIndividual|None=None, /, cross_point: CPType|None=None):
-    if isinstance(a, list):
+  def __init__(self, a: MaxIntsIndividual, b: MaxIntsIndividual, /, *, cross_point: CPType): ...
+  def __init__(self, a: GenShemaType|MaxIntsIndividual, b: MaxIntsIndividual|None=None, /, *, cross_point: CPType|None=None):
+    if isinstance(a, tuple):
       n=sum([l for _,(l,_,_) in a])
       super().__init__(GenIndividual(n))
       self.shema=a

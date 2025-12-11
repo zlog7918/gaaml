@@ -9,8 +9,8 @@ class GenIndividual(Individual[str]):
   @t.overload
   def __init__(self, num_gens: int, /): ...
   @t.overload
-  def __init__(self, a: GenIndividual, b: GenIndividual, /, cross_point: CPType): ...
-  def __init__(self, a: int|GenIndividual, b: GenIndividual|None=None, /, cross_point: CPType|None=None):
+  def __init__(self, a: GenIndividual, b: GenIndividual, /, *, cross_point: CPType): ...
+  def __init__(self, a: int|GenIndividual, b: GenIndividual|None=None, /, *, cross_point: CPType|None=None):
     if isinstance(a, int):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return
