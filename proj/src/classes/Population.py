@@ -1,13 +1,17 @@
 import typing as t
 import random as rand
 from . import _utils as util
+from . import _consts as const
+from concurrent.futures import ThreadPoolExecutor
 
 class Population(t.Generic[util.IndividualType, util.CpType]):
   population: list[util.IndividualType]
   _get_cp: t.Callable[[util.IndividualType, util.IndividualType], util.CpType]
   _crossover: t.Callable[[util.IndividualType, util.IndividualType, util.CpType], tuple[util.IndividualType, util.IndividualType]]
   fitness: t.Callable[[util.IndividualType], float]
+  _calc_fitnesses: t.Callable[[], None]
   fitnesses: list[float]
+  fitnesses_sum: float
   cross_rate: float
   mutate_rate: float
   def __init__(
@@ -19,6 +23,8 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
     fitness: t.Callable[[util.IndividualType], float],
     cross_rate: float,
     mutate_rate: float,
+    *,
+    max_worker_num: int=const.MAX_WORKERS
   ):
     super().__init__()
     self.population=[individual_gen() for _ in range(pop_num)]
@@ -27,10 +33,21 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
     self.fitness=fitness
     self.cross_rate=cross_rate
     self.mutate_rate=mutate_rate
+    self.max_worker_num=max_worker_num
+    self._calc_fitnesses=(
+      self._calc_fitnesses_multi
+        if self.max_worker_num>1 else
+      self._calc_fitnesses_seq
+    )
     self._calc_fitnesses()
 
-  def _calc_fitnesses(self) -> None:
-    # TODO: write multi-thread version of calc fitness func
+  def _calc_fitnesses_multi(self) -> None:
+    self.fitnesses=[]
+    with ThreadPoolExecutor(max_workers=self.max_worker_num) as executor:
+      future_fits=[executor.submit(self.fitness, ind) for ind in self.population]
+      self.fitnesses=[future.result() for future in future_fits]
+    self.fitnesses_sum=sum(self.fitnesses)
+  def _calc_fitnesses_seq(self) -> None:
     self.fitnesses=[self.fitness(ind) for ind in self.population]
     self.fitnesses_sum=sum(self.fitnesses)
 
