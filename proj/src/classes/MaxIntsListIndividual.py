@@ -1,6 +1,6 @@
 from __future__ import annotations
 import typing as t
-from . import utils as util
+from . import _utils as util
 from .Individual import Individual
 from .ListIndividual import ListIndividual
 

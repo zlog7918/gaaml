@@ -1,7 +1,7 @@
 from __future__ import annotations
 import typing as t
 import random as rnd
-from . import utils as util
+from . import _utils as util
 from .Individual import Individual
 
 class ListIndividual(Individual[str]):

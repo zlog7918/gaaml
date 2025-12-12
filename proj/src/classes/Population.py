@@ -1,6 +1,6 @@
 import typing as t
 import random as rand
-from . import utils as util
+from . import _utils as util
 
 class Population(t.Generic[util.IndividualType, util.CpType]):
   population: list[util.IndividualType]
