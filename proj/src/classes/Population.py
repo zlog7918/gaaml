@@ -30,6 +30,7 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
     self._calc_fitnesses()
 
   def _calc_fitnesses(self) -> None:
+    # TODO: write multi-thread version of calc fitness func
     self.fitnesses=[self.fitness(ind) for ind in self.population]
     self.fitnesses_sum=sum(self.fitnesses)
 

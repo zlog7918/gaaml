@@ -13,8 +13,8 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
   def __init__(self, a: MaxIntsListIndividual, b: MaxIntsListIndividual, /, *, cross_point: CPType): ...
   def __init__(self, a: int|MaxIntsListIndividual, b: GenShemaType|MaxIntsListIndividual, /, *, cross_point: CPType|None=None):
     if isinstance(a, int) and isinstance(b, tuple):
+      super().__init__(ListIndividual(a, b[0]))
       self.shema=b
-      super().__init__(ListIndividual(a, self.shema[0]))
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
         raise Exception('Illegal argument options')
