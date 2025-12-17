@@ -1,1 +1,1 @@
-from src.app import cr_app
+from .src.app import cr_network

@@ -1,4 +1,3 @@
-from __future__ import annotations
 import typing as t
 import random as rnd
 from . import _utils as util
@@ -10,8 +9,8 @@ class ListIndividual(Individual[str]):
   @t.overload
   def __init__(self, num_items: int, item_size: int, /): ...
   @t.overload
-  def __init__(self, a: ListIndividual, b: ListIndividual, /, *, cross_point: CPType): ...
-  def __init__(self, a: int|ListIndividual, b: int|ListIndividual, /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "ListIndividual", b: "ListIndividual", /, *, cross_point: CPType): ...
+  def __init__(self, a: "int|ListIndividual", b: "int|ListIndividual", /, *, cross_point: CPType|None=None):
     if isinstance(a, int) and isinstance(b, int):
       a=a*b
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
@@ -32,7 +31,7 @@ class ListIndividual(Individual[str]):
     bit='0' if self.gen[i]=='1' else '1'
     self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
-  _VGI=t.TypeVar('_VGI', bound=ListIndividual)
+  _VGI=t.TypeVar('_VGI', bound="ListIndividual")
   @classmethod
   def get_cp(cls: type[_VGI], a: _VGI, b: _VGI) -> CPType:
     if a.item_size!=b.item_size:

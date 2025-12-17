@@ -1,4 +1,3 @@
-from __future__ import annotations
 import typing as t
 from . import _utils as util
 from .Individual import Individual
@@ -10,8 +9,8 @@ class MaxIntsIndividual(Individual[GenIndividual]):
   @t.overload
   def __init__(self, gen_shema: GenShemaType, /): ...
   @t.overload
-  def __init__(self, a: MaxIntsIndividual, b: MaxIntsIndividual, /, *, cross_point: CPType): ...
-  def __init__(self, a: GenShemaType|MaxIntsIndividual, b: MaxIntsIndividual|None=None, /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "MaxIntsIndividual", b: "MaxIntsIndividual", /, *, cross_point: CPType): ...
+  def __init__(self, a: "GenShemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None):
     if isinstance(a, tuple):
       n=sum([l for _,(l,_,_) in a])
       super().__init__(GenIndividual(n))
@@ -40,7 +39,7 @@ class MaxIntsIndividual(Individual[GenIndividual]):
       )
       g_idx+=l
 
-  _MII=t.TypeVar('_MII', bound=MaxIntsIndividual)
+  _MII=t.TypeVar('_MII', bound="MaxIntsIndividual")
   @classmethod
   def get_cp(cls: type[_MII], a: _MII, b: _MII) -> CPType:
     return GenIndividual.get_cp(a.gen, b.gen)

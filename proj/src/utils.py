@@ -1,5 +1,5 @@
 import typing as t
-from .classes import utils as util
+from .classes import _utils as util
 from .classes.Population import Population
 
 def get_max_avg_min(pop: Population[util.IndividualType, util.CpType]) -> tuple[t.Optional[util.IndividualType], t.Optional[util.IndividualType], float, float, float]:
