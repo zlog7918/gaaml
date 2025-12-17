@@ -1,4 +1,3 @@
-from __future__ import annotations
 import typing as t
 import random as rnd
 from .Individual import Individual
@@ -18,15 +17,15 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
   @t.overload
   def __init__(
     self,
-    a: NetIndividual,
-    b: NetIndividual,
+    a: "NetIndividual",
+    b: "NetIndividual",
     /, *,
     cross_point: CPType
   ): ...
   def __init__(
     self,
-    a: tuple[str, tuple[int, int, int]]|NetIndividual,
-    b: GenShemaType|NetIndividual,
+    a: "tuple[str, tuple[int, int, int]]|NetIndividual",
+    b: "GenShemaType|NetIndividual",
     /, *,
     cross_point: CPType|None=None,
   ):
@@ -62,7 +61,7 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
     for i in rnd.sample(range(len(self.gen)), n):
       self.gen[i].mutate()
 
-  _NI=t.TypeVar('_NI', bound=NetIndividual)
+  _NI=t.TypeVar('_NI', bound="NetIndividual")
   @classmethod
   def get_cp(cls: type[_NI], a: _NI, b: _NI) -> CPType:
     ag, al, at=a.gen

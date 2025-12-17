@@ -6,13 +6,8 @@ NUM_OF_GENERATIONS=100
 # (name, (num_of_bits, min_v, max_v))
 BIN_PART_LIST_LEN=('layer_num', (7, 1, 128))
 BIN_PART_REST=(
-  ('neuron_num_seed', (10, 0, 1023)),
-  ('neuron_type_seed', (10, 0, 1023)),
-  ('optimizer', (1, 0, 1)),
-  ('learning_rate', (12, 1, 4096)),
-  # TODO: maybe this version [2^(-13) - 0.5] → [2^(-13) - 1.]
-  # ('learning_rate', (13, 1, 8192)),
-  ('epochs', (10, 1, 1024)),
+  ('x', (10, 1, 1000)),
+  ('y', (10, 1, 1000)),
 )
 
 # (num_of_elem_bits, min_v, max_v)
