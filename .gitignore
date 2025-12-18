@@ -25,4 +25,5 @@ __pypackages__/
 *.out
 *.pdf
 *.synctex.gz
+*.synctex(busy)
 _minted-*/
