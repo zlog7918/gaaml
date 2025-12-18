@@ -315,14 +315,22 @@ $
 Końcowa długość i postać kodu dzieci:\\
 $\displaystyle
   {\Delta p_r}=p_{r_1}-p_{r_2}\\
-  n_{c_1}=
+  n_{c_1}=\begin{cases}
     \frac{p_{r_1}+\left(n_{p_2}-p_{r_2}\right)}{e_s}=
-    \frac{n_{p_2}+\left(p_{r_1}-p_{r_2}\right)}{e_s}=
-    \frac{n_{p_2}+{\Delta p_r}}{e_s}\\
-  n_{c_2}=
+      \frac{n_{p_2}+\left(p_{r_1}-p_{r_2}\right)}{e_s}=
+      \frac{n_{p_2}+{\Delta p_r}}{e_s}
+        &, \frac{n_{p_2}+{\Delta p_r}}{e_s} \le e_s l_{\max}\\
+    l_{\max}
+      &, \frac{n_{p_2}+{\Delta p_r}}{e_s}>e_s l_{\max}\\
+  \end{cases}\\
+  n_{c_2}=\begin{cases}
     \frac{p_{r_2}+\left(n_{p_1}-p_{r_1}\right)}{e_s}=
-    \frac{n_{p_1}-\left(p_{r_1}-p_{r_2}\right)}{e_s}=
-    \frac{n_{p_1}-{\Delta p_r}}{e_s}\\
+      \frac{n_{p_1}-\left(p_{r_1}-p_{r_2}\right)}{e_s}=
+      \frac{n_{p_1}-{\Delta p_r}}{e_s}
+        &, \frac{n_{p_1}-{\Delta p_r}}{e_s} \le e_s l_{\max}\\
+    l_{\max}
+      &, \frac{n_{p_1}-{\Delta p_r}}{e_s}>e_s l_{\max}\\
+  \end{cases}\\
   c_1\left[i_{c_1}\right]=\begin{cases}
     p_1[i_{c_1}]
       &, i_{c_1} \le p_{r_1}\\
