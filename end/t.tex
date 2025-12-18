@@ -205,14 +205,44 @@ Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowani
 W przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
 to zostanie użyta selekcja losowa.
 
-\subsubsection{Krzyżowanie}
-Krzyżowanie będzie odbywało się różnie dla części binarnej
-i listowej kodu genetycznego.
+% Krzyżowanie będzie odbywało się różnie dla części binarnej
+% i listowej kodu genetycznego.
+\subsubsection{Krzyżowanie - część binarna}
 W przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
 gdzie losowo zostanie wybrany punkt podziału i
 części kodu genetycznego zostaną zamienione między dwoma rodzicami.
 
 \noindent\\
+Matematyczny opis krzyżowania, gdzie\\
+$n$ - długość genotypu (liczba bitów),\\
+$R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
+  na zbiorze $\mathbb{N} \cap \left[p, k\right]$,\\
+$r_1\left[i\right]$ i $r_2\left[i\right]$ -
+  rodzice 1 i 2 dla
+  $i \in \mathbb{N} \cap \left[1, n\right]$,\\
+$c_1\left[i\right]$ i $c_2\left[i\right]$ -
+  dzieci 1 i 2 dla
+  $i \in \mathbb{N} \cap \left[1, n\right]$:
+
+\noindent\\
+Wylosowanie punktu przecięcia i końcowa postać kodu dzieci:\\
+$\displaystyle
+  p_r=R\left(0, n\right)\\
+  c_1\left[i\right]=\begin{cases}
+    p_1[i]
+      &, i \le p_r\\
+    p_2[i]
+      &, i>p_r\\
+  \end{cases}\\
+  c_2\left[i\right]=\begin{cases}
+    p_2[i]
+      &, i \le p_r\\
+    p_1[i]
+      &, i>p_r\\
+  \end{cases}
+$
+
+\subsubsection{Krzyżowanie - część listowa}
 W przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
 gdzie losowo są wybrane punkty podziału w obu listach\,\sscite{synapsing_varlen_crossover}.
 Natomiast jest on inny od opisanego w przypisie algorytmu,
