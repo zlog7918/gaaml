@@ -230,51 +230,84 @@ poza decydowaniem konkretnego przecięcia, decyduje o tym czy
 i w którym punkcie nastąpi podział elementów w drugiej liście.
 
 \noindent\\
-Przykład krzyżowania listy ilości neuronów:
-\begin{minted}{text}
-  Rodzic 1: [3, 1, 2, 2, 0, 1]
-  Liczba elementów: 6
-  Postać binarna rodzica 1:
-    11 01 10 10 00 01
-  Rodzic 2: [2, 2, 1, 0, 2]
-  Liczba elementów: 5
-  Postać binarna rodzica 2:
-    10 10 01 00 10
+Matematyczny opis krzyżowania, gdzie\\
+$e_s$ - wielkość pojedyńczego elementu,\\
+$l_{\min}$ i $l_{\max}$ - minimalna i maksymalna liczba elementów,\\
+$R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
+  na zbiorze $\mathbb{N} \cap \left[p, k\right]$,\\
+$n_{r_1}$ i $n_{r_2}$ - liczba elementów dla rodzica 1 i 2,\\
+$r_1\left[i_{r_1}\right]$ i $r_2\left[i_{r_2}\right]$ -
+  rodzice 1 i 2 odpowiednio dla
+  $i_{r_1} \in \mathbb{N} \cap \left[1, e_s n_{r_1}\right]$
+  i $i_{r_2} \in \mathbb{N} \cap \left[1, e_s n_{r_2}\right]$,\\
+$n_{c_1}$ i $n_{c_2}$ - liczba elementów dla dziecka 1 i 2,\\
+$c_1\left[i_{c_1}\right]$ i $c_2\left[i_{c_2}\right]$ -
+  dzieci 1 i 2 odpowiednio dla
+  $i_{c_1} \in \mathbb{N} \cap \left[1, e_s n_{c_1}\right]$
+  i $i_{c_2} \in \mathbb{N} \cap \left[1, e_s n_{c_2}\right]$:
 
-  Losowanie punktu podziału rodzica 1 (z zakresu 0-12): 3
-  Pełnych elementów rodzica 1: 3/2=1.5 -> 1
-  Liczba bitów z następnego elementu rodzica 1: 3%2=1 -> 1
-  Długość zapewniona dla dziecka 1: 1+1=2 -> 2
-  Długość zapewniona dla dziecka 2: 6-1=5 -> 5
+\noindent\\
+Losowanie punktu przecięcia dla pierwszego rodzica i obliczenia dla niego:\\
+$\displaystyle
+  p_{r_1}=R\left(0, e_s n_{r_1}\right)\\
+  l_b=p_{r_1} \mod e_s\\
+  l_{p_b}=\begin{cases}
+    1 &, l_b>0\\
+    0 &, l_b=0
+  \end{cases}\\
+  l_{p_{c_1}}=\left\lfloor
+    \frac{p_{r_1}}{e_s}
+  \right\rfloor + l_{p_b}\\
+  l_{k_{c_2}}=n_{r_1}-\left\lfloor
+    \frac{p_{r_1}}{e_s}
+  \right\rfloor
+$
 
-  Losowanie punktu podziału rodzica 2
-    (z zakresu 0-4 lub 1-5 jeżeli liczba bitów rodzica 1, to 0): 3
-  Pełnych elementów rodzica 2: 3
-  Liczba bitów z następnego elementu rodzica 2: 1
+\noindent\\
+Przygotowanie do losowania i losowanie punktu przecięcia dla drugiego rodzica:\\
+$\displaystyle
+  p_r=\begin{cases}
+    0
+      &, l_{k_{c_2}} \ge l_{\min}\\
+    l_{\min}-l_{k_{c_2}}
+      &, l_{k_{c_2}}<l_{\min}\\
+  \end{cases}\\
+  k_r=\begin{cases}
+    n_{r_2}-l_{p_b}
+      &, l_{p_{c_1}} \ge l_{\min}\\
+    n_{r_2}-\left(l_{\min}-l_{p_{c_1}}+l_{p_b}\right)
+      &, l_{p_{c_1}}<l_{\min}\\
+  \end{cases}\\
+  p_{r_2}=R\left(p_r, k_r\right) + l_b
+$
 
-  Postać binarna rodzica 1 z podziałem:
-    11 0|1 10 10 00 01
-  Postać binarna rodzica 2 z podziałem:
-    001100 011001 110011 0|01010 010100
-
-  Dziecko 1:
-    Część od rodzica 1:
-      111111 011110 000010 001100 000100 1
-    Część od rodzica 2:
-                                          01010 010100
-    Postać binarna dziecka 1:
-      111111 011110 000010 001100 000100 101010 010100
-  Dziecko 2:
-    Część od rodzica 2:
-      001100 011001 110011 0
-    Część od rodzica 1:
-                            01100
-    Postać binarna dziecka 2:
-      001100 011001 110011 001100
-
-  Dziecko 1: [63, 30, 2, 12, 4, 42, 20]
-  Dziecko 2: [12, 25, 51, 12]
-\end{minted}
+\noindent\\
+Końcowa długość i postać kodu dzieci:\\
+$\displaystyle
+  {\Delta p_r}=p_{r_1}-p_{r_2}\\
+  n_{c_1}=
+    \frac{p_{r_1}+\left(n_{p_2}-p_{r_2}\right)}{e_s}=
+    \frac{n_{p_2}+\left(p_{r_1}-p_{r_2}\right)}{e_s}=
+    \frac{n_{p_2}+{\Delta p_r}}{e_s}\\
+  n_{c_2}=
+    \frac{p_{r_2}+\left(n_{p_1}-p_{r_1}\right)}{e_s}=
+    \frac{n_{p_1}-\left(p_{r_1}-p_{r_2}\right)}{e_s}=
+    \frac{n_{p_1}-{\Delta p_r}}{e_s}\\
+  c_1\left[i_{c_1}\right]=\begin{cases}
+    p_1[i_{c_1}]
+      &, i_{c_1} \le p_{r_1}\\
+    p_2[i_{c_1}-p_{r_1}+p_{r_2}]=
+      p_2[i_{c_1}-{\Delta p_r}]
+      &, i_{c_1}>p_{r_1}\\
+  \end{cases}\\
+  c_2\left[i_{c_2}\right]=\begin{cases}
+    p_2[i_{c_2}]
+      &, i_{c_2} \le p_{r_2}\\
+    p_1[i_{c_2}-p_{r_2}+p_{r_1}]=
+      p_1[i_{c_2}+{\Delta p_r}]
+      &, i_{c_2}>p_{r_2}\\
+  \end{cases}
+$
 
 \subsubsection{Mutacja}
 Mutacja będzie odbywała się przez odwracanie losowych bitów.
