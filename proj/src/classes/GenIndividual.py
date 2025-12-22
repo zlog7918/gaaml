@@ -15,8 +15,7 @@ class GenIndividual(Individual[str]):
       return
     if b is None or cross_point is None:
       raise Exception('Illegal argument options')
-    if len(a.gen)!=len(b.gen):
-      raise Exception('First and second solution are not equal in size')
+    a.__same_or_err(b)
     if cross_point<0 or cross_point>len(b.gen):
       raise Exception('Cross point is out side of solution')
     super().__init__(a.gen[:cross_point]+b.gen[cross_point:])
@@ -28,8 +27,13 @@ class GenIndividual(Individual[str]):
     self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
   _GI=t.TypeVar('_GI', bound="GenIndividual")
+  def __same_or_err(self: _GI, o: _GI) -> None:
+    if len(self.gen)!=len(o.gen):
+      raise Exception('First and second solution are not equal in size')
+
   @classmethod
-  def get_cp(cls: type[_GI], a: _GI, _: _GI) -> CPType:
+  def get_cp(cls: type[_GI], a: _GI, b: _GI) -> CPType:
+    a.__same_or_err(b)
     return rnd.randint(0, len(a.gen))
 
   @classmethod

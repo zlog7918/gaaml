@@ -4,14 +4,17 @@ from .Individual import Individual
 from .MaxIntsIndividual import MaxIntsIndividual
 from .MaxIntsListIndividual import MaxIntsListIndividual
 
+# TODO: modify to fit later code
+
 class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, MaxIntsListIndividual]]):
-  GenShemaType=tuple[MaxIntsIndividual.GenShemaType, MaxIntsListIndividual.GenShemaType, MaxIntsListIndividual.GenShemaType]
+  GenSchemaType=tuple[MaxIntsIndividual.GenSchemaType, MaxIntsListIndividual.GenSchemaType, MaxIntsListIndividual.GenSchemaType]
   CPType=tuple[MaxIntsIndividual.CPType, MaxIntsListIndividual.CPType, MaxIntsListIndividual.CPType]
+  layers_len: tuple[str, int, int]
   @t.overload
   def __init__(
     self,
     layers_len: tuple[str, tuple[int, int, int]],
-    gen_shema: GenShemaType,
+    gen_schema: GenSchemaType,
     /,
   ): ...
   @t.overload
@@ -25,23 +28,23 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
   def __init__(
     self,
     a: "tuple[str, tuple[int, int, int]]|NetIndividual",
-    b: "GenShemaType|NetIndividual",
+    b: "GenSchemaType|NetIndividual",
     /, *,
     cross_point: CPType|None=None,
   ):
     if isinstance(a, tuple) and isinstance(b, tuple):
-      layers_len_name, _=a
-      g_shema, l_shema, t_shema=b
-      names={name for name,_ in g_shema}
+      layers_len_name, (_, layers_len_min, layers_len_max)=a
+      g_schema, l_schema, t_schema=b
+      names={name for name,_ in g_schema}
       if layers_len_name in names:
         raise Exception('Item names must be unique')
-      if len(names)!=len(g_shema):
+      if len(names)!=len(g_schema):
         raise Exception('Item names must be unique')
-      g_shema=(a, *g_shema)
-      g=MaxIntsIndividual(g_shema)
+      g_schema=(a, *g_schema)
+      g=MaxIntsIndividual(g_schema)
       list_len=g.fenotype[layers_len_name]
-      l=MaxIntsListIndividual(list_len, l_shema)
-      t=MaxIntsListIndividual(list_len, t_shema)
+      l=MaxIntsListIndividual(list_len, l_schema)
+      t=MaxIntsListIndividual(list_len, t_schema)
       super().__init__((g, l, t))
       return
     if isinstance(a, tuple) or isinstance(b, tuple) or cross_point is None:

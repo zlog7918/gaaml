@@ -12,4 +12,7 @@ BIN_PART_REST=(
 
 # (num_of_elem_bits, min_v, max_v)
 NEURON_NUM=(20, 2, 1048577)
-NEURON_TYPE=(2, 0, 3)
+
+MIN_MAX_LEN=(2, 9)
+NEURON_TYPE=(6, 0, 63)
+# NEURON_TYPE=(2, 0, 3)
