@@ -3,7 +3,7 @@ import random as rnd
 from . import _utils as util
 from .Individual import Individual
 
-class GenIndividual(Individual[str]):
+class GenIndividual(Individual[bytearray]):
   CPType=int
   @t.overload
   def __init__(self, num_gens: int, /): ...
@@ -23,8 +23,9 @@ class GenIndividual(Individual[str]):
   def mutate(self) -> None:
     i=rnd.randint(0, len(self.gen)-1)
     # self.gen[i]=str(1-int(self.gen[i]))
-    bit='0' if self.gen[i]=='1' else '1'
-    self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
+    self.gen[i]=util.ord0 if self.gen[i]==util.ord1 else util.ord1
+    # bit='0' if self.gen[i]=='1' else '1'
+    # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
   _GI=t.TypeVar('_GI', bound="GenIndividual")
   def __same_or_err(self: _GI, o: _GI) -> None:

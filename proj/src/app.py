@@ -5,12 +5,12 @@ import random as rnd
 from . import utils as util
 from . import consts as const
 from .classes.Population import Population
-from .classes.MaxIntsListIndividual import MaxIntsListIndividual
+from .classes.MaxIntsIndividual import MaxIntsIndividual
 # import keras as krs
 # import tensorflow
 
-IndType=MaxIntsListIndividual
-RetType=MaxIntsListIndividual
+IndType=MaxIntsIndividual
+RetType=MaxIntsIndividual
 
 @t.overload
 def cr_network(
@@ -53,22 +53,22 @@ def cr_network(
   )
   del _validation_data, _test_data
 
-  def f(x: list[int]) -> float:
-    len_part=63-9*abs(len(x)-3)
-    x_part=sum(4-abs(el-6) for el in x)
-    return len_part+x_part
+  def f(x: float, y: float) -> float:
+    return (x-.6)**2+(y-.4)**2
   def fitness(net_ind: IndType) -> float:
     # TODO: write fitness func
     feno=net_ind.fenotype
-    ret=f(feno)+10
-    return ret if ret>0 else 0
+    x, y=feno['x'], feno['y']
+    x, y=x/1000, y/1000
+    f_ret=f(x, y)+.25 # >=.25
+    return 2/(math.log(f_ret)+2)
 
   pop=Population(
     population_size,
-    lambda: IndType(
-      rnd.randint(*const.MIN_MAX_LEN),
-      (const.MIN_MAX_LEN, const.NEURON_TYPE),
-    ),
+    lambda: IndType((
+      # const.BIN_PART_LIST_LEN,
+      *const.BIN_PART_REST,
+    )),
     IndType.crossover,
     IndType.get_cp,
     fitness,
