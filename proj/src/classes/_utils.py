@@ -6,6 +6,7 @@ ord0=ord('0')
 ord1=ord('1')
 IndividualType=t.TypeVar('IndividualType', bound=Individual)
 CpType=t.TypeVar('CpType')
+BitSize_Min_Max: t.TypeAlias=tuple[int, int, int]
 
 def _center_of_range(p: int, k: int) -> int:
   return int((k-p)/2)+p

@@ -1,19 +1,23 @@
 import typing as t
 import random as rnd
+from . import _utils as util
 from .Individual import Individual
 from .MaxIntsIndividual import MaxIntsIndividual
 from .MaxIntsListIndividual import MaxIntsListIndividual
 
-# TODO: modify to fit later code
-
 class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, MaxIntsListIndividual]]):
-  GenSchemaType=tuple[MaxIntsIndividual.GenSchemaType, MaxIntsListIndividual.GenSchemaType, MaxIntsListIndividual.GenSchemaType]
+  GenSchemaType=tuple[MaxIntsIndividual.GenSchemaType, util.BitSize_Min_Max, util.BitSize_Min_Max]
   CPType=tuple[MaxIntsIndividual.CPType, MaxIntsListIndividual.CPType, MaxIntsListIndividual.CPType]
-  layers_len: tuple[str, int, int]
+  layers_len_name: str
+  num_seed_name: str
+  type_seed_name: str
+  type_len_modifier: t.Callable[[int], int]=staticmethod(lambda x: x+2)
   @t.overload
   def __init__(
     self,
-    layers_len: tuple[str, tuple[int, int, int]],
+    layers_len: MaxIntsIndividual.EntryType,
+    num_seed: MaxIntsIndividual.EntryType,
+    type_seed: MaxIntsIndividual.EntryType,
     gen_schema: GenSchemaType,
     /,
   ): ...
@@ -27,25 +31,45 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
   ): ...
   def __init__(
     self,
-    a: "tuple[str, tuple[int, int, int]]|NetIndividual",
-    b: "GenSchemaType|NetIndividual",
+    a: "MaxIntsIndividual.EntryType|NetIndividual",
+    b: "MaxIntsIndividual.EntryType|NetIndividual",
+    type_seed: MaxIntsIndividual.EntryType|None=None,
+    gen_schema: GenSchemaType|None=None,
     /, *,
     cross_point: CPType|None=None,
   ):
-    if isinstance(a, tuple) and isinstance(b, tuple):
+    if (
+      isinstance(a, tuple)
+      and isinstance(b, tuple)
+      and type_seed is not None
+      and gen_schema is not None
+    ):
       layers_len_name, (_, layers_len_min, layers_len_max)=a
-      g_schema, l_schema, t_schema=b
+      g_schema, l_schema, t_schema=gen_schema
+      g_schema=(a, b, type_seed, *g_schema)
       names={name for name,_ in g_schema}
-      if layers_len_name in names:
-        raise Exception('Item names must be unique')
       if len(names)!=len(g_schema):
         raise Exception('Item names must be unique')
-      g_schema=(a, *g_schema)
       g=MaxIntsIndividual(g_schema)
       list_len=g.fenotype[layers_len_name]
-      l=MaxIntsListIndividual(list_len, l_schema)
-      t=MaxIntsListIndividual(list_len, t_schema)
+      l=MaxIntsListIndividual(
+        list_len,
+        ((
+          layers_len_min,
+          layers_len_max+1
+        ), l_schema)
+      )
+      t=MaxIntsListIndividual(
+        self.type_len_modifier(list_len),
+        ((
+          self.type_len_modifier(layers_len_min),
+          self.type_len_modifier(layers_len_max+1)
+        ), t_schema)
+      )
       super().__init__((g, l, t))
+      self.layers_len_name=layers_len_name
+      self.num_seed_name, _=b
+      self.type_seed_name, _=type_seed
       return
     if isinstance(a, tuple) or isinstance(b, tuple) or cross_point is None:
       raise Exception('Illegal argument options')
@@ -58,13 +82,57 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
     l=MaxIntsListIndividual(al, bl, cross_point=cl)
     t=MaxIntsListIndividual(at, bt, cross_point=ct)
     super().__init__((g, l, t))
+    self.layers_len_name=a.layers_len_name
+    self.num_seed_name=a.num_seed_name
+    self.type_seed_name=a.type_seed_name
+    self._update()
 
   def mutate(self) -> None:
-    n=rnd.randint(1, len(self.gen))
-    for i in rnd.sample(range(len(self.gen)), n):
+    n=len(self.gen)
+    sampled=rnd.sample(
+      range(n),
+      rnd.randint(1, n)
+    )
+    for i in sampled:
       self.gen[i].mutate()
+    if 0 in sampled:
+      self._update()
+
+  def _update(self) -> None:
+    g, l, t=self.gen
+    list_len=g.fenotype[self.layers_len_name]
+    to_add: list[tuple[MaxIntsListIndividual, int, int]]=[]
+    # for _list_len, _list_ind, name in zip(
+    #   (list_len, self.type_len_modifier(list_len)),
+    #   (l, t),
+    #   (self.num_seed_name, self.type_seed_name),
+    # ):
+    #   if _list_len<len(_list_ind.fenotype):
+    #     to_add.append((_list_ind, _list_len, g.fenotype[name]))
+    if list_len<len(l.fenotype):
+      to_add.append((l, list_len, g.fenotype[self.num_seed_name]))
+    list_len=self.type_len_modifier(list_len)
+    if list_len<len(t.fenotype):
+      to_add.append((t, list_len, g.fenotype[self.type_seed_name]))
+
+    for to_a_l, to_a_to_n, to_a_seed in to_add:
+      r=rnd.Random(to_a_seed)
+      nums=(
+          r.randint(*to_a_l.schema)
+        for _ in
+          range(to_a_to_n-len(to_a_l.fenotype))
+      )
+      to_a_l.fenotype.extend(nums)
 
   _NI=t.TypeVar('_NI', bound="NetIndividual")
+  def _same_or_err(self: _NI, o: _NI) -> None:
+    if self.layers_len_name!=o.layers_len_name:
+      raise Exception('First and second solution do not have same parameter name for: layers length')
+    if self.num_seed_name!=o.num_seed_name:
+      raise Exception('First and second solution do not have same parameter name for: layer size seed')
+    if self.type_seed_name!=o.type_seed_name:
+      raise Exception('First and second solution do not have same parameter name for: layer type seed')
+
   @classmethod
   def get_cp(cls: type[_NI], a: _NI, b: _NI) -> CPType:
     ag, al, at=a.gen

@@ -4,8 +4,8 @@ from .Individual import Individual
 from .ListIndividual import ListIndividual
 
 class MaxIntsListIndividual(Individual[ListIndividual]):
-  GenSchemaType=tuple[tuple[int, int], tuple[int, int, int]]
-  CPType=ListIndividual.CPType
+  GenSchemaType: t.TypeAlias=tuple[tuple[int, int], util.BitSize_Min_Max]
+  CPType: t.TypeAlias=ListIndividual.CPType
   @t.overload
   def __init__(self, num_items: int, schema: GenSchemaType, /): ...
   @t.overload
@@ -18,7 +18,7 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
         raise Exception('Illegal argument options')
-      a.__same_or_err(b)
+      a._same_or_err(b)
       super().__init__(ListIndividual(a.gen, b.gen, cross_point=cross_point))
       self.schema=a.schema
     self._update_fenotype()
@@ -40,13 +40,13 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
       )
 
   _MILI=t.TypeVar('_MILI', bound="MaxIntsListIndividual")
-  def __same_or_err(self: _MILI, o: _MILI) -> None:
+  def _same_or_err(self: _MILI, o: _MILI) -> None:
     if self.schema!=o.schema:
       raise Exception('First and second solution do not have equal configuration')
 
   @classmethod
   def get_cp(cls: type[_MILI], a: _MILI, b: _MILI) -> CPType:
-    a.__same_or_err(b)
+    a._same_or_err(b)
     return ListIndividual.get_cp(a.gen, b.gen)
 
   @classmethod
