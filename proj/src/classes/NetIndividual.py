@@ -91,12 +91,11 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
     n=len(self.gen)
     sampled=rnd.sample(
       range(n),
-      rnd.randint(1, n)
+      util.randint(1, n)
     )
     for i in sampled:
       self.gen[i].mutate()
-    if 0 in sampled:
-      self._update()
+    self._update()
 
   def _update(self) -> None:
     g, l, t=self.gen
@@ -109,18 +108,18 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
     # ):
     #   if _list_len<len(_list_ind.fenotype):
     #     to_add.append((_list_ind, _list_len, g.fenotype[name]))
-    if list_len<len(l.fenotype):
-      to_add.append((l, list_len, g.fenotype[self.num_seed_name]))
+    if len(l.fenotype)<list_len:
+      to_add.append((l, list_len-len(l.fenotype), g.fenotype[self.num_seed_name]))
     list_len=self.type_len_modifier(list_len)
-    if list_len<len(t.fenotype):
-      to_add.append((t, list_len, g.fenotype[self.type_seed_name]))
+    if len(t.fenotype)<list_len:
+      to_add.append((t, list_len-len(t.fenotype), g.fenotype[self.type_seed_name]))
 
-    for to_a_l, to_a_to_n, to_a_seed in to_add:
+    for to_a_l, to_a_n, to_a_seed in to_add:
       r=rnd.Random(to_a_seed)
       nums=(
           r.randint(*to_a_l.schema)
         for _ in
-          range(to_a_to_n-len(to_a_l.fenotype))
+          range(to_a_n)
       )
       to_a_l.fenotype.extend(nums)
 

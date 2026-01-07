@@ -28,21 +28,24 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
     self._update_fenotype()
 
   def _update_fenotype(self) -> None:
-    self.fenotype: list[int]=[]
-    min_v, max_v=self.schema
-    for idx in range(0, len(self.gen.gen), self.gen.item_size):
-      self.fenotype.append(
-        util.correct_gen_to_min_max(
-          self.gen.gen[idx:idx+self.gen.item_size],
-          min_v,
-          max_v,
-        )
-      )
+    self.fenotype: list[int]=self.get_fenotype(self.gen, *self.schema)
 
   _MILI=t.TypeVar('_MILI', bound="MaxIntsListIndividual")
   def _same_or_err(self: _MILI, o: _MILI) -> None:
     if self.schema!=o.schema:
       raise Exception('First and second solution do not have equal configuration')
+
+  @staticmethod
+  def get_fenotype(gen: ListIndividual, min_v: int, max_v: int) -> list[int]:
+    gen_len=len(gen.gen)
+    fenotype: list[int]=[0]*(gen_len//gen.item_size)
+    for i, idx in enumerate(range(0, gen_len, gen.item_size)):
+      fenotype[i]=util.correct_gen_to_min_max(
+        gen.gen[idx:idx+gen.item_size],
+        min_v,
+        max_v,
+      )
+    return fenotype
 
   @classmethod
   def get_cp(cls: type[_MILI], a: _MILI, b: _MILI) -> CPType:

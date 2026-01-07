@@ -11,7 +11,7 @@ IndType=NetIndividual
 RetType=NetIndividual
 
 def fitness(_f: t.Callable[[IndType], float], net_ind: IndType) -> float:
-  ret=1000-_f(net_ind)/8
+  ret=(1024000000-_f(net_ind)**2)/1024
   return ret if ret>0 else 0
 
 @t.overload
@@ -71,7 +71,10 @@ def cr_network(
     g, l, t=net_ind.gen
     x, y=g.fenotype['x'], g.fenotype['y']
     length=g.fenotype[const.BIN_PART_LIST_LEN[0]]
-    num_list, type_list=l.fenotype, t.fenotype
+    num_list, type_list=(
+      l.fenotype[:length],
+      t.fenotype[:net_ind.type_len_modifier(length)],
+    )
 
     _xy=(x-.6)**2+(y-.4)**2
     _len=abs(length-6)
