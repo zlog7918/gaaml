@@ -4,24 +4,24 @@ from .Individual import Individual
 from .GenIndividual import GenIndividual
 
 class MaxIntsIndividual(Individual[GenIndividual]):
-  GenShemaType=tuple[tuple[str, tuple[int, int, int]], ...]
-  CPType=GenIndividual.CPType
+  EntryType: t.TypeAlias=tuple[str, util.BitSize_Min_Max]
+  GenSchemaType: t.TypeAlias=tuple[EntryType, ...]
+  CPType: t.TypeAlias=GenIndividual.CPType
   @t.overload
-  def __init__(self, gen_shema: GenShemaType, /): ...
+  def __init__(self, gen_schema: GenSchemaType, /): ...
   @t.overload
   def __init__(self, a: "MaxIntsIndividual", b: "MaxIntsIndividual", /, *, cross_point: CPType): ...
-  def __init__(self, a: "GenShemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "GenSchemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None):
     if isinstance(a, tuple):
       n=sum([l for _,(l,_,_) in a])
       super().__init__(GenIndividual(n))
-      self.shema=a
+      self.schema=a
     else:
       if b is None or cross_point is None:
         raise Exception('Illegal argument options')
-      if a.shema!=b.shema:
-        raise Exception('First and second solution do not have equal configuration')
+      a._same_or_err(b)
       super().__init__(GenIndividual(a.gen, b.gen, cross_point=cross_point))
-      self.shema=a.shema
+      self.schema=a.schema
     self._update_fenotype()
 
   def mutate(self) -> None:
@@ -31,7 +31,7 @@ class MaxIntsIndividual(Individual[GenIndividual]):
   def _update_fenotype(self) -> None:
     self.fenotype: dict[str, int]={}
     g_idx=0
-    for g_name, (l, min_v, max_v) in self.shema:
+    for g_name, (l, min_v, max_v) in self.schema:
       self.fenotype[g_name]=util.correct_gen_to_min_max(
         self.gen.gen[g_idx:g_idx+l],
         min_v,
@@ -40,8 +40,13 @@ class MaxIntsIndividual(Individual[GenIndividual]):
       g_idx+=l
 
   _MII=t.TypeVar('_MII', bound="MaxIntsIndividual")
+  def _same_or_err(self: _MII, o: _MII) -> None:
+    if self.schema!=o.schema:
+      raise Exception('First and second solution do not have equal configuration')
+
   @classmethod
   def get_cp(cls: type[_MII], a: _MII, b: _MII) -> CPType:
+    a._same_or_err(b)
     return GenIndividual.get_cp(a.gen, b.gen)
 
   @classmethod

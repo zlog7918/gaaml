@@ -10,6 +10,10 @@ from .classes.NetIndividual import NetIndividual
 IndType=NetIndividual
 RetType=NetIndividual
 
+def fitness(_f: t.Callable[[IndType], float], net_ind: IndType) -> float:
+  ret=_f(net_ind)
+  return ret if ret>0 else 0
+
 @t.overload
 def cr_network(
   training_data: np.ndarray,
@@ -19,6 +23,10 @@ def cr_network(
   number_of_generations: int=...,
   cross_rate: float=...,
   mutation_rate: float=...,
+  fitness_func: t.Callable[[
+    t.Callable[[IndType], float],
+    IndType
+  ], float]=...,
   plot: bool=False,
 ) -> RetType: ...
 @t.overload
@@ -31,6 +39,10 @@ def cr_network(
   number_of_generations: int=...,
   cross_rate: float=...,
   mutation_rate: float=...,
+  fitness_func: t.Callable[[
+    t.Callable[[IndType], float],
+    IndType
+  ], float]=...,
   plot: bool=False,
 ) -> RetType: ...
 def cr_network(
@@ -42,26 +54,37 @@ def cr_network(
   number_of_generations: int=const.NUM_OF_GENERATIONS,
   cross_rate: float=const.CROSS_RATE,
   mutation_rate: float=const.MUTATE_RATE,
+  fitness_func: t.Callable[[
+    t.Callable[[IndType], float],
+    IndType
+  ], float]=fitness,
   plot: bool=False,
 ) -> RetType:
-  test_data, validation_data=(_validation_data, None) if _test_data is None else (_test_data, _validation_data)
+  test_data, validation_data=(
+    (_validation_data, None)
+      if _test_data is None else
+    (_test_data, _validation_data)
+  )
   del _validation_data, _test_data
-  def fitness(net_ind: IndType) -> float:
-    # TODO: write fitness func
+
+  def f(net_ind: IndType) -> float:
     return 0
 
   pop=Population(
     population_size,
     lambda: IndType(
-      const.BIN_PART_LIST_LEN, (
+      const.BIN_PART_LIST_LEN,
+      const.BIN_PART_NEURON_NUM_SEED,
+      const.BIN_PART_NEURON_TYPE_SEED,
+      (
         const.BIN_PART_REST,
         const.NEURON_NUM,
         const.NEURON_TYPE,
-      )
+      ),
     ),
     IndType.crossover,
     IndType.get_cp,
-    fitness,
+    lambda x: fitness_func(f, x),
     cross_rate,
     mutation_rate,
   )
@@ -91,15 +114,23 @@ def cr_network(
     raise Exception('number_of_generations: is too small')
 
   if plot:
+    if max_of_max!=0:
+      print('Maksymalna wartość:', max_of_max)
     import matplotlib.pyplot as plt
-    for i, (title, l) in enumerate(zip(('Max values', 'Avg values', 'Min values'), (maxs, avgs, mins))):
+    for i, (title, l) in enumerate(zip(
+      ('Max values', 'Avg values', 'Min values'),
+      (maxs, avgs, mins)
+    )):
       i+=1
       plt.figure(i)
       plt.plot(list(range(len(l))), l, marker='o', color='b', linestyle='-')
       plt.xlabel('x')
       plt.ylabel('y')
       plt.xlim((0, len(l)+1))
-      plt.ylim((0, max_of_max))
+      if max_of_max==0:
+        plt.ylim((0, .5))
+      else:
+        plt.ylim((0, max_of_max))
       plt.title(title)
       plt.show()
 
