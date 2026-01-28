@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[margin=1.5cm]{geometry}
+% \usepackage[margin=2.5cm]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{minted}
@@ -44,7 +45,7 @@ które mogą wpływać znacząco na końcowy wygląd sieci po uczeniu.
 
 \noindent\\
 Potrzeba ograniczenia ręcznego zmieniania parametrów i testowania,
-kieruje do automatyzacji tego procesu.
+kieruje do automa\-tyzacji tego procesu.
 Do tego zostanie wykorzystany algorytm genetyczny,
 ponieważ jest dobrze przystosowany
 do przeszukiwania dużych przestrzeni rozwiązań.
@@ -68,7 +69,7 @@ i walidacyjnych, i testowych.
 \section{Cele szczegółowe}
 Pierwszym kamieniem milowym jest opracowanie struktury
 kodu genetycznego umożliwiającego generowanie z nich,
-w spójny sposób, architektury sieci neuronowej oraz parametrów uczenia.
+w spójny sposób, architektury sieci neuronowej oraz para\-metrów uczenia.
 
 \noindent\\
 Kolejnym jest zawarcie w kodzie nauczania sieci neuronowych
@@ -88,22 +89,23 @@ Program powininen optymalizować architekturę sieci neuronowej wraz
 z jej parametrami uczenia dla~danych podanych przez użytkownika.
 Dane będą przyjmowane w postaci tabel pakietu \texttt{numpy}.
 
-\noindent
+\noindent\\
 Przez architekturę sieci, w niniejszym dokumencie, rozumie się liczbę warstw,
 liczbę neuronów w~każdej z warstw oraz funkcje aktywacji dla każdej z warstw.
 A przez parametry uczenia rozumie się rodzaj optymalizatora,
 wskaźnik uczenia się oraz liczbę epok.
 
-\noindent
-Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych przez użytkownika,
-za pomocą algorytmu genetycznego.
+\noindent\\
+Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych
+przez uży\-tkownika, za pomocą algorytmu genetycznego.
 Implementacja algorytmu genetycznego będzie obejmowała:
 osobni\-ków, selekcję, krzyżowanie i mutację.
 
-\noindent
+\noindent\\
 Każdy osobnik będzie przechowywał jednoznaczny kod genetyczny, to znaczy,
 że dany kod genetyczny za każdym razem doprowadzi do takiej samej architektury
 wraz z takimi samymi parametrami uczenia.
+
 
 \noindent\\
 Zostaną przeprowadzone eksperymenty, gdzie będzie spradzane
@@ -111,6 +113,17 @@ czy automatycznie dobrane sieci są lepszej lub takiej samej jakości
 jak te dobrane manualnie.
 Oraz zostaną określone domyślne parametry dla algorytmu genetycznego,
 które będą możliwie najkorzystniejsze dla optymalizacji architektur sieci neuronowych.
+
+\section{Ograniczenia}
+Program nie operuje na wszystkich typach sieci neuronowych,
+tworzy tylko sieci MLP, więc po użyciu stworzonego
+w niniejszej pracy programu, można dalej zoptymalizować sieć.
+Do jeszcze lepszego działania mogą się przyczynić:
+połączenia przechodzące na inne warstwy niż tylko następna w kolejności
+i/lub mniejsza ilość połączeń między neuronami (czyli gdy przestaną być w pełni połączone).
+
+\noindent\\
+Do optymalizacji wymagana jest duża ilość mocy obliczeniowej.
 
 \section{Wstęp teoretyczny}
 \subsection{Sieć neuronowa}
