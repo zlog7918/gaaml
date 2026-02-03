@@ -16,6 +16,7 @@
   pdfborderstyle={/S/U/W 1},
 ]{hyperref}
 
+\renewcommand{\abstractname}{Streszczenie}
 \renewcommand{\contentsname}{Spis treści}
 \newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
 \renewcommand{\bibsection}{\section{Bibliografia}}
@@ -28,8 +29,30 @@
 \begin{document}
 % \selectlanguage{polish}
 \maketitle
+\thispagestyle{empty}
+\vfil
+\begin{abstract}
+  \centering
+  % PL
+  \noindent
+  Niniejsza praca przedstawia rozumowanie stojące
+  za wykorzystywaniem algorytmów genetycznych
+  do optymalizacji sieci neuronowych, praktyczne ich wykorzystanie
+  oraz porównanie z manualnie wybranymi sieciami.
+
+  % EN
+  \vspace{1cm}
+  \noindent
+  This document shows reasoning in using genetic algorithm
+  for neural network optimalization purposes, their practical usage
+  and compartion to manualy chosen neural networks.
+\end{abstract}
+\vfil
+\newpage
+\thispagestyle{empty}
 \tableofcontents
 \newpage
+\setcounter{page}{1}
 \section{Motywacja}
 Dobór architektury sieci neuronowej i parametrów uczenia jest procesem,
 wymagającym doświadczenia.
