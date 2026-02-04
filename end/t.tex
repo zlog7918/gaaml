@@ -11,6 +11,7 @@
 
 \usepackage{lipsum}
 
+\usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage[
   % colorlinks=true,
@@ -25,6 +26,16 @@
 \renewcommand{\bibsection}{\section{Bibliografia}}
 \bibliographystyle{plain}
 
+\pagestyle{fancy}
+\setlength{\headheight}{14.5pt}
+% \setlength{\footheight}{14.5pt}
+\fancyhead{}
+\fancyhead[R]{Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{1pt}
+% \renewcommand{\footrulewidth}{0.1pt}
+
 \title{Praca inżynierska "Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych"}
 \author{Szymon Wasążnik\\325522}
 % \date{}
@@ -32,6 +43,7 @@
 \begin{document}
 % \selectlanguage{polish}
 \maketitle
+\setcounter{page}{-1}
 \thispagestyle{empty}
 \vfil
 \begin{abstract}
@@ -55,7 +67,6 @@
 \thispagestyle{empty}
 \tableofcontents
 \newpage
-\setcounter{page}{1}
 \section{Motywacja}
 Dobór architektury sieci neuronowej i parametrów uczenia jest procesem,
 wymagającym doświadczenia.
