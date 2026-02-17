@@ -1,4 +1,4 @@
-\section{Wstęp teoretyczny}
+\section{Podstawy teoretyczne}
 \subsection{Sieć neuronowa}
 Sieć neuronowa to model matematyczny inspirowany działaniem mózgu.
 Składa się z sztucznych neuronów (dalej nazywanych neuronami)
@@ -33,7 +33,7 @@ Ponieważ wejściowa warstwa musi być wielkości danych wejściowych,
 a warstwa wyjściowa - danych wyjściowych,
 to~algorytm musi zajmować się tylko warstwami ukrytymi.
 
-\subsection{Architektura sieci neuronowej}
+\subsubsection*{Architektura sieci neuronowej}
 Architektura sieci, w rozumieniu niniejszego dokumentu,
 to: liczba warstw ukrytych, liczba neuronów w każdej z warstw,
 i funkcja aktywacji każdej z warstw.
@@ -134,11 +134,11 @@ części kodu genetycznego zostaną zamienione między dwoma rodzicami.
 Matematyczny opis krzyżowania, gdzie\\
 $n$ - długość genotypu (liczba bitów),\\
 $R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
-  na zbiorze $\mathbb{N} \cap \left[p, k\right]$,\\
+  na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
 $r_1\left[i\right]$ i $r_2\left[i\right]$ -
   rodzice 1 i 2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$,\\
-$c_1\left[i\right]$ i $c_2\left[i\right]$ -
+$d_1\left[i\right]$ i $d_2\left[i\right]$ -
   dzieci 1 i 2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$:
 
@@ -146,16 +146,16 @@ $c_1\left[i\right]$ i $c_2\left[i\right]$ -
 Wylosowanie punktu przecięcia i końcowa postać kodu dzieci:\\
 $\displaystyle
   p_r=R\left(0, n\right)\\
-  c_1\left[i\right]=\begin{cases}
-    p_1[i]
+  d_1\left[i\right]=\begin{cases}
+    r_1[i]
       &, i \le p_r\\
-    p_2[i]
+    r_2[i]
       &, i>p_r\\
   \end{cases}\\
-  c_2\left[i\right]=\begin{cases}
-    p_2[i]
+  d_2\left[i\right]=\begin{cases}
+    r_2[i]
       &, i \le p_r\\
-    p_1[i]
+    r_1[i]
       &, i>p_r\\
   \end{cases}
 $
@@ -182,17 +182,17 @@ Matematyczny opis krzyżowania, gdzie\\
 $e_s$ - wielkość pojedyńczego elementu,\\
 $l_{\min}$ i $l_{\max}$ - minimalna i maksymalna liczba elementów,\\
 $R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
-  na zbiorze $\mathbb{N} \cap \left[p, k\right]$,\\
+  na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
 $n_{r_1}$ i $n_{r_2}$ - liczba elementów dla rodzica 1 i 2,\\
 $r_1\left[i_{r_1}\right]$ i $r_2\left[i_{r_2}\right]$ -
   rodzice 1 i 2 odpowiednio dla
   $i_{r_1} \in \mathbb{N} \cap \left[1, e_s n_{r_1}\right]$
   i $i_{r_2} \in \mathbb{N} \cap \left[1, e_s n_{r_2}\right]$,\\
-$n_{c_1}$ i $n_{c_2}$ - liczba elementów dla dziecka 1 i 2,\\
-$c_1\left[i_{c_1}\right]$ i $c_2\left[i_{c_2}\right]$ -
+$n_{d_1}$ i $n_{d_2}$ - liczba elementów dla dziecka 1 i 2,\\
+$d_1\left[i_{d_1}\right]$ i $d_2\left[i_{d_2}\right]$ -
   dzieci 1 i 2 odpowiednio dla
-  $i_{c_1} \in \mathbb{N} \cap \left[1, e_s n_{c_1}\right]$
-  i $i_{c_2} \in \mathbb{N} \cap \left[1, e_s n_{c_2}\right]$:
+  $i_{d_1} \in \mathbb{N} \cap \left[1, e_s n_{d_1}\right]$
+  i $i_{d_2} \in \mathbb{N} \cap \left[1, e_s n_{d_2}\right]$:
 
 \noindent\\
 Losowanie punktu przecięcia dla pierwszego rodzica i obliczenia dla niego:\\
@@ -203,10 +203,10 @@ $\displaystyle
     1 &, l_b>0\\
     0 &, l_b=0
   \end{cases}\\
-  l_{p_{c_1}}=\left\lfloor
+  l_{p_{d_1}}=\left\lfloor
     \frac{p_{r_1}}{e_s}
   \right\rfloor + l_{p_b}\\
-  l_{k_{c_2}}=n_{r_1}-\left\lfloor
+  l_{k_{d_2}}=n_{r_1}-\left\lfloor
     \frac{p_{r_1}}{e_s}
   \right\rfloor
 $
@@ -214,26 +214,26 @@ $
 \noindent\\
 Przygotowanie do losowania i losowanie punktu przecięcia dla drugiego rodzica:\\
 $\displaystyle
-  p_r=\begin{cases}
+  p_{r_{2_p}}=\begin{cases}
     0
-      &, l_{k_{c_2}} \ge l_{\min}\\
-    l_{\min}-l_{k_{c_2}}
-      &, l_{k_{c_2}}<l_{\min}\\
+      &, l_{k_{d_2}} \ge l_{\min}\\
+    l_{\min}-l_{k_{d_2}}
+      &, l_{k_{d_2}}<l_{\min}\\
   \end{cases}\\
-  k_r=\begin{cases}
+  p_{r_{2_k}}=\begin{cases}
     n_{r_2}-l_{p_b}
-      &, l_{p_{c_1}} \ge l_{\min}\\
-    n_{r_2}-\left(l_{\min}-l_{p_{c_1}}+l_{p_b}\right)
-      &, l_{p_{c_1}}<l_{\min}\\
+      &, l_{p_{d_1}} \ge l_{\min}\\
+    n_{r_2}-\left(l_{\min}-l_{p_{d_1}}+l_{p_b}\right)
+      &, l_{p_{d_1}}<l_{\min}\\
   \end{cases}\\
-  p_{r_2}=e_s R\left(p_r, k_r\right) + l_b
+  p_{r_2}=e_s R\left(p_{r_{2_p}}, p_{r_{2_k}}\right) + l_b
 $
 
 \noindent\\
 Końcowa długość i postać kodu dzieci:\\
 $\displaystyle
   {\Delta p_r}=p_{r_1}-p_{r_2}\\
-  n_{c_1}=\begin{cases}
+  n_{d_1}=\begin{cases}
     \frac{p_{r_1}+\left(e_s n_{p_2}-p_{r_2}\right)}{e_s}=
       n_{p_2}+\frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}=
       n_{p_2}+\frac{{\Delta p_r}}{e_s}
@@ -241,7 +241,7 @@ $\displaystyle
     l_{\max}
       &, n_{p_2}+\frac{{\Delta p_r}}{e_s}>l_{\max}\\
   \end{cases}\\
-  n_{c_2}=\begin{cases}
+  n_{d_2}=\begin{cases}
     \frac{p_{r_2}+\left(e_s n_{p_1}-p_{r_1}\right)}{e_s}=
       n_{p_1}-\frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}=
       n_{p_1}-\frac{{\Delta p_r}}{e_s}
@@ -249,19 +249,19 @@ $\displaystyle
     l_{\max}
       &, n_{p_1}-\frac{{\Delta p_r}}{e_s}>l_{\max}\\
   \end{cases}\\
-  c_1\left[i_{c_1}\right]=\begin{cases}
-    p_1[i_{c_1}]
-      &, i_{c_1} \le p_{r_1}\\
-    p_2[i_{c_1}-p_{r_1}+p_{r_2}]=
-      p_2[i_{c_1}-{\Delta p_r}]
-      &, i_{c_1}>p_{r_1}\\
+  d_1\left[i_{d_1}\right]=\begin{cases}
+    p_1[i_{d_1}]
+      &, i_{d_1} \le p_{r_1}\\
+    p_2[i_{d_1}-p_{r_1}+p_{r_2}]=
+      p_2[i_{d_1}-{\Delta p_r}]
+      &, i_{d_1}>p_{r_1}\\
   \end{cases}\\
-  c_2\left[i_{c_2}\right]=\begin{cases}
-    p_2[i_{c_2}]
-      &, i_{c_2} \le p_{r_2}\\
-    p_1[i_{c_2}-p_{r_2}+p_{r_1}]=
-      p_1[i_{c_2}+{\Delta p_r}]
-      &, i_{c_2}>p_{r_2}\\
+  d_2\left[i_{d_2}\right]=\begin{cases}
+    p_2[i_{d_2}]
+      &, i_{d_2} \le p_{r_2}\\
+    p_1[i_{d_2}-p_{r_2}+p_{r_1}]=
+      p_1[i_{d_2}+{\Delta p_r}]
+      &, i_{d_2}>p_{r_2}\\
   \end{cases}
 $
 
