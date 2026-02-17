@@ -46,8 +46,8 @@ class ListIndividual(Individual[bytearray]):
       # bit='0' if self.gen[i]=='1' else '1'
       # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
-  _VGI=t.TypeVar('_VGI', bound="ListIndividual")
-  def _same_or_err(self: _VGI, o: _VGI) -> None:
+  _LI=t.TypeVar('_LI', bound="ListIndividual")
+  def _same_or_err(self: _LI, o: _LI) -> None:
     if self.item_size!=o.item_size:
       raise TypeError('First and second solution do not have equal gen size')
     if self.max_bit_len!=o.max_bit_len:
@@ -56,7 +56,7 @@ class ListIndividual(Individual[bytearray]):
       raise TypeError('First and second solution do not have equal min list size')
 
   @classmethod
-  def get_cp(cls: type[_VGI], a: _VGI, b: _VGI) -> CPType:
+  def get_cp(cls: type[_LI], a: _LI, b: _LI) -> CPType:
     a._same_or_err(b)
     l_min, es=a.min_elem_len, a.item_size
     la=len(a.gen)
@@ -74,5 +74,5 @@ class ListIndividual(Individual[bytearray]):
     return ira, irb
 
   @classmethod
-  def crossover(cls: type[_VGI], a: _VGI, b: _VGI, cp: CPType) -> tuple[_VGI, _VGI]:
+  def crossover(cls: type[_LI], a: _LI, b: _LI, cp: CPType) -> tuple[_LI, _LI]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=(cp[1], cp[0])))
