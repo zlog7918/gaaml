@@ -23,7 +23,7 @@
 \renewcommand{\abstractname}{Streszczenie}
 \renewcommand{\contentsname}{Spis treści}
 \newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
-\renewcommand{\bibsection}{\section{Bibliografia}}
+\renewcommand{\bibsection}{\section*{Bibliografia}\addcontentsline{toc}{section}{Bibliografia}}
 \bibliographystyle{plain}
 
 \pagestyle{fancy}
@@ -69,8 +69,10 @@
 \thispagestyle{empty}
 \tableofcontents
 \newpage
-\input{sections/introduction_oryg.tex}
+\input{sections/01_introduction_oryg.tex}
 
-\input{sections/theory_oryg.tex}
+\input{sections/02_prev_solutions_oryg.tex}
+
+\input{sections/03_theory_oryg.tex}
 \bibliography{references}
 \end{document}
