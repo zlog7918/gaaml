@@ -86,3 +86,21 @@ class Population(t.Generic[util.IndividualType, util.CpType]):
 
     self.population=new_generation[:pop_len]
     self._calc_fitnesses()
+
+  def get_max_avg_min(self) -> tuple[util.IndividualType|None, util.IndividualType|None, float, float, float]:
+    n=len(self.population)
+    _min=float('inf')
+    _max=-1
+    _sum=0
+
+    max_sol: util.IndividualType|None=None
+    min_sol: util.IndividualType|None=None
+    for fit, sol in zip(self.fitnesses, self.population):
+      if fit>_max:
+        max_sol=sol
+        _max=fit
+      if fit<_min:
+        min_sol=sol
+        _min=fit
+      _sum+=fit
+    return max_sol, min_sol, _max, _sum/n, _min
