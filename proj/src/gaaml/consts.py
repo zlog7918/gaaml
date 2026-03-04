@@ -8,8 +8,8 @@ BIN_PART_LIST_LEN=('layer_num', (7, 1, 128))
 BIN_PART_NEURON_NUM_SEED=('neuron_num_seed', (10, 0, 1023))
 BIN_PART_NEURON_TYPE_SEED=('neuron_type_seed', (10, 0, 1023))
 BIN_PART_REST=(
-  ('neuron_num_seed', (10, 0, 1023)),
-  ('neuron_type_seed', (10, 0, 1023)),
+  # ('neuron_num_seed', (10, 0, 1023)),
+  # ('neuron_type_seed', (10, 0, 1023)),
   ('optimizer', (1, 0, 1)),
   ('learning_rate', (12, 1, 4096)),
   # TODO: maybe this version [2^(-13) - 0.5] → [2^(-13) - 1.]

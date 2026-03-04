@@ -1,0 +1,25 @@
+[project]
+name = "gaaml"
+version = "0.1.0"
+description = "Genetic Algorithm-based AutoML"
+authors = [{ name="Szymon Wasążnik", email="zlog@zlog.pl" }]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "tensorflow"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+# [tool.pytest.ini_options]
+# pythonpath = ["src"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+gaaml = ["py.typed"]

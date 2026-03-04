@@ -67,9 +67,13 @@ def cr_network(
   )
   del _validation_data, _test_data
 
-  def f(net_ind: IndType) -> float:
-    return 0
-
+  def _f(training_data: np.ndarray, validation_data: np.ndarray|None, test_data: np.ndarray) -> t.Callable[[IndType], float]:
+    def f(net_ind: IndType) -> float:
+      params, layer_sizes, layer_types=net_ind.gen
+      params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
+      return 0
+    return f
+  f=_f(training_data, validation_data, test_data)
   pop=Population(
     population_size,
     lambda: IndType(
