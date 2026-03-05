@@ -12,6 +12,9 @@ __pycache__/
 # library files
 *.egg-info/
 
+# pytest files
+.coverage
+
 # pip
 pip-log.txt
 pip-delete-this-directory.txt
