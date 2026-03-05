@@ -68,7 +68,7 @@ def test_int_to_bin() -> None:
   assert len(ret)==length
   assert ret==expected
 
-def test_correct_gen_to_min_max() -> None:
+def test_correct_gen_to_min_max1() -> None:
   """
   gen: 1 1 1 0 1 (29d)
   max_v=27
@@ -81,7 +81,7 @@ def test_correct_gen_to_min_max() -> None:
   ret=21+5=26
   """
   # values
-  gen=bytearray('1 0 1 1 1'.replace(' ', '').encode())
+  gen=bytearray('1 1 1 0 1'.replace(' ', '').encode())
 
   max_val=27
   min_val=5
@@ -91,6 +91,58 @@ def test_correct_gen_to_min_max() -> None:
 
   # results
   expected=int(bytearray('1 0 1 0 1'.replace(' ', '').encode()), 2)+min_val
+  assert isinstance(ret, int)
+  assert ret==expected
+
+def test_correct_gen_to_min_max2() -> None:
+  """
+  gen: 1 0 1 1 1 (23d)
+  max_v=27
+  min_v=5
+
+  max: 1 0 1 1 0 (22d)
+  min: 0 0 0 0 0 (0d)
+
+  ret: 1 0 1 1 0 (22d)
+  ret=22+5=27
+  """
+  # values
+  gen=bytearray('1 0 1 1 1'.replace(' ', '').encode())
+
+  max_val=27
+  min_val=5
+
+  # test
+  ret=util.correct_gen_to_min_max(gen, min_val, max_val)
+
+  # results
+  expected=int(bytearray('1 0 1 1 0'.replace(' ', '').encode()), 2)+min_val
+  assert isinstance(ret, int)
+  assert ret==expected
+
+def test_correct_gen_to_min_max3() -> None:
+  """
+  gen: 1 1 0 1 1 (27d)
+  max_v=26
+  min_v=5
+
+  max: 1 0 1 0 1 (21d)
+  min: 0 0 0 0 0 (0d)
+
+  ret: 1 0 0 1 1 (19d)
+  ret=19+5=24
+  """
+  # values
+  gen=bytearray('1 1 0 1 1'.replace(' ', '').encode())
+
+  max_val=26
+  min_val=5
+
+  # test
+  ret=util.correct_gen_to_min_max(gen, min_val, max_val)
+
+  # results
+  expected=int(bytearray('1 0 0 1 1'.replace(' ', '').encode()), 2)+min_val
   assert isinstance(ret, int)
   assert ret==expected
 
