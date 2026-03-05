@@ -14,10 +14,10 @@ class GenIndividual(Individual[bytearray]):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return
     if b is None or cross_point is None:
-      raise Exception('Illegal argument options')
+      raise ValueError('Illegal argument options')
     a._same_or_err(b)
     if cross_point<0 or cross_point>len(b.gen):
-      raise Exception('Cross point is out side of solution')
+      raise ValueError('Cross point is out side of solution')
     super().__init__(a.gen[:cross_point]+b.gen[cross_point:])
 
   def mutate(self) -> None:
@@ -30,7 +30,7 @@ class GenIndividual(Individual[bytearray]):
   _GI=t.TypeVar('_GI', bound="GenIndividual")
   def _same_or_err(self: _GI, o: _GI) -> None:
     if len(self.gen)!=len(o.gen):
-      raise Exception('First and second solution are not equal in size')
+      raise ValueError('First and second solution are not equal in size')
 
   @classmethod
   def get_cp(cls: type[_GI], a: _GI, b: _GI) -> CPType:
