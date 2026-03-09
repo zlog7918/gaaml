@@ -104,10 +104,10 @@ def test_error_outside_range_on_crossover() -> None:
   gi2=GI(input_len)
   with pytest.raises(ValueError) as excinfo:
     _=GI.crossover(gi1, gi2, -1)
-  assert str(excinfo.value)=='Cross point is out side of solution'
+  assert str(excinfo.value)=='Cross point is outside of solution'
   with pytest.raises(ValueError) as excinfo:
     _=GI.crossover(gi1, gi2, 6)
-  assert str(excinfo.value)=='Cross point is out side of solution'
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
 def test_error_outside_range_on_create() -> None:
   input_len=5
@@ -115,10 +115,10 @@ def test_error_outside_range_on_create() -> None:
   gi2=GI(input_len)
   with pytest.raises(ValueError) as excinfo:
     _=GI(gi1, gi2, cross_point=-1)
-  assert str(excinfo.value)=='Cross point is out side of solution'
+  assert str(excinfo.value)=='Cross point is outside of solution'
   with pytest.raises(ValueError) as excinfo:
     _=GI(gi1, gi2, cross_point=6)
-  assert str(excinfo.value)=='Cross point is out side of solution'
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
 def test_error_illegal_argument_on_create() -> None:
   input_len=5
