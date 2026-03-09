@@ -19,7 +19,8 @@ def get_i_in_range(l: list[float], v: float) -> int:
   # In: l=[.3, .4, .6, .8, .9, .999] and v=1
   # Out: i=5
   p: int=0
-  k: int=len(l)-1
+  n: int=len(l)
+  k: int=n-1
   i: int
   while(p<k):
     i=_center_of_range(p, k)
@@ -31,6 +32,8 @@ def get_i_in_range(l: list[float], v: float) -> int:
       continue
     break
   i=_center_of_range(p, k)
+  if l[i]==v and i!=n-1:
+    i+=1
   return i
 
 def correct_gen_to_min_max(gen: bytearray, min_v: int, max_v: int) -> int:
