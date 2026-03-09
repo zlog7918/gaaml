@@ -17,7 +17,7 @@ class GenIndividual(Individual[bytearray]):
       raise ValueError('Illegal argument options')
     a._same_or_err(b)
     if cross_point<0 or cross_point>len(b.gen):
-      raise ValueError('Cross point is out side of solution')
+      raise ValueError('Cross point is outside of solution')
     super().__init__(a.gen[:cross_point]+b.gen[cross_point:])
 
   def mutate(self) -> None:
