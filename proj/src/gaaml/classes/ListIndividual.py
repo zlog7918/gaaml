@@ -25,14 +25,14 @@ class ListIndividual(Individual[bytearray]):
       self.item_size=it_size
       return
     if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
-      raise TypeError('Illegal argument options')
+      raise ValueError('Illegal argument options')
     a._same_or_err(b)
     if any(
       cp<0 or cp>len(gen)
         for gen, cp in
       zip((a.gen, b.gen), cross_point)
     ):
-      raise ValueError('Cross point is out side of solution')
+      raise ValueError('Cross point is outside of solution')
     super().__init__((a.gen[:cross_point[0]]+b.gen[cross_point[1]:])[:a.max_bit_len])
     self.item_size=a.item_size
     self.max_bit_len=a.max_bit_len
@@ -49,11 +49,11 @@ class ListIndividual(Individual[bytearray]):
   _LI=t.TypeVar('_LI', bound="ListIndividual")
   def _same_or_err(self: _LI, o: _LI) -> None:
     if self.item_size!=o.item_size:
-      raise TypeError('First and second solution do not have equal gen size')
+      raise ValueError('First and second solution do not have equal gen size')
     if self.max_bit_len!=o.max_bit_len:
-      raise TypeError('First and second solution do not have equal max list size')
+      raise ValueError('First and second solution do not have equal max list size')
     if self.min_elem_len!=o.min_elem_len:
-      raise TypeError('First and second solution do not have equal min list size')
+      raise ValueError('First and second solution do not have equal min list size')
 
   @classmethod
   def get_cp(cls: type[_LI], a: _LI, b: _LI) -> CPType:
