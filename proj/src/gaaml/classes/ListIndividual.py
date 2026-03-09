@@ -33,6 +33,10 @@ class ListIndividual(Individual[bytearray]):
       zip((a.gen, b.gen), cross_point)
     ):
       raise ValueError('Cross point is outside of solution')
+    if cross_point[0]%a.item_size!=cross_point[1]%a.item_size:
+      raise ValueError('Cross points\' offsets are not equal')
+    if (cross_point[0]+len(b.gen)-cross_point[1])<a.min_elem_len*a.item_size:
+      raise ValueError('Solution too short')
     super().__init__((a.gen[:cross_point[0]]+b.gen[cross_point[1]:])[:a.max_bit_len])
     self.item_size=a.item_size
     self.max_bit_len=a.max_bit_len
