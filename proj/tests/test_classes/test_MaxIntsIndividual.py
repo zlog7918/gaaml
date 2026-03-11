@@ -44,9 +44,9 @@ def test_mutate() -> None:
     ('x', (x_bit, x_min, x_max)),
     ('y', (y_bit, y_min, y_max)),
   )
+  mii=MII(schema)
 
   for i in range(1, 50): # random process
-    mii=MII(schema)
     oryg_gen=mii.gen.gen[:]
 
     # test
@@ -221,6 +221,50 @@ def test_update_fenotype() -> None:
     assert oryg_fenotype1==oryg_fenotype2
     assert oryg_fenotype2!=mii.fenotype
     assert mii.fenotype==expected
+
+def test_get_fenotype() -> None:
+  """
+  x: 2, 1, 4
+  x: 3, 0, 5
+         x     y
+  bits: 1 0  1 1 0
+
+  expected:
+  x=2, y=6
+  fenotype: {
+    x: 2+1=3
+    y: 6+0>5 -> 6->4 -> 4+0=4
+  }
+  """
+  # values
+  x_bit=2
+  y_bit=3
+  schema=(
+    ('x', (x_bit, 1, 4)),
+    ('y', (y_bit, 0, 5)),
+  )
+  mii=MII(schema)
+
+  for b_str, expected in (
+    ('1 0  1 1 0', {'x': 3, 'y': 4}),
+    ('0 0  1 1 0', {'x': 1, 'y': 4}),
+    ('0 1  1 1 0', {'x': 2, 'y': 4}),
+    ('1 1  1 1 0', {'x': 4, 'y': 4}),
+    ('1 0  1 1 1', {'x': 3, 'y': 5}),
+    ('1 0  0 0 0', {'x': 3, 'y': 0}),
+    ('1 0  0 0 1', {'x': 3, 'y': 1}),
+    ('1 0  0 1 0', {'x': 3, 'y': 2}),
+    ('1 0  0 1 1', {'x': 3, 'y': 3}),
+    ('1 0  1 0 0', {'x': 3, 'y': 4}),
+    ('1 0  1 0 1', {'x': 3, 'y': 5}),
+  ):
+    mii.gen.gen=bytearray(b_str.replace(' ', '').encode())
+
+    # test
+    fenotype=MII.get_fenotype(mii.gen, mii.schema)
+
+    # results
+    assert fenotype==expected
 
 def test_error_name_collition_on_create() -> None:
   # values
