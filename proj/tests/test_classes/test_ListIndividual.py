@@ -429,7 +429,7 @@ def test_error_not_same_max_list_on_create() -> None:
   # results
   assert str(excinfo.value)=='First and second solution do not have equal max list size'
 
-def test_error_too_short_on_create() -> None:
+def test_error_too_short_on_create_from_two() -> None:
   # values
   input_len1=2
   input_len2=3
