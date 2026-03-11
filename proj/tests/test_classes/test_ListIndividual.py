@@ -9,12 +9,13 @@ def test_create() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
 
-  # test
-  li=LI(input_len, schema)
+  for i in range(1, 50): # random process
+    # test
+    li=LI(input_len, schema)
 
-  # results
-  assert isinstance(li.gen, bytearray)
-  assert len(li.gen)==input_len*item_size
+    # results
+    assert isinstance(li.gen, bytearray)
+    assert len(li.gen)==input_len*item_size
 
 def test_mutate() -> None:
   # values
@@ -23,14 +24,16 @@ def test_mutate() -> None:
   min_list_size=1
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
-  li=LI(input_len, schema)
-  oryg_gen=li.gen[:]
 
-  # test
-  li.mutate()
+  for i in range(1, 50): # random process
+    li=LI(input_len, schema)
+    oryg_gen=li.gen[:]
 
-  # results
-  assert li.gen!=oryg_gen
+    # test
+    li.mutate()
+
+    # results
+    assert li.gen!=oryg_gen
 
 def test_get_cp() -> None:
   # values
@@ -584,6 +587,7 @@ def test_error_offset_on_crossover() -> None:
     assert str(excinfo.value)=='Cross points\' offsets are not equal'
 
 def test_error_illegal_argument_on_create() -> None:
+  # values
   input_len1=2
   input_len2=3
   item_size=3
@@ -592,6 +596,7 @@ def test_error_illegal_argument_on_create() -> None:
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
   li2=LI(input_len2, schema)
+
   for args, kwargs in (
     ((li1, schema), {'cross_point': (1, 1)}),
     ((input_len1, li2), {'cross_point': (1, 1)}),
@@ -602,6 +607,9 @@ def test_error_illegal_argument_on_create() -> None:
     ((input_len1, li2), {}),
     ((input_len1, li2), {'cross_point': None}),
   ):
+    # test
     with pytest.raises(ValueError) as excinfo:
       _=LI(*args, **kwargs) # type: ignore
+
+    # results
     assert str(excinfo.value)=='Illegal argument options'
