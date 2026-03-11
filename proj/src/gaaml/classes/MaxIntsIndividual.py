@@ -7,13 +7,17 @@ class MaxIntsIndividual(Individual[GenIndividual]):
   EntryType: t.TypeAlias=tuple[str, util.BitSize_Min_Max]
   GenSchemaType: t.TypeAlias=tuple[EntryType, ...]
   CPType: t.TypeAlias=GenIndividual.CPType
+  schema: GenSchemaType
   @t.overload
   def __init__(self, gen_schema: GenSchemaType, /): ...
   @t.overload
   def __init__(self, a: "MaxIntsIndividual", b: "MaxIntsIndividual", /, *, cross_point: CPType): ...
   def __init__(self, a: "GenSchemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None):
     if isinstance(a, tuple):
-      n=sum([l for _,(l,_,_) in a])
+      n=sum(l for _,(l,_,_) in a)
+      names=tuple(n for n,(_,_,_) in a)
+      if len({n for n in names})!=len(names):
+        raise ValueError('Names can not collide')
       super().__init__(GenIndividual(n))
       self.schema=a
     else:
