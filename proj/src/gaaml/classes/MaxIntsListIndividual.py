@@ -17,7 +17,7 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
       self.schema=_max, _min
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
-        raise Exception('Illegal argument options')
+        raise ValueError('Illegal argument options')
       a._same_or_err(b)
       super().__init__(ListIndividual(a.gen, b.gen, cross_point=cross_point))
       self.schema=a.schema
@@ -33,7 +33,7 @@ class MaxIntsListIndividual(Individual[ListIndividual]):
   _MILI=t.TypeVar('_MILI', bound="MaxIntsListIndividual")
   def _same_or_err(self: _MILI, o: _MILI) -> None:
     if self.schema!=o.schema:
-      raise Exception('First and second solution do not have equal configuration')
+      raise ValueError('First and second solution do not have equal configuration')
 
   @staticmethod
   def get_fenotype(gen: ListIndividual, min_v: int, max_v: int) -> list[int]:
