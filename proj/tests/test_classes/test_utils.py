@@ -42,13 +42,14 @@ def test_randint() -> None:
   p=2
   k=5
 
-  # test
-  ret=util.randint(p, k)
+  for _ in range(50): # random
+    # test
+    ret=util.randint(p, k)
 
-  # results
-  assert isinstance(ret, int)
-  assert p<=ret
-  assert ret<=k
+    # results
+    assert isinstance(ret, int)
+    assert p<=ret
+    assert ret<=k
 
 def test_int_to_bin() -> None:
   """
