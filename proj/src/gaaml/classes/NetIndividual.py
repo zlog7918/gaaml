@@ -53,15 +53,15 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
         list_len,
         ((
           layers_len_min,
-          layers_len_max+1
-        ), l_schema)
+          layers_len_max+1,
+        ), l_schema),
       )
       t=MaxIntsListIndividual(
         self.type_len_modifier(list_len),
         ((
           self.type_len_modifier(layers_len_min),
-          self.type_len_modifier(layers_len_max+1)
-        ), t_schema)
+          self.type_len_modifier(layers_len_max+1),
+        ), t_schema),
       )
       super().__init__((g, l, t))
       self.layers_len_name=layers_len_name
@@ -98,18 +98,15 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
     g, l, t=self.gen
     list_len=g.fenotype[self.layers_len_name]
     to_add: list[tuple[MaxIntsListIndividual, int, int]]=[]
-    # for _list_len, _list_ind, name in zip(
-    #   (list_len, self.type_len_modifier(list_len)),
-    #   (l, t),
-    #   (self.num_seed_name, self.type_seed_name),
-    # ):
-    #   if _list_len<len(_list_ind.fenotype):
-    #     to_add.append((_list_ind, _list_len, g.fenotype[name]))
     if len(l.fenotype)<list_len:
       to_add.append((l, list_len-len(l.fenotype), g.fenotype[self.num_seed_name]))
+    else:
+      l.fenotype=l.fenotype[:list_len]
     list_len=self.type_len_modifier(list_len)
     if len(t.fenotype)<list_len:
       to_add.append((t, list_len-len(t.fenotype), g.fenotype[self.type_seed_name]))
+    else:
+      t.fenotype=t.fenotype[:list_len]
 
     for to_a_l, to_a_n, to_a_seed in to_add:
       r=rnd.Random(to_a_seed)
@@ -121,14 +118,6 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
       to_a_l.fenotype.extend(nums)
 
   _NI=t.TypeVar('_NI', bound="NetIndividual")
-  def _same_or_err(self: _NI, o: _NI) -> None:
-    if self.layers_len_name!=o.layers_len_name:
-      raise Exception('First and second solution do not have same parameter name for: layers length')
-    if self.num_seed_name!=o.num_seed_name:
-      raise Exception('First and second solution do not have same parameter name for: layer size seed')
-    if self.type_seed_name!=o.type_seed_name:
-      raise Exception('First and second solution do not have same parameter name for: layer type seed')
-
   @classmethod
   def get_cp(cls: type[_NI], a: _NI, b: _NI) -> CPType:
     ag, al, at=a.gen
