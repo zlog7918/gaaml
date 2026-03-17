@@ -23,7 +23,7 @@ class MaxIntsIndividual(Individual[GenIndividual]):
     else:
       if b is None or cross_point is None:
         raise ValueError('Illegal argument options')
-      a._same_or_err(b)
+      a.__same_or_err(b)
       super().__init__(GenIndividual(a.gen, b.gen, cross_point=cross_point))
       self.schema=a.schema
     self._update_fenotype()
@@ -49,13 +49,13 @@ class MaxIntsIndividual(Individual[GenIndividual]):
     return fenotype
 
   _MII=t.TypeVar('_MII', bound="MaxIntsIndividual")
-  def _same_or_err(self: _MII, o: _MII) -> None:
+  def __same_or_err(self: _MII, o: _MII) -> None:
     if self.schema!=o.schema:
       raise ValueError('First and second solution do not have equal configuration')
 
   @classmethod
   def get_cp(cls: type[_MII], a: _MII, b: _MII) -> CPType:
-    a._same_or_err(b)
+    a.__same_or_err(b)
     return GenIndividual.get_cp(a.gen, b.gen)
 
   @classmethod
