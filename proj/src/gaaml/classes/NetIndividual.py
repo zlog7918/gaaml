@@ -47,9 +47,6 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
       layers_len_name, (_, layers_len_min, layers_len_max)=a
       g_schema, l_schema, t_schema=gen_schema
       g_schema=(a, b, type_seed, *g_schema)
-      names={name for name,_ in g_schema}
-      if len(names)!=len(g_schema):
-        raise Exception('Item names must be unique')
       g=MaxIntsIndividual(g_schema)
       list_len=g.fenotype[layers_len_name]
       l=MaxIntsListIndividual(
@@ -72,7 +69,7 @@ class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, M
       self.type_seed_name, _=type_seed
       return
     if isinstance(a, tuple) or isinstance(b, tuple) or cross_point is None:
-      raise Exception('Illegal argument options')
+      raise ValueError('Illegal argument options')
     (
       (ag, al, at),
       (bg, bl, bt),
