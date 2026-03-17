@@ -33,15 +33,20 @@ class MaxIntsIndividual(Individual[GenIndividual]):
     self._update_fenotype()
 
   def _update_fenotype(self) -> None:
-    self.fenotype: dict[str, int]={}
+    self.fenotype: dict[str, int]=self.get_fenotype(self.gen, self.schema)
+
+  @staticmethod
+  def get_fenotype(gen: GenIndividual, schema: GenSchemaType) -> dict[str, int]:
+    fenotype: dict[str, int]={}
     g_idx=0
-    for g_name, (l, min_v, max_v) in self.schema:
-      self.fenotype[g_name]=util.correct_gen_to_min_max(
-        self.gen.gen[g_idx:g_idx+l],
+    for g_name, (l, min_v, max_v) in schema:
+      fenotype[g_name]=util.correct_gen_to_min_max(
+        gen.gen[g_idx:g_idx+l],
         min_v,
         max_v,
       )
       g_idx+=l
+    return fenotype
 
   _MII=t.TypeVar('_MII', bound="MaxIntsIndividual")
   def _same_or_err(self: _MII, o: _MII) -> None:
