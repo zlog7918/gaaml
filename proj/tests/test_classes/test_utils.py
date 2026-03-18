@@ -146,27 +146,3 @@ def test_correct_gen_to_min_max3() -> None:
   expected=int(bytearray('1 0 0 1 1'.replace(' ', '').encode()), 2)+min_val
   assert isinstance(ret, int)
   assert ret==expected
-
-# def test_error_not_same_type_on_get_cp() -> None:
-#   input_len1=5
-#   input_len2=6
-#   gi1=GI(input_len1)
-#   gi2=GI(input_len2)
-#   with pytest.raises(ValueError) as excinfo:
-#     _=GI.get_cp(gi1, gi2)
-#   assert str(excinfo.value)=='First and second solution are not equal in size'
-
-# def test_error_illegal_argument_on_create() -> None:
-#   input_len=5
-#   gi1=GI(input_len)
-#   gi2=GI(input_len)
-#   for args, kwargs in (
-#     ((gi1, None), {'cross_point': 2}),
-#     ((gi1, gi2), {}),
-#     ((gi1, gi2), {'cross_point': None}),
-#     ((gi1, None), {}),
-#     ((gi1, None), {'cross_point': None}),
-#   ):
-#     with pytest.raises(ValueError) as excinfo:
-#       _=GI(*args, **kwargs) # type: ignore
-#     assert str(excinfo.value)=='Illegal argument options'
