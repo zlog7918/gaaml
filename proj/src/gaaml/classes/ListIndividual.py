@@ -3,9 +3,9 @@ import random as rnd
 from . import _utils as util
 from .Individual import Individual
 
-class ListIndividual(Individual[bytearray]):
+CPType: t.TypeAlias=tuple[int, int]
+class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   GenSchemaType: t.TypeAlias=tuple[tuple[int, int], int]
-  CPType: t.TypeAlias=tuple[int, int]
   item_size: int
   min_elem_len: int
   max_bit_len: int

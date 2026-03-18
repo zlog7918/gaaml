@@ -222,13 +222,13 @@ def test_create_from_two() -> None:
   n_schema=3, 2, 7
   t_schema=2, 0, 3
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni1.gen[0].gen.gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
-  ni1.gen[1].gen.gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen.gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
+  ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
+  ni1.gen[2].gen._gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni2.gen[0].gen.gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
-  ni2.gen[1].gen.gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen.gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
+  ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
+  ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
+  ni2.gen[2].gen._gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
   len_name, _=layers_len
   num_seed_name, _=num_seed
   type_seed_name, _=type_seed
@@ -308,13 +308,13 @@ def test_crossover() -> None:
   n_schema=3, 2, 7
   t_schema=2, 0, 3
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni1.gen[0].gen.gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
-  ni1.gen[1].gen.gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen.gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
+  ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
+  ni1.gen[2].gen._gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni2.gen[0].gen.gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
-  ni2.gen[1].gen.gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen.gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
+  ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
+  ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
+  ni2.gen[2].gen._gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
   len_name, (len_bit, len_min, len_max)=layers_len
 
   num_seed_name, (num_seed_bit, num_seed_min, num_seed_max)=num_seed
@@ -455,7 +455,7 @@ def test_update_fenotype() -> None:
     ),
   ):
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen.gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
 
     oryg_fenotype0={k: v for k,v in ni.gen[0].fenotype.items()}
@@ -1110,7 +1110,7 @@ def test_error_too_short_on_create_from_two() -> None:
     ),
   ):
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen.gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
     ni._update()
 
@@ -1176,7 +1176,7 @@ def test_error_too_short_on_crossover() -> None:
     ),
   ):
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen.gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
     ni._update()
 

@@ -3,13 +3,14 @@ import random as rnd
 from . import _utils as util
 from .Individual import Individual
 
-class GenIndividual(Individual[bytearray]):
-  CPType: t.TypeAlias=int
+CPType: t.TypeAlias=int
+class GenIndividual(Individual["GenIndividual", CPType, bytearray]):
+  _GI=t.TypeVar('_GI', bound="GenIndividual")
   @t.overload
   def __init__(self, num_gens: int, /) -> None: ...
   @t.overload
-  def __init__(self, a: "GenIndividual", b: "GenIndividual", /, *, cross_point: CPType) -> None: ...
-  def __init__(self, a: "int|GenIndividual", b: "GenIndividual|None"=None, /, *, cross_point: CPType|None=None) -> None:
+  def __init__(self: _GI, a: _GI, b: _GI, /, *, cross_point: CPType) -> None: ...
+  def __init__(self: _GI, a: int|_GI, b: _GI|None=None, /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return
@@ -27,7 +28,6 @@ class GenIndividual(Individual[bytearray]):
     # bit='0' if self.gen[i]=='1' else '1'
     # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
-  _GI=t.TypeVar('_GI', bound="GenIndividual")
   def __same_or_err(self: _GI, o: _GI) -> None:
     if len(self.gen)!=len(o.gen):
       raise ValueError('First and second solution are not equal in size')

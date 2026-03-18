@@ -1,12 +1,14 @@
 import typing as t
 from . import _utils as util
 from .Individual import Individual
-from .GenIndividual import GenIndividual
+from .GenIndividual import (
+  CPType,
+  GenIndividual,
+)
 
-class MaxIntsIndividual(Individual[GenIndividual]):
+class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
   EntryType: t.TypeAlias=tuple[str, util.BitSize_Min_Max]
   GenSchemaType: t.TypeAlias=tuple[EntryType, ...]
-  CPType: t.TypeAlias=GenIndividual.CPType
   schema: GenSchemaType
   @t.overload
   def __init__(self, gen_schema: GenSchemaType, /): ...

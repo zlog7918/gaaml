@@ -110,8 +110,8 @@ def test_create_from_two() -> None:
   mii1=MII(schema)
   mii2=MII(schema)
   expected_len=x_bit+y_bit
-  mii1.gen.gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
-  mii2.gen.gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
+  mii1.gen._gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
+  mii2.gen._gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
 
   for cp, expected_str in zip(range(expected_len+1), (
     '1 1  1 0 1',
@@ -153,8 +153,8 @@ def test_crossover() -> None:
   mii1=MII(schema)
   mii2=MII(schema)
   expected_len=x_bit+y_bit
-  mii1.gen.gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
-  mii2.gen.gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
+  mii1.gen._gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
+  mii2.gen._gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
 
   for cp, (expected_str1, expected_str2) in zip(range(expected_len+1), (
     ('1 1  1 0 1', '1 0  0 1 0'),
@@ -194,7 +194,7 @@ def test_update_fenotype() -> None:
     ('y', (y_bit, 0, 5)),
   )
   mii=MII(schema)
-  mii.gen.gen=bytearray('0 0  0 0 0'.replace(' ', '').encode())
+  mii.gen._gen=bytearray('0 0  0 0 0'.replace(' ', '').encode())
   mii._update_fenotype()
 
   for b_str, expected in (
@@ -211,7 +211,7 @@ def test_update_fenotype() -> None:
     ('1 0  1 0 1', {'x': 3, 'y': 5}),
   ):
     oryg_fenotype1={k: v for k,v in mii.fenotype.items()}
-    mii.gen.gen=bytearray(b_str.replace(' ', '').encode())
+    mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
     oryg_fenotype2={k: v for k,v in mii.fenotype.items()}
 
     # test
@@ -258,7 +258,7 @@ def test_get_fenotype() -> None:
     ('1 0  1 0 0', {'x': 3, 'y': 4}),
     ('1 0  1 0 1', {'x': 3, 'y': 5}),
   ):
-    mii.gen.gen=bytearray(b_str.replace(' ', '').encode())
+    mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
 
     # test
     fenotype=MII.get_fenotype(mii.gen, mii.schema)

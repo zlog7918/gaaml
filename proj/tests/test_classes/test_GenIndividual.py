@@ -53,9 +53,9 @@ def test_create_from_two() -> None:
   # values
   input_len=5
   gi1=GI(input_len)
-  gi1.gen=bytearray('01100'.encode())
+  gi1._gen=bytearray('01100'.encode())
   gi2=GI(input_len)
-  gi2.gen=bytearray('10001'.encode())
+  gi2._gen=bytearray('10001'.encode())
 
   for cp, expected_str in zip(
     range(input_len+1),
@@ -81,9 +81,9 @@ def test_crossover() -> None:
   # values
   input_len=5
   gi1=GI(input_len)
-  gi1.gen=bytearray('01100'.encode())
+  gi1._gen=bytearray('01100'.encode())
   gi2=GI(input_len)
-  gi2.gen=bytearray('10001'.encode())
+  gi2._gen=bytearray('10001'.encode())
 
   for cp, expected_strs in zip(
     range(input_len+1),

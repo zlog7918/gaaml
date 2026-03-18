@@ -2,12 +2,18 @@ import typing as t
 import random as rnd
 from . import _utils as util
 from .Individual import Individual
-from .MaxIntsIndividual import MaxIntsIndividual
-from .MaxIntsListIndividual import MaxIntsListIndividual
+from .MaxIntsIndividual import (
+  MaxIntsIndividual,
+  CPType as MII_CPType,
+)
+from .MaxIntsListIndividual import (
+  MaxIntsListIndividual,
+  CPType as MILI_CPType,
+)
 
-class NetIndividual(Individual[tuple[MaxIntsIndividual, MaxIntsListIndividual, MaxIntsListIndividual]]):
+CPType: t.TypeAlias=tuple[MII_CPType, MILI_CPType, MILI_CPType]
+class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual, MaxIntsListIndividual, MaxIntsListIndividual]]):
   GenSchemaType: t.TypeAlias=tuple[MaxIntsIndividual.GenSchemaType, util.BitSize_Min_Max, util.BitSize_Min_Max]
-  CPType: t.TypeAlias=tuple[MaxIntsIndividual.CPType, MaxIntsListIndividual.CPType, MaxIntsListIndividual.CPType]
   layers_len_name: str
   num_seed_name: str
   type_seed_name: str

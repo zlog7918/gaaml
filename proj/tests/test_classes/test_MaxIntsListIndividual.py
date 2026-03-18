@@ -109,9 +109,9 @@ def test_create_from_two() -> None:
     (item_size, min_elem_val, max_elem_val),
   )
   mili1=MILI(input_len1, schema)
-  mili1.gen.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  mili1.gen._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   mili2=MILI(input_len2, schema)
-  mili2.gen.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  mili2.gen._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, expected_str, expected_arr in (
     ((4, 7), '0 1 1  1 0 1', [4, 6]),
@@ -152,9 +152,9 @@ def test_create_from_two_too_long() -> None:
     (item_size, min_elem_val, max_elem_val),
   )
   mili1=MILI(input_len1, schema)
-  mili1.gen.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  mili1.gen._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   mili2=MILI(input_len2, schema)
-  mili2.gen.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  mili2.gen._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, expected_str, expected_arr in (
     ((4, 1), '0 1 1  1 1 0  0 1 0', [4, 5, 3]), # '0 1 1  1 1 0  0 1 0  0 0 1'
@@ -192,9 +192,9 @@ def test_crossover() -> None:
     (item_size, min_elem_val, max_elem_val),
   )
   mili1=MILI(input_len1, schema)
-  mili1.gen.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  mili1.gen._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   mili2=MILI(input_len2, schema)
-  mili2.gen.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  mili2.gen._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, (expected_str1, expected_str2), (expected_arr1, expected_arr2) in (
     ((4, 7), ('0 1 1  1 0 1', '1 1 0  0 1 0  0 1 1'), ([4, 6], [5, 3, 4])),
@@ -239,9 +239,9 @@ def test_crossover_too_long() -> None:
     (item_size, min_elem_val, max_elem_val),
   )
   mili1=MILI(input_len1, schema)
-  mili1.gen.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  mili1.gen._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   mili2=MILI(input_len2, schema)
-  mili2.gen.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  mili2.gen._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, (expected_str1, expected_str2), (expected_arr1, expected_arr2) in (
     ((4, 1), ('0 1 1  1 1 0  0 1 0', '1 1 1'), ([4, 5, 3], [6])), # ('0 1 1  1 1 0  0 1 0  0 0 1', '1 1 1')
@@ -290,7 +290,7 @@ def test_get_fenotype() -> None:
     ('0 0 1  1 0 0  1 0 1', [2, 5, 6]),
     ('0 1 1  0 1 0  0 0 0', [4, 3, 1]),
   ):
-    mili.gen.gen=bytearray(b_str.replace(' ', '').encode())
+    mili.gen._gen=bytearray(b_str.replace(' ', '').encode())
 
     # test
     fenotype=MILI.get_fenotype(mili.gen, *mili.schema)

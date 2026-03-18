@@ -83,9 +83,9 @@ def test_create_from_two() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
-  li2.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, expected_str in (
     ((4, 7), '0 1 1  1 0 1'),
@@ -121,9 +121,9 @@ def test_create_from_two_too_long() -> None:
   max_list_size=3
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
-  li2.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, expected_str in (
     ((4, 1), '0 1 1  1 1 0  0 1 0'), # '0 1 1  1 1 0  0 1 0  0 0 1'
@@ -156,9 +156,9 @@ def test_crossover() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
-  li2.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, (expected_str1, expected_str2) in (
     ((4, 7), ('0 1 1  1 0 1', '1 1 0  0 1 0  0 1 1')),
@@ -196,9 +196,9 @@ def test_crossover_too_long() -> None:
   max_list_size=3
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1.gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
-  li2.gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
+  li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   for cp, (expected_str1, expected_str2) in (
     ((4, 1), ('0 1 1  1 1 0  0 1 0', '1 1 1')), # ('0 1 1  1 1 0  0 1 0  0 0 1', '1 1 1')
