@@ -1,10 +1,10 @@
 import typing as t
 import random as rnd
-from .Individual import Individual
+from .Individual import _BaseIndividual
 
 ord0=ord('0')
 ord1=ord('1')
-IndividualType=t.TypeVar('IndividualType', bound=Individual)
+IndividualType=t.TypeVar('IndividualType', bound=_BaseIndividual)
 CpType=t.TypeVar('CpType')
 BitSize_Min_Max: t.TypeAlias=tuple[int, int, int]
 
