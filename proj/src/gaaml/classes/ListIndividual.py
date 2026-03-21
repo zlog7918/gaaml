@@ -10,10 +10,10 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   min_elem_len: int
   max_bit_len: int
   @t.overload
-  def __init__(self, num_items: int, schema: GenSchemaType, /): ...
+  def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
-  def __init__(self, a: "ListIndividual", b: "ListIndividual", /, *, cross_point: CPType): ...
-  def __init__(self, a: "int|ListIndividual", b: "GenSchemaType|ListIndividual", /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "ListIndividual", b: "ListIndividual", /, *, cross_point: CPType) -> None: ...
+  def __init__(self, a: "int|ListIndividual", b: "GenSchemaType|ListIndividual", /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       (_min, _max), it_size=b
       if a>_max or a<_min:

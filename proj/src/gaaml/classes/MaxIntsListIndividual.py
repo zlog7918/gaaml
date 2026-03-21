@@ -10,10 +10,10 @@ from .ListIndividual import (
 class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, ListIndividual]):
   GenSchemaType: t.TypeAlias=tuple[tuple[int, int], util.BitSize_Min_Max]
   @t.overload
-  def __init__(self, num_items: int, schema: GenSchemaType, /): ...
+  def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
-  def __init__(self, a: "MaxIntsListIndividual", b: "MaxIntsListIndividual", /, *, cross_point: CPType): ...
-  def __init__(self, a: "int|MaxIntsListIndividual", b: "GenSchemaType|MaxIntsListIndividual", /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "MaxIntsListIndividual", b: "MaxIntsListIndividual", /, *, cross_point: CPType) -> None: ...
+  def __init__(self, a: "int|MaxIntsListIndividual", b: "GenSchemaType|MaxIntsListIndividual", /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       min_max_len, (elem_size, _max, _min)=b
       super().__init__(ListIndividual(a, (min_max_len, elem_size)))

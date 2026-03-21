@@ -26,7 +26,7 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual,
     type_seed: MaxIntsIndividual.EntryType,
     gen_schema: GenSchemaType,
     /,
-  ): ...
+  ) -> None: ...
   @t.overload
   def __init__(
     self,
@@ -34,7 +34,7 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual,
     b: "NetIndividual",
     /, *,
     cross_point: CPType
-  ): ...
+  ) -> None: ...
   def __init__(
     self,
     a: "MaxIntsIndividual.EntryType|NetIndividual",
@@ -43,7 +43,7 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual,
     gen_schema: GenSchemaType|None=None,
     /, *,
     cross_point: CPType|None=None,
-  ):
+  ) -> None:
     if (
       isinstance(a, tuple)
       and isinstance(b, tuple)

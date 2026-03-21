@@ -11,10 +11,10 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
   GenSchemaType: t.TypeAlias=tuple[EntryType, ...]
   schema: GenSchemaType
   @t.overload
-  def __init__(self, gen_schema: GenSchemaType, /): ...
+  def __init__(self, gen_schema: GenSchemaType, /) -> None: ...
   @t.overload
-  def __init__(self, a: "MaxIntsIndividual", b: "MaxIntsIndividual", /, *, cross_point: CPType): ...
-  def __init__(self, a: "GenSchemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None):
+  def __init__(self, a: "MaxIntsIndividual", b: "MaxIntsIndividual", /, *, cross_point: CPType) -> None: ...
+  def __init__(self, a: "GenSchemaType|MaxIntsIndividual", b: "MaxIntsIndividual|None"=None, /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, tuple):
       n=sum(l for _,(l,_,_) in a)
       names=tuple(n for n,(_,_,_) in a)
