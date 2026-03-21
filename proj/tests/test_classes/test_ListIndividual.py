@@ -9,7 +9,7 @@ def test_create() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     li=LI(input_len, schema)
 
@@ -25,7 +25,7 @@ def test_mutate() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     li=LI(input_len, schema)
     oryg_gen=li.gen[:]
 
@@ -50,7 +50,7 @@ def test_get_cp() -> None:
   li1=LI(input_len1, schema)
   li2=LI(input_len2, schema)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     cp=LI.get_cp(li1, li2)
 

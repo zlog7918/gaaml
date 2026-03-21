@@ -40,7 +40,7 @@ def test_create() -> None:
   exp_t_bit, exp_t_min, exp_t_max=t_schema
   expected_0gen=exp_len_bit+exp_num_seed_bit+exp_type_seed_bit+exp_x_bit+exp_y_bit
 
-  for _ in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
 
@@ -109,7 +109,7 @@ def test_mutate() -> None:
   t_schema=2, 0, 3
   ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
 
-  for _ in range(1, 50): # random process
+  for _ in range(50): # random process
     oryg_gen=(
       ni.gen[0].gen.gen[:],
       ni.gen[1].gen.gen[:],
@@ -153,7 +153,7 @@ def test_get_cp() -> None:
   t_bit, t_min, t_max=t_schema
   gen0_bit=len_bit+num_seed_bit+type_seed_bit+x_bit+y_bit
 
-  for _ in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     cp=NI.get_cp(ni1, ni2)
 

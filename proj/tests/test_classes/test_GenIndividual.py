@@ -5,7 +5,7 @@ def test_create() -> None:
   # values
   input_len=5
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     gi=GI(input_len)
 
@@ -17,7 +17,7 @@ def test_mutate() -> None:
   # values
   input_len=5
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     gi=GI(input_len)
     oryg_gen=gi.gen[:]
 
@@ -32,7 +32,7 @@ def test_get_cp() -> None:
   input_len=5
   gi1=GI(input_len)
   gi2=GI(input_len)
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     cp=GI.get_cp(gi1, gi2)
 

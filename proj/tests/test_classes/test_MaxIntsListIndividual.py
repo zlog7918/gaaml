@@ -15,7 +15,7 @@ def test_create() -> None:
     (item_size, min_elem_val, max_elem_val),
   )
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     mili=MILI(input_len, schema)
 
@@ -40,7 +40,7 @@ def test_mutate() -> None:
   )
   mili=MILI(input_len, schema)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     oryg_gen=mili.gen.gen[:]
 
     # test
@@ -71,7 +71,7 @@ def test_get_cp() -> None:
   mili1=MILI(input_len1, schema)
   mili2=MILI(input_len2, schema)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     cp=MILI.get_cp(mili1, mili2)
 

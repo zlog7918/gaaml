@@ -17,7 +17,7 @@ def test_create() -> None:
   )
   expected=x_bit+y_bit
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     mii=MII(schema)
 
@@ -46,7 +46,7 @@ def test_mutate() -> None:
   )
   mii=MII(schema)
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     oryg_gen=mii.gen.gen[:]
 
     # test
@@ -77,7 +77,7 @@ def test_get_cp() -> None:
   mii2=MII(schema)
   expected_len=x_bit+y_bit
 
-  for i in range(1, 50): # random process
+  for _ in range(50): # random process
     # test
     cp=MII.get_cp(mii1, mii2)
 
