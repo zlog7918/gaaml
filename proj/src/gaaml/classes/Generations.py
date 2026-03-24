@@ -2,12 +2,12 @@ import typing as t
 from . import _utils as util
 from .Population import Population
 
-class Generations(t.Generic[util.IndividualType, util.CpType]):
+class Generations(t.Generic[util.IndividualType]):
   max_sol: util.IndividualType|None=None
   min_sol: util.IndividualType|None=None
   max_of_max=-1.
   min_of_min=float('inf')
-  def __init__(self, pop: Population[util.IndividualType, util.CpType], num_gen: int) -> None:
+  def __init__(self, pop: Population[util.IndividualType], num_gen: int) -> None:
     super().__init__()
     # assert num_gen>0
     if num_gen<1:
