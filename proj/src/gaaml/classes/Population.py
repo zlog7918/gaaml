@@ -64,7 +64,11 @@ class Population(t.Generic[util.IndividualType]):
     # }{
     #   n(k+7)-k(k+9)
     # }
-    to_add=.01*fitnesses.min_v
+    to_add=float('inf')
+    for v in fitnesses.arr:
+      if v>0 and v<to_add:
+        to_add=v
+    to_add*=.01
     return to_add
 
   def _selection(self) -> tuple[util.IndividualType, util.IndividualType]:
