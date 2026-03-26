@@ -24,6 +24,7 @@ class _BaseIndividual(t.Generic[_BI, _CPType, _T, _RT], metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def crossover(cls: type[_BI], a: _BI, b: _BI, cp: _CPType) -> tuple[_BI, _BI]: ...
 
-class Individual(t.Generic[_BI, _CPType, _T], _BaseIndividual[_BI, _CPType, _T, _T], metaclass=abc.ABCMeta):
+_I=t.TypeVar('_I', bound="Individual")
+class Individual(t.Generic[_I, _CPType, _T], _BaseIndividual[_I, _CPType, _T, _T], metaclass=abc.ABCMeta):
   def __init__(self, gen: _T) -> None:
-    super().__init__(gen, lambda x:x)
+    super().__init__(gen, lambda x: x)
