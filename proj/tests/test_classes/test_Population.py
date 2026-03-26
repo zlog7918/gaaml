@@ -8,7 +8,7 @@ from gaaml.classes.GenIndividual import GenIndividual as _GI
 
 
 @pytest.mark.parametrize(
-  "seed, flag",
+  ('seed', 'flag'),
   [*zip(range(10), (
     False, # 0.8444218515250481
     True, # 0.13436424411240122
@@ -42,7 +42,7 @@ def test_crossover(seed: int, flag: bool) -> None:
   assert (cgi2 is gi2)^flag
 
 @pytest.mark.parametrize(
-  "seed, flag",
+  ('seed', 'flag'),
   [*zip(range(20), (
     False, # 0.8444218515250481
     True, # 0.13436424411240122
@@ -83,7 +83,7 @@ def test_mutate(seed: int, flag: bool) -> None:
   assert (mgi.gen==oryg_gen)!=flag
 
 @pytest.mark.parametrize(
-  "values, exp_to_add",
+  ('values', 'exp_to_add'),
   [
     ((0, 1), .01),
     ((1, 4), .01),
@@ -362,7 +362,7 @@ def test_next_generation() -> None:
     assert len(pop.fitnesses)==pop_num
 
 @pytest.mark.parametrize(
-  "workers",
+  'workers',
   [1, 2, 4]
 )
 def test_multi_vs_single_thread_consistency(workers) -> None:
