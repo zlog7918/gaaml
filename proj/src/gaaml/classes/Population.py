@@ -22,7 +22,7 @@ class Population(t.Generic[util.IndividualType]):
   def __init__(
     self,
     pop_num: int,
-    individual_generator: t.Callable[[], util.IndividualType],
+    individual_factory: t.Callable[[], util.IndividualType],
     calc_fitness_func: t.Callable[[util.IndividualType], float],
     cross_rate: float,
     mutate_rate: float,
@@ -30,7 +30,7 @@ class Population(t.Generic[util.IndividualType]):
     max_worker_num: int=const.MAX_WORKERS,
   ) -> None:
     super().__init__()
-    self.__population=[individual_generator() for _ in range(pop_num)]
+    self.__population=[individual_factory() for _ in range(pop_num)]
     self.__calc_fitness=calc_fitness_func
     self.__cross_rate=cross_rate
     self.__mutate_rate=mutate_rate
