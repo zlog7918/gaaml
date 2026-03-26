@@ -513,11 +513,7 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
 
 @pytest.mark.parametrize(
   'number_of_generations',
-  [
-    0,
-    -1,
-    -2,
-  ]
+  [0, -1, -2]
 )
 def test_invalid_num_gen(number_of_generations: int) -> None:
   # values
