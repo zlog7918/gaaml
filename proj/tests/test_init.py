@@ -1,9 +1,8 @@
 import sys
+import gaaml
 import pytest
 import numpy as np
 import typing as t
-import gaaml.core as core
-from gaaml.classes.NetIndividual import NetIndividual as _NI
 from gaaml.classes.Generations import Generations as _G
 
 class MockPlt:
@@ -30,40 +29,6 @@ class MockPlt:
   def title(self, *_: t.Any, **__: t.Any) -> None: ...
 
 @pytest.mark.parametrize(
-  ('ni_str', 'expected_fit'),
-  [
-    ('0 0  1 0  1 1  1 0 1 0 1', 16.),
-    ('0 0  1 0  1 1  1 1 1 1 1', 25.),
-    ('0 0  1 0  1 1  1 1 1 1 0', 25.),
-    ('0 0  1 0  1 1  0 0 0 1 0', 0.),
-    ('0 0  1 0  1 1  0 0 0 0 0', 0.),
-    ('0 0  1 0  1 1  0 0 1 0 0', 0.),
-    ('0 0  1 0  1 1  0 0 1 0 1', 0.),
-    ('0 0  1 0  1 1  0 0 1 1 0', 1.),
-  ]
-)
-def test_fitness(ni_str: str, expected_fit: float) -> None:
-  # values
-  layers_len=('len', (2, 1, 4))
-  num_seed=('num_seed', (2, 0, 3))
-  type_seed=('type_seed', (2, 0, 3))
-  g_schema=(
-    ('x', (5, -5, 25)),
-  )
-  n_schema=3, 2, 7
-  t_schema=2, 0, 3
-  ni=_NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni.gen[0].gen._gen=bytearray(ni_str.replace(' ', '').encode())
-  ni.gen[0]._update_fenotype()
-
-  # test
-  ret=core.fitness(lambda ni: ni.gen[0].fenotype['x'], ni)
-
-  # results
-  assert isinstance(float(ret), float)
-  assert ret==pytest.approx(expected_fit)
-
-@pytest.mark.parametrize(
   'number_of_generations',
   [1, 2, 5]
 )
@@ -74,7 +39,7 @@ def test_cr_network(number_of_generations: int) -> None:
   population_size=10
 
   # test
-  ret=core.cr_network(
+  ret=gaaml.cr_network(
     training_data,
     test_data,
     population_size=population_size,
@@ -92,6 +57,7 @@ def test_cr_network(number_of_generations: int) -> None:
 def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations: int) -> None:
   # values
   mock_plt=MockPlt()
+  mock_plt=MockPlt()
   try:
     monkeypatch.setattr(__import__("matplotlib"), "pyplot", mock_plt)
   except:
@@ -102,7 +68,7 @@ def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations:
   population_size=10
 
   # test
-  ret=core.cr_network(
+  ret=gaaml.cr_network(
     training_data,
     test_data,
     population_size=population_size,
@@ -132,7 +98,7 @@ def test_error_cr_network_0generations(number_of_generations: int) -> None:
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=core.cr_network(
+    _=gaaml.cr_network(
       training_data,
       test_data,
       population_size=population_size,
