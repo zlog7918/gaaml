@@ -86,8 +86,10 @@ Kod genetyczny będzie składał się z trzech części:
         \hspace*{1em}liczba elementów - taka sama:
           $\left[1, 128\right]$,\\
         \hspace*{1em}zawiera liczby z zakresu:
-          $\left[2, 1 048 577\right]$,\\
-        \hspace*{1em}każdy element składa się z 20 bitów.
+          $\left[2, 724\right]$,\\
+        % ze wzgędu na możliwe ograniczenia pamięci dla sieci: .5GB
+        % .5÷128÷8×1024×1024×1024=524288 -> √524288 ~ 724
+        \hspace*{1em}każdy element składa się z 10 bitów.
       \item lista typów aktywacji w warstwach ukrytych -\\
         \hspace*{1em}liczba elementów - o 1 większa
           (uwzględnia warstwę wyjściową):
