@@ -17,7 +17,7 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual,
   layers_len_name: str
   num_seed_name: str
   type_seed_name: str
-  type_len_modifier: t.Callable[[int], int]=staticmethod(lambda x: x+2)
+  type_len_modifier: t.Callable[[int], int]=staticmethod(lambda x: x+1)
   @t.overload
   def __init__(
     self,

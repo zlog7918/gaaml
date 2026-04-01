@@ -4,19 +4,32 @@ from gaaml.classes.NetIndividual import NetIndividual as NI
 from gaaml.classes.MaxIntsIndividual import MaxIntsIndividual as _MII
 from gaaml.classes.MaxIntsListIndividual import MaxIntsListIndividual as _MILI
 
-def test_type_len_modifier() -> None:
-  # values
-  for l, exp_l in (
-    (4, 6),
-    (7, 9),
-    (16, 18),
-    (1, 3),
-  ):
-    # test
-    ret_l=NI.type_len_modifier(l)
+# @pytest.mark.parametrize(
+#   ('l', 'exp_l'),
+#   [
+#     (4, 6),
+#     (7, 9),
+#     (16, 18),
+#     (1, 3),
+#   ]
+# )
+@pytest.mark.parametrize(
+  ('l', 'exp_l'),
+  [
+    (4, 5),
+    (7, 8),
+    (16, 17),
+    (1, 2),
+  ]
+)
+def test_type_len_modifier(l: int, exp_l: int) -> None:
+  # values ^
 
-    # results
-    assert ret_l==exp_l
+  # test
+  ret_l=NI.type_len_modifier(l)
+
+  # results
+  assert ret_l==exp_l
 
 def test_create() -> None:
   # values
@@ -139,18 +152,18 @@ def test_get_cp() -> None:
   t_schema=2, 0, 3
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  len_name, (len_bit, len_min, len_max)=layers_len
+  len_name, (len_bit, len_min, _)=layers_len
   bit_len1=ni1.gen[0].fenotype[len_name]
   bit_len2=ni2.gen[0].fenotype[len_name]
 
-  num_seed_name, (num_seed_bit, num_seed_min, num_seed_max)=num_seed
-  type_seed_name, (type_seed_bit, type_seed_min, type_seed_max)=type_seed
+  _, (num_seed_bit, _, _)=num_seed
+  _, (type_seed_bit, _, _)=type_seed
   (
-    (x_name, (x_bit, x_min, x_max)),
-    (y_name, (y_bit, y_min, y_max)),
+    (_, (x_bit, _, _)),
+    (_, (y_bit, _, _)),
   )=g_schema
-  n_bit, n_min, n_max=n_schema
-  t_bit, t_min, t_max=t_schema
+  n_bit, _, _=n_schema
+  t_bit, _, _=t_schema
   gen0_bit=len_bit+num_seed_bit+type_seed_bit+x_bit+y_bit
 
   for _ in range(50): # random process
@@ -200,16 +213,16 @@ def test_create_from_two() -> None:
                      ↑
   cp1:2,5
 
-  bits_t1: 1 0  1 1  0 1
-                      ↑
-  bits_t2: 0 1  1 0  0 1  0 0
+  bits_t1: 1 1  0 1
                  ↑
-  cp1:5,3
+  bits_t2: 1 0  0 1  0 0
+            ↑
+  cp1:3,1
 
   expected:
   bits0: 0 1  0 1  0 0  0 0  0 1 1
   bits_n: 1 1 1
-  bits_t: 1 0  1 1  0 0  0 1  0 0
+  bits_t: 1 1  0 0  0 1  0 0
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -224,11 +237,11 @@ def test_create_from_two() -> None:
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
   ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen._gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[2].gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
   ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen._gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
+  ni2.gen[2].gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
   len_name, _=layers_len
   num_seed_name, _=num_seed
   type_seed_name, _=type_seed
@@ -239,14 +252,14 @@ def test_create_from_two() -> None:
 
   for cp, (exp_str0, exp_str1, exp_str2), (exp_feno0, exp_feno1, exp_feno2) in (
     (
-      (1, (2, 5), (5,3)), (
+      (1, (2, 5), (3, 1)), (
         '0 1  0 1  0 0  0 0  0 1 1',
         '1 1 1',
-        '1 0  1 1  0 0  0 1  0 0',
+        '1 1  0 0  0 1  0 0',
       ), (
         {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
         [7, 3], # one more: len->2, filled in by random with num_seed(1)->3
-        [2, 3, 0, 1], # one less: len->2 -> 2+2=4
+        [3, 0, 1], # one less: len->2 -> 2+2=4
       )
     ),
   ):
@@ -286,16 +299,21 @@ def test_crossover() -> None:
                      ↑
   cp1:2,5
 
-  bits_t1: 1 0  1 1  0 1
+  bits_t1: 1 1  0 1
             ↑
-  bits_t2: 0 1  1 0  0 1  0 0
+  bits_t2: 1 0  0 1  0 0
                  ↑
   cp1:1,3
 
   expected:
+  child1:
   bits0: 0 1  0 1  0 0  0 0  0 1 1
   bits_n: 1 1 1
-  bits_t: 1 0  1 1  0 0  0 1  0 0
+  bits_t: 1 1  0 0
+  child2:
+  bits0: 0 0  1 0  1 1  1 0  1 0 1
+  bits_n: 0 1 0  0 0 0
+  bits_t: 1 0  0 1  0 1
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -310,22 +328,19 @@ def test_crossover() -> None:
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
   ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen._gen=bytearray('1 0  1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[2].gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
   ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen._gen=bytearray('0 1  1 0  0 1  0 0'.replace(' ', '').encode())
-  len_name, (len_bit, len_min, len_max)=layers_len
+  ni2.gen[2].gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
+  len_name, _=layers_len
 
-  num_seed_name, (num_seed_bit, num_seed_min, num_seed_max)=num_seed
-  type_seed_name, (type_seed_bit, type_seed_min, type_seed_max)=type_seed
+  num_seed_name, _=num_seed
+  type_seed_name, _=type_seed
   (
-    (x_name, (x_bit, x_min, x_max)),
-    (y_name, (y_bit, y_min, y_max)),
+    (x_name, _),
+    (y_name, _),
   )=g_schema
-  n_bit, n_min, n_max=n_schema
-  t_bit, t_min, t_max=t_schema
-  gen0_bit=len_bit+num_seed_bit+type_seed_bit+x_bit+y_bit
 
   for (
     cp,
@@ -343,23 +358,23 @@ def test_crossover() -> None:
         (
           '0 1  0 1  0 0  0 0  0 1 1',
           '1 1 1',
-          '1 0  0 1  0 0',
+          '1 1  0 0',
         ),
         (
           {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
           [7, 3], # one more: len->2, filled in by random with num_seed(1)->3
-          [2, 1, 0, 3], # one more: len->2, filled in by random with type_seed(0)->3
+          [3, 0, 3], # one more: len->2, filled in by random with type_seed(0)->3
         ),
       ), (
         (
           '0 0  1 0  1 1  1 0  1 0 1',
           '0 1 0  0 0 0',
-          '0 1  1 0  1 1  0 1',
+          '1 0  0 1  0 1',
         ),
         (
           {len_name: 1, num_seed_name: 2, type_seed_name: 3, x_name: 3, y_name: 5},
           [4], # one less: len->1
-          [1, 2, 3], # one less: len->1 -> 1+2=3
+          [2, 1], # one less: len->1 -> 1+1=2
         ),
       )
     ),
@@ -398,7 +413,7 @@ def test_update_fenotype() -> None:
   bits0: 0 1  1 0  1 1  1 0  1 1 0
 
   bits_n: 0 1 0  0 0 1
-  bits_t: 0 1  1 0  0 1  0 0
+  bits_t: 1 0  0 1  0 0
 
   expected:
   fenotype0: {
@@ -409,7 +424,7 @@ def test_update_fenotype() -> None:
     y: 6+0=6 -> 6->4 -> 4+0=4
   }
   fenotype1: [2+2->4, 1+2->3]
-  fenotype2: [1+0->1, 2+0->2, 1+0->1, 0+0->0]
+  fenotype2: [2+0->2, 1+0->1, 0+0->0]
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -439,18 +454,18 @@ def test_update_fenotype() -> None:
       ), (
         {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
         ([7, 3], True), # one more: len->2, filled in by random with num_seed(1)->3
-        ([2, 3, 0, 1], True), # one less: len->2 -> 2+2=4
+        ([2, 3, 0], True), # one less: len->2 -> 2+1=3
       )
     ),
     (
       (
         '1 1  0 1  0 1  0 1  0 1 1',
         '1 1 1  1 0 1  0 1 1  0 0 0',
-        '1 0  1 1  0 0',
+        '1 0  1 1',
       ), (
         {len_name: 4, num_seed_name: 1, type_seed_name: 1, x_name: 2, y_name: 3},
         ([7, 7, 5, 2], False),
-        ([2, 3, 0, 1, 0, 2], True), # three more: len->4 -> 4+2=6, filled in by random with num_seed(1)->[1, 0, 2]
+        ([2, 3, 1, 0, 2], True), # three more: len->4 -> 4+1=5, filled in by random with num_seed(1)->[1, 0, 2]
       )
     ),
   ):
@@ -1069,73 +1084,21 @@ def test_error_not_same_elem_size_on_crossover2() -> None:
   # results
   assert str(excinfo.value)=='First and second solution do not have equal gen size'
 
-def test_error_too_short_on_create_from_two() -> None:
-  # values
-  layers_len=('len', (2, 2, 5))
-  num_seed=('num_seed', (2, 0, 3))
-  type_seed=('type_seed', (2, 0, 3))
-  g_schema=(
-    ('x', (2, 1, 4)),
-    ('y', (3, 0, 5)),
-  )
-  n_schema=3, 2, 7
-  t_schema=2, 0, 3
-  schema=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
-  ni1=NI(*schema)
-  ni2=NI(*schema)
-
-  len_name, _=layers_len
-  num_seed_name, _=num_seed
-  type_seed_name, _=type_seed
-  (
-    (x_name, _),
-    (y_name, _),
-  )=g_schema
-  for ni, (str0, str1, str2) in (
-    (
-      ni1,
-      (
-        '0 0  0 1  0 0  0 0  0 1 1',
-        '1 1 1  0 1 1',
-        '1 0  1 1  0 1  0 0',
-      ),
-    ),
-    (
-      ni2,
-      (
-        '1 1  0 1  0 1  0 1  0 1 1',
-        '1 0 1  0 0 0',
-        '1 0  1 1  0 0  0 1',
-      ),
-    ),
-  ):
-    for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
-      ni.gen[i]._update_fenotype()
-    ni._update()
-
-  for cp in (
+@pytest.mark.parametrize(
+  'cp',
+  [
     (1, (0, 3), (1, 1)),
     (1, (1, 4), (1, 1)),
     (1, (2, 5), (1, 1)),
     (1, (3, 6), (1, 1)),
-    (1, (1, 1), (0, 2)),
-    (1, (1, 1), (1, 3)),
-    (1, (1, 1), (4, 6)),
     (1, (1, 1), (4, 8)),
     (1, (1, 1), (3, 7)),
     (1, (1, 1), (1, 7)),
     (1, (1, 1), (1, 5)),
     # (1, (1, 1), (1, 1)),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI(ni1, ni2, cross_point=cp)
-
-    # results
-    assert str(excinfo.value)=='Solution too short'
-
-def test_error_too_short_on_crossover() -> None:
+  ]
+)
+def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:
   # values
   layers_len=('len', (2, 2, 5))
   num_seed=('num_seed', (2, 0, 3))
@@ -1149,14 +1112,6 @@ def test_error_too_short_on_crossover() -> None:
   schema=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
   ni1=NI(*schema)
   ni2=NI(*schema)
-
-  len_name, _=layers_len
-  num_seed_name, _=num_seed
-  type_seed_name, _=type_seed
-  (
-    (x_name, _),
-    (y_name, _),
-  )=g_schema
   for ni, (str0, str1, str2) in (
     (
       ni1,
@@ -1180,15 +1135,22 @@ def test_error_too_short_on_crossover() -> None:
       ni.gen[i]._update_fenotype()
     ni._update()
 
-  for cp in (
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI(ni1, ni2, cross_point=cp)
+
+  # results
+  assert str(excinfo.value)=='Solution too short'
+
+
+@pytest.mark.parametrize(
+  'cp',
+  [
     # first too short
     (1, (0, 3), (1, 1)),
     (1, (1, 4), (1, 1)),
     (1, (2, 5), (1, 1)),
     (1, (3, 6), (1, 1)),
-    (1, (1, 1), (0, 2)),
-    (1, (1, 1), (1, 3)),
-    (1, (1, 1), (4, 6)),
     (1, (1, 1), (4, 8)),
     (1, (1, 1), (3, 7)),
     (1, (1, 1), (1, 7)),
@@ -1198,20 +1160,55 @@ def test_error_too_short_on_crossover() -> None:
     (1, (4, 1), (1, 1)),
     (1, (5, 2), (1, 1)),
     (1, (6, 3), (1, 1)),
-    (1, (1, 1), (2, 0)),
-    (1, (1, 1), (3, 1)),
-    (1, (1, 1), (6, 4)),
     (1, (1, 1), (8, 4)),
     (1, (1, 1), (7, 3)),
     (1, (1, 1), (7, 1)),
     (1, (1, 1), (5, 1)),
+  ]
+)
+def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:
+  # values
+  layers_len=('len', (2, 2, 5))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  n_schema=3, 2, 7
+  t_schema=2, 0, 3
+  schema=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  ni1=NI(*schema)
+  ni2=NI(*schema)
+  for ni, (str0, str1, str2) in (
+    (
+      ni1,
+      (
+        '0 0  0 1  0 0  0 0  0 1 1',
+        '1 1 1  0 1 1',
+        '1 0  1 1  0 1  0 0',
+      ),
+    ),
+    (
+      ni2,
+      (
+        '1 1  0 1  0 1  0 1  0 1 1',
+        '1 0 1  0 0 0',
+        '1 0  1 1  0 0  0 1',
+      ),
+    ),
   ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.crossover(ni1, ni2, cp)
+    for i, _str in zip(range(3), (str0, str1, str2)):
+      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i]._update_fenotype()
+    ni._update()
 
-    # results
-    assert str(excinfo.value)=='Solution too short'
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.crossover(ni1, ni2, cp)
+
+  # results
+  assert str(excinfo.value)=='Solution too short'
 
 def test_error_illegal_argument_on_create() -> None:
   # values
