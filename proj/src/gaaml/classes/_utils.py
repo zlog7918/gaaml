@@ -35,20 +35,14 @@ def get_i_in_range(l: list[float], v: float) -> int:
     i+=1
   return i
 
+def __get_i_maxs(a: bytearray, b: bytearray) -> set[int]:
+  return {i for i, (ai, bi) in enumerate(zip(a,b)) if ai>bi}
 def correct_gen_to_min_max(gen: bytearray, min_v: int, max_v: int) -> int:
   l=len(gen)
-  gen=gen.copy()
-  max_gen=int_to_bin(max_v-min_v, l)
-  correct_gens: t.Callable[[bytearray, bytearray], bool]=lambda g, max_g: int(g, base=2)<=int(max_g, base=2)
-  if not correct_gens(gen, max_gen):
-    for i, org_1gen, max_1gen in zip(range(l), gen, max_gen):
-      if org_1gen==max_1gen:
-        continue
-      # gen[i]=0
-      gen[i]=ord0
-      # gen=f'{gen[:i]}0{gen[i+1:]}'
-      if correct_gens(gen, max_gen):
-        break
+  m=int_to_bin(max_v-min_v, l)
+  m_g=min(__get_i_maxs(m, gen), default=l)
+  g_m=__get_i_maxs(gen[:m_g], m[:m_g])
+  gen=bytearray(ord0 if i in g_m else gen[i] for i in range(l))
   return int(gen, base=2)+min_v
 
 def randint(a: int, b: int) -> int:
