@@ -1,5 +1,23 @@
 import pytest
-from gaaml.classes.MaxAvgMinHolder import MaxAvgMinHolder as MAMH
+import typing as t
+from gaaml.classes.MaxAvgMinHolder import (
+  _f2f as f2f,
+  MaxAvgMinHolder as MAMH,
+)
+
+mark__test___f2f=pytest.mark.parametrize(
+  'v',
+  [3, 5., 2., 65., 2., 6]
+)
+@mark__test___f2f
+def test___f2f(v: float) -> None:
+  # values ^
+
+  # test
+  ret=f2f(v)
+
+  # results
+  assert ret==v
 
 def test_empty_initial_state() -> None:
   # values
@@ -11,6 +29,8 @@ def test_empty_initial_state() -> None:
   total=holder.sum
   zeros=holder.zero_count
   arr=holder.arr
+  arr_v=holder.arr_v
+  v2f=holder.v2f
 
   # results
   assert length==0
@@ -18,31 +38,39 @@ def test_empty_initial_state() -> None:
   assert total==0
   assert zeros==0
   assert arr==[]
+  assert arr_v==pytest.approx([])
+  assert isinstance(v2f, t.Callable)
+  assert v2f is f2f
 
-def test_empty_raises_on_properties() -> None:
+def test_empty_initial_state_own_func() -> None:
   # values
-  holder=MAMH()
-  exp_str='No item added yet'
+  v2f=lambda v: sum(v)/2
+  holder=MAMH[tuple[float, float]](to_val=v2f)
 
   # test
-  with pytest.raises(IndexError) as excinfo1:
-    _=holder.max_i
-  with pytest.raises(IndexError) as excinfo2:
-    _=holder.min_i
-  with pytest.raises(IndexError) as excinfo3:
-    _=holder.max_v
-  with pytest.raises(IndexError) as excinfo4:
-    _=holder.min_v
-  with pytest.raises(IndexError) as excinfo5:
-    _=holder.avg
+  length=len(holder)
+  is_empty=holder.empty()
+  total=holder.sum
+  zeros=holder.zero_count
+  arr=holder.arr
+  arr_v=holder.arr_v
+  ret_v2f=holder.v2f
 
   # results
-  assert all(str(excinfo.value)==exp_str for excinfo in (excinfo1, excinfo2, excinfo3, excinfo4, excinfo5))
+  assert length==0
+  assert is_empty is True
+  assert total==0
+  assert zeros==0
+  assert arr==[]
+  assert arr_v==pytest.approx([])
+  assert isinstance(v2f, t.Callable)
+  assert ret_v2f is not f2f
+  assert ret_v2f is v2f
 
 def test_single_append() -> None:
   # values
   holder=MAMH()
-  value=5.0
+  value=5.
 
   # test
   holder.append(value)
@@ -50,20 +78,45 @@ def test_single_append() -> None:
   # results
   assert len(holder)==1
   assert holder.empty() is False
-  assert holder.sum==5.0
-  assert holder.avg==5.0
-  assert holder.max_v==5.0
-  assert holder.min_v==5.0
+  assert holder.sum==pytest.approx(5.)
+  assert holder.avg==pytest.approx(5.)
+  assert holder.max_v==pytest.approx(5.)
+  assert holder.min_v==pytest.approx(5.)
   assert holder.max_i==0
   assert holder.min_i==0
   assert holder.zero_count==0
-  assert holder.arr==[5.0]
+  assert holder.arr==[5.]
+  assert holder.arr_v==pytest.approx([5.])
+  assert holder.arr_v==pytest.approx([*map(holder.v2f, holder.arr)])
 
+def test_single_append_own_func() -> None:
+  # values
+  v2f=lambda v: sum(v)/3
+  holder=MAMH[tuple[float, int, float]](to_val=v2f)
+  item=(5., 6, 1)
+  exp_val=v2f(item)
+
+  # test
+  holder.append(item)
+
+  # results
+  assert len(holder)==1
+  assert holder.empty() is False
+  assert holder.sum==pytest.approx(exp_val)
+  assert holder.avg==pytest.approx(exp_val)
+  assert holder.max_v==pytest.approx(exp_val)
+  assert holder.min_v==pytest.approx(exp_val)
+  assert holder.max_i==0
+  assert holder.min_i==0
+  assert holder.zero_count==0
+  assert holder.arr==[item]
+  assert holder.arr_v==pytest.approx([exp_val])
+  assert holder.arr_v==[*map(holder.v2f, holder.arr)]
 
 def test_multiple_appends() -> None:
   # values
   holder=MAMH()
-  values=[1.0, 3.0, -2.0, 7.0, 4.0]
+  values=[1., 3., -2., 7., 4.]
 
   # test
   for v in values:
@@ -71,101 +124,240 @@ def test_multiple_appends() -> None:
 
   # results
   assert len(holder)==len(values)
-  assert holder.sum==sum(values)
-  assert holder.avg==sum(values)/len(values)
-  assert holder.max_v==7.0
-  assert holder.min_v==-2.0
-  assert holder.max_i==values.index(7.0)
-  assert holder.min_i==values.index(-2.0)
+  assert holder.sum==pytest.approx(sum(values))
+  assert holder.avg==pytest.approx(sum(values)/len(values))
+  assert holder.max_v==7.
+  assert holder.min_v==-2.
+  assert holder.max_i==values.index(7.)
+  assert holder.min_i==values.index(-2.)
+  assert holder.zero_count==0
   assert holder.arr==values
+  assert holder.arr_v==values
+  assert holder.arr_v==[*map(holder.v2f, holder.arr)]
 
+def test_multiple_appends_own_func() -> None:
+  # values
+  v2f=lambda v: sum(v)/3
+  holder=MAMH[tuple[float, int, float]](to_val=v2f)
+  items=[
+    (1., 0, 2.),
+    (2., 6, 1.),
+    (-2.5, -4, .5),
+    (7., 6, 8),
+    (4., 4, 4),
+  ]
+
+  # test
+  exp_val=[]
+  for i in items:
+    holder.append(i)
+    exp_val.append(v2f(i))
+
+  # results
+  assert len(holder)==len(items)
+  assert len(holder)==len(exp_val)
+  assert holder.sum==pytest.approx(sum(exp_val))
+  assert holder.avg==pytest.approx(sum(exp_val)/len(exp_val))
+  assert holder.max_v==pytest.approx(7.)
+  assert holder.min_v==pytest.approx(-2.)
+  assert holder.max_i==items.index((7., 6, 8))
+  assert holder.min_i==items.index((-2.5, -4, .5))
+  assert holder.zero_count==0
+  assert holder.arr==items
+  assert holder.arr_v==[*map(v2f, holder.arr)]
 
 def test_zero_count() -> None:
   # values
   holder=MAMH()
-  values=[0.0, 1.0, 0.0, 2.0, 0.0]
-
-  # test
+  values=[0., 1., 0., 2., 0.]
   for v in values:
     holder.append(v)
 
-  # results
-  assert holder.zero_count==3
+  # test
+  zero_count=holder.zero_count
 
+  # results
+  assert len(holder)==5
+  assert zero_count==3
+
+def test_zero_count_own_func() -> None:
+  # values
+  v2f=lambda v: v[1]
+  holder=MAMH[tuple[float, int]](to_val=v2f)
+  items=[
+    (1., 0),
+    (2., 0),
+    (-2.5, -4),
+    (7., 0),
+    (4., 4),
+  ]
+  for i in items:
+    holder.append(i)
+
+  # test
+  zero_count=holder.zero_count
+
+  # results
+  assert len(holder)==5
+  assert zero_count==3
 
 def test_dynamic_resize() -> None:
   # values
   holder=MAMH(num=2)
-  values=[1.0, 2.0, 3.0, 4.0]
-
-  # test
+  values=[1., 2., 3., 4.]
   for v in values:
     holder.append(v)
 
-  # results
-  assert len(holder)==4
-  assert holder.arr==values
-  assert holder.max_v==4.0
-  assert holder.min_v==1.0
+  # test
+  arr=holder.arr
+  max_v=holder.max_v
+  min_v=holder.min_v
 
+  # results
+  assert len(holder)==len(values)
+  assert len(arr)==len(values)
+  assert arr==values
+  assert max_v==pytest.approx(4.)
+  assert min_v==pytest.approx(1.)
 
 def test_all_equal_values() -> None:
   # values
   holder=MAMH()
-  values=[5.0, 5.0, 5.0]
-
-  # test
+  values=[5., 5., 5.]
   for v in values:
     holder.append(v)
 
-  # results
-  assert holder.max_v==5.0
-  assert holder.min_v==5.0
-  assert holder.max_i==0
-  assert holder.min_i==0
-  assert holder.avg==5.0
+  # test
+  max_v=holder.max_v
+  min_v=holder.min_v
+  max_i=holder.max_i
+  min_i=holder.min_i
+  avg=holder.avg
 
+  # results
+  assert max_v==pytest.approx(5.)
+  assert min_v==pytest.approx(5.)
+  assert max_i==0
+  assert min_i==0
+  assert avg==pytest.approx(5.)
 
 def test_negative_values() -> None:
   # values
   holder=MAMH()
-  values=[-10.0, -5.0, -20.0]
-
-  # test
+  values=[-10., -5., -20.]
   for v in values:
     holder.append(v)
 
-  # results
-  assert holder.max_v==-5.0
-  assert holder.min_v==-20.0
-  assert holder.max_i==1
-  assert holder.min_i==2
-  assert holder.sum==sum(values)
+  # test
+  max_v=holder.max_v
+  min_v=holder.min_v
+  max_i=holder.max_i
+  min_i=holder.min_i
+  _sum=holder.sum
+  avg=holder.avg
 
-def test_arr_returns_copy1() -> None:
+  # results
+  assert max_v==pytest.approx(-5.)
+  assert min_v==pytest.approx(-20.)
+  assert max_i==1
+  assert min_i==2
+  assert _sum==pytest.approx(sum(values))
+  assert avg==pytest.approx(sum(values)/len(values))
+
+def test_arr_and_arr_v_return_copys1() -> None:
   # values
   holder=MAMH()
-  holder.append(1.0)
-  holder.append(2.0)
+  holder.append(1.)
+  holder.append(2.)
 
   # test
   arr=holder.arr
-  arr.append(999.0)
+  arr_v=holder.arr_v
+  arr.append(999.)
+  arr_v.append(959.)
 
   # results
-  assert holder.arr==[1.0, 2.0]
-  assert arr==[1.0, 2.0, 999.0]
+  assert holder.arr==[1., 2.]
+  assert holder.arr_v==pytest.approx([1., 2.])
+  assert arr==[1., 2., 999.]
+  assert arr_v==pytest.approx([1., 2., 959.])
 
-def test_arr_returns_copy2() -> None:
+def test_arr_and_arr_v_return_copys2() -> None:
   # values
   holder=MAMH()
-  holder.append(1.0)
-  holder.append(2.0)
+  holder.append(1.)
+  holder.append(2.)
 
   # test
   arr=holder.arr
-  holder.append(999.0)
+  arr_v=holder.arr_v
+  holder.append(999.)
 
   # results
-  assert holder.arr==[1.0, 2.0, 999.0]
-  assert arr==[1.0, 2.0]
+  assert holder.arr==[1., 2., 999.]
+  assert holder.arr_v==pytest.approx([1., 2., 999.])
+  assert arr==[1., 2.]
+  assert arr_v==pytest.approx([1., 2.])
+
+mark__test_empty_raises_on_properties=pytest.mark.parametrize(
+  'prop',
+  [
+    MAMH.max_i,
+    MAMH.min_i,
+    MAMH.max_v,
+    MAMH.min_v,
+    MAMH.avg,
+  ]
+)
+@mark__test_empty_raises_on_properties
+def test_empty_raises_on_properties(prop: property) -> None:
+  # values
+  holder=MAMH()
+  exp_str='No item added yet'
+
+  # # test
+  with pytest.raises(IndexError) as excinfo:
+    _=prop.__get__(holder)
+
+  # results
+  assert str(excinfo.value)==exp_str
+
+if __name__=='__main__':
+  import sys
+  ret_tuple=tuple[tuple[t.Any, ...], dict[str, t.Any]]
+  def get_args_kwargs_from_mark(mark: pytest.MarkDecorator, index: int|slice=slice(None)) -> list[ret_tuple]:
+    names_args_kwargs: tuple[str, list[t.Any]]|tuple[tuple[str, ...], list[tuple[t.Any, ...]]]=mark.args
+    names, args_kwargs=names_args_kwargs
+    args: tuple[t.Any, ...]=()
+    kwargs: dict[str, t.Any]={}
+    if isinstance(index, int):
+      args_kwargs=[args_kwargs[index]]
+    else:
+      args_kwargs=args_kwargs[index]
+    return [(
+      (), (
+        {names: a_kw}
+          if isinstance(names, str) else
+        {n: v for n,v in zip(names, a_kw)}
+      )
+    ) for a_kw in args_kwargs]
+  args_kwargs=(((),{}),)
+  func_name=sys.argv[1]
+  func=locals()[func_name]
+  mark=f'mark__{func_name}'
+  print_index=lambda i, args, kwargs: print('no index')
+  if mark in locals():
+    mark=locals()[mark]
+    print_index=lambda i, args, kwargs: print(f'index {i} with: {(args, kwargs)}')
+    try:
+      index=int(sys.argv[2]),
+      print_index=(lambda index: (
+        lambda i, args, kwargs: print(f'index {index} with: {(args, kwargs)}')
+      ))(index[0])
+    except IndexError:
+      index=()
+    args_kwargs=get_args_kwargs_from_mark(mark, *index)
+  for i, (args, kwargs) in enumerate(args_kwargs):
+    print_index(i, args, kwargs)
+    # print(args, kwargs)
+    func(*args, **kwargs)

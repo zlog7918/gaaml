@@ -1,10 +1,22 @@
 import typing as t
 
-class MaxAvgMinHolder:
-  __list: list[float]
+def _f2f(f: float) -> float: return f
+
+_T=t.TypeVar('_T')
+_CTV=t.TypeVar('_CTV', bound=t.Callable)
+class MaxAvgMinHolder(t.Generic[_T]):
+  __list: list[_T]
+  __list_v: list[float]
   @property
-  def arr(self) -> list[float]:
+  def arr(self) -> list[_T]:
     return self.__list[:self.__curr_len]
+  @property
+  def arr_v(self) -> list[float]:
+    return self.__list_v[:self.__curr_len]
+  __v2f: t.Callable[[_T], float]
+  @property
+  def v2f(self) -> t.Callable[[_T], float]:
+    return self.__v2f
   __curr_len: int=0
   __max_i: int=-1
   __min_i: int=-1
@@ -15,17 +27,23 @@ class MaxAvgMinHolder:
   def __init__(
     self,
     num: int=10,
+    to_val: t.Callable[[_T], float]=_f2f
   ) -> None:
     super().__init__()
-    self.__list=[0]*num
+    self.__v2f=to_val
+    self.__list=[0]*num # type: ignore
+    self.__list_v=[0]*num
 
   def __is_filled_and_expand(self) -> None:
     if self.__curr_len>=len(self.__list):
-      self.__list.extend([.0]*len(self.__list))
+      self.__list.extend([.0]*len(self.__list)) # type: ignore
+      self.__list_v.extend([.0]*len(self.__list))
 
-  def append(self, value: float) -> None:
+  def append(self, item: _T) -> None:
     self.__is_filled_and_expand()
-    self.__list[self.__curr_len]=value
+    value=self.__v2f(item)
+    self.__list[self.__curr_len]=item
+    self.__list_v[self.__curr_len]=value
     if value==0:
       self.__zero_counter+=1
     if value>self.__max_v:
