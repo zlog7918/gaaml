@@ -2,23 +2,29 @@ import typing as t
 import random as rnd
 from . import _utils as util
 from . import _consts as const
-from .MaxAvgMinHolder import MaxAvgMinHolder as MAMHolder
 from concurrent.futures import ThreadPoolExecutor
+from .MaxAvgMinHolder import MaxAvgMinHolder as MAMHolder
 
 class Population(t.Generic[util.IndividualType]):
+  __calc_avg_from_fittnesses: t.Callable[[list[float]], float]=staticmethod(lambda i: sum(i)/len(i))
+
   __population: list[util.IndividualType]
   @property
   def population(self) -> list[util.IndividualType]:
     return self.__population[:]
-  __fitnesses: MAMHolder
+  __fitnesses: MAMHolder[list[float]]
+  @property
+  def fitnesses_all(self) -> list[list[float]]:
+    return self.__fitnesses.arr
   @property
   def fitnesses(self) -> list[float]:
-    return self.__fitnesses.arr
+    return self.__fitnesses.arr_v
   __calc_fitness: t.Callable[[util.IndividualType], float]
   __calc_fitnesses: t.Callable[[], None]
   __cross_rate: float
   __mutate_rate: float
   __max_worker_num: int
+  __num_of_fit_calc: int
   def __init__(
     self,
     pop_num: int,
@@ -27,6 +33,7 @@ class Population(t.Generic[util.IndividualType]):
     cross_rate: float,
     mutate_rate: float,
     *,
+    num_of_fit_calc: int=const.NUM_OF_FIT_CALC,
     max_worker_num: int=const.MAX_WORKERS,
   ) -> None:
     super().__init__()
@@ -35,6 +42,7 @@ class Population(t.Generic[util.IndividualType]):
     self.__cross_rate=cross_rate
     self.__mutate_rate=mutate_rate
     self.__max_worker_num=max_worker_num
+    self.__num_of_fit_calc=num_of_fit_calc
     self.__calc_fitnesses=(
       self.__calc_fitnesses_multi
         if self.__max_worker_num>1 else
@@ -43,21 +51,35 @@ class Population(t.Generic[util.IndividualType]):
     self.__calc_fitnesses()
 
   def __calc_fitnesses_multi(self) -> None:
-    fitnesses=MAMHolder(len(self.__population))
+    fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
     with ThreadPoolExecutor(max_workers=self.__max_worker_num) as executor:
-      future_fits=[executor.submit(self.__calc_fitness, ind) for ind in self.__population]
+      future_fits=[
+        executor.submit(
+          lambda ind: [
+            self.__calc_fitness(ind)
+              for _ in
+            range(self.__num_of_fit_calc)
+          ], ind
+        ) for ind in self.__population
+      ]
       for future in future_fits:
         fit=future.result()
         fitnesses.append(fit)
     self.__fitnesses=fitnesses
   def __calc_fitnesses_seq(self) -> None:
-    fitnesses=MAMHolder(len(self.__population))
-    for fit in (self.__calc_fitness(ind) for ind in self.__population):
+    fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
+    for fit in (
+      [
+        self.__calc_fitness(ind)
+          for _ in
+        range(self.__num_of_fit_calc)
+      ] for ind in self.__population
+    ):
       fitnesses.append(fit)
     self.__fitnesses=fitnesses
 
   @staticmethod
-  def _calc_to_add(fitnesses: MAMHolder) -> float:
+  def _calc_to_add(fitnesses: MAMHolder[list[float]]) -> float:
     # add more elaborate way, so if fitnesses for example are: [0, 0, 0, 5, 0], id does not always cross one and the same individual
     # a=\frac{
     #   2S
@@ -65,7 +87,7 @@ class Population(t.Generic[util.IndividualType]):
     #   n(k+7)-k(k+9)
     # }
     to_add=float('inf')
-    for v in fitnesses.arr:
+    for v in fitnesses.arr_v:
       if v>0 and v<to_add:
         to_add=v
     to_add*=.01
@@ -79,7 +101,7 @@ class Population(t.Generic[util.IndividualType]):
 
     probs=[]
     _sum=0
-    for p in ((fit+to_add)/self.__fitnesses.sum for fit in self.__fitnesses.arr):
+    for p in ((fit+to_add)/self.__fitnesses.sum for fit in self.__fitnesses.arr_v):
       _sum+=p
       probs.append(_sum)
     del _sum

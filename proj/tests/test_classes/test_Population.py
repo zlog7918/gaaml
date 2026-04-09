@@ -85,15 +85,17 @@ def test_mutate(seed: int, flag: bool) -> None:
 @pytest.mark.parametrize(
   ('values', 'exp_to_add'),
   [
-    ((0, 1), .01),
-    ((1, 4), .01),
-    ((8, 4, 3), .03),
-    ((140, 510, 753), 1.4),
+    (([0], [1]), .01),
+    (([1], [3, 5]), .01),
+    (([11, 7, 6], [4], [1, 5]), .03),
+    (([140], [510], [753]), 1.4),
   ]
 )
-def test_calc_to_add(values: tuple[float, ...], exp_to_add: float) -> None:
+def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None:
   # values
-  handle=MAMH(5)
+  # private access: calc_avg_from_fittnesses=P.__calc_avg_from_fittnesses
+  calc_avg_from_fittnesses=P._Population__calc_avg_from_fittnesses # type: ignore
+  handle=MAMH[list[float]](5, calc_avg_from_fittnesses)
   for v in values:
     handle.append(v)
 
@@ -136,13 +138,16 @@ def test_create() -> None:
   # results
   assert isinstance(pop.population, list)
   assert isinstance(pop.fitnesses, list)
+  assert isinstance(pop.fitnesses_all, list)
 
   assert len(pop.population)==pop_num
   assert len(pop.fitnesses)==pop_num
+  assert len(pop.fitnesses_all)==pop_num
   assert all(isinstance(ind, _GI) for ind in pop.population)
   assert all(len(ind.gen)==input_len for ind in pop.population)
   assert all(ind is gi for ind, gi in zip(pop.population, (gi1, gi2, gi3, gi4, gi5)))
   assert all(isinstance(float(fit), float) for fit in pop.fitnesses)
+  assert all(isinstance(fits, list) for fits in pop.fitnesses_all)
   assert all(
     min_v<=fit
     and fit<=max_v
@@ -150,11 +155,21 @@ def test_create() -> None:
       for fit, exp_fit in
     zip(pop.fitnesses, exp_fitnesses)
   )
+  assert all(
+    all(
+        min_v<=fit
+        and fit<=max_v
+        and fit==exp_fit
+      for fit in fits
+    )
+      for fits, exp_fit in
+    zip(pop.fitnesses_all, exp_fitnesses)
+  )
 
 def test_population_returns_copy() -> None:
   # values
   pop_num=2
-  bit,min_v,max_v=4,1,11
+  bit,min_v,max_v=4, 1, 11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
   def calc_fitness_func(ind: _GI) -> float:
@@ -436,3 +451,23 @@ def test_error_change_fitnesses() -> None:
 
   # results
   assert str(excinfo.value)=='property \'fitnesses\' of \'Population\' object has no setter'
+
+def test_error_change_fitnesses_all() -> None:
+  # values
+  pop_num=5
+  bit,min_v,max_v=4,1,11
+  input_len=bit
+  cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
+  def calc_fitness_func(ind: _GI):
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  crossover_rate=.8
+  mutation_rate=.1
+  schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
+  pop=P(*schema)
+
+  # test
+  with pytest.raises(AttributeError) as excinfo:
+    pop.fitnesses_all=[[0.]]*pop_num # type: ignore
+
+  # results
+  assert str(excinfo.value)=='property \'fitnesses_all\' of \'Population\' object has no setter'
