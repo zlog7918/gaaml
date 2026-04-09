@@ -39,8 +39,9 @@ def test_empty_initial_state() -> None:
   assert zeros==0
   assert arr==[]
   assert arr_v==pytest.approx([])
-  assert isinstance(v2f, t.Callable)
-  assert v2f is f2f
+  assert isinstance(v2f, staticmethod)
+  assert isinstance(v2f.__wrapped__, t.Callable)
+  assert v2f.__wrapped__ is f2f
 
 def test_empty_initial_state_own_func() -> None:
   # values
@@ -63,9 +64,10 @@ def test_empty_initial_state_own_func() -> None:
   assert zeros==0
   assert arr==[]
   assert arr_v==pytest.approx([])
-  assert isinstance(v2f, t.Callable)
-  assert ret_v2f is not f2f
-  assert ret_v2f is v2f
+  assert isinstance(ret_v2f, staticmethod)
+  assert isinstance(ret_v2f.__wrapped__, t.Callable)
+  assert ret_v2f.__wrapped__ is not f2f
+  assert ret_v2f.__wrapped__ is v2f
 
 def test_single_append() -> None:
   # values

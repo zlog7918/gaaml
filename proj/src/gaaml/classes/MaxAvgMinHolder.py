@@ -30,7 +30,7 @@ class MaxAvgMinHolder(t.Generic[_T]):
     to_val: t.Callable[[_T], float]=_f2f
   ) -> None:
     super().__init__()
-    self.__v2f=to_val
+    self.__v2f=staticmethod(to_val)
     self.__list=[0]*num # type: ignore
     self.__list_v=[0]*num
 
