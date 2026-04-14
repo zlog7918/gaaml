@@ -1,14 +1,47 @@
 import numpy as np
 import typing as t
+from . import utils as util
 from . import consts as const
-from .classes.Population import Population
+from .classes.Population import (
+  const as Pop_const,
+  Population,
+)
 from .classes.Generations import Generations
 from .classes.NetIndividual import NetIndividual
 # import keras as krs
 # import tensorflow
 
 IndType=NetIndividual
-RetType=NetIndividual
+RetType=Generations
+
+def __f(training_data: np.ndarray, validation_data: np.ndarray|None, test_data: np.ndarray, number_of_attributes: int) -> t.Callable[[IndType], float]:
+  if training_data.shape[1]!=test_data.shape[1]:
+    raise ValueError('training_data and test_data do not have the same number of attributes in data or output')
+  if validation_data is not None and training_data.shape[1]!=validation_data.shape[1]:
+    raise ValueError('validation_data does not have the same number of attributes in data or output as training_data and test_data')
+  training_data_x, training_data_y=training_data[:,:number_of_attributes], training_data[:,number_of_attributes:]
+  _validation_data=None if validation_data is None else (validation_data[:,:number_of_attributes], validation_data[:,number_of_attributes:])
+  del validation_data
+  test_data_x, test_data_y=test_data[:,:number_of_attributes], test_data[:,number_of_attributes:]
+
+  def f(net_ind: IndType, verbose: t.Literal[0]|t.Literal[1]|t.Literal[2]|t.Literal['auto']='auto') -> float:
+    model, batch_size, epochs=util.cr_net_from_ind(net_ind, training_data_x.shape[1], training_data_y.shape[1])
+    model.fit(
+      training_data_x,
+      training_data_y,
+      batch_size=batch_size,
+      epochs=epochs,
+      validation_data=_validation_data,
+      verbose=verbose, # type: ignore
+    ) # throws (3) warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
+
+    ret=model.evaluate(
+      test_data_x,
+      test_data_y,
+      verbose=verbose, # type: ignore
+    )
+    return ret
+  return f
 
 def fitness(_f: t.Callable[[IndType], float], net_ind: IndType) -> float:
   ret=_f(net_ind)
@@ -19,6 +52,7 @@ def cr_network(
   training_data: np.ndarray,
   test_data: np.ndarray,
   /,*,
+  number_of_attributes: int=...,
   population_size: int=...,
   number_of_generations: int=...,
   cross_rate: float=...,
@@ -28,6 +62,7 @@ def cr_network(
     IndType
   ], float]=...,
   plot: bool=False,
+  max_worker_num: int=...,
 ) -> RetType: ...
 @t.overload
 def cr_network(
@@ -35,6 +70,7 @@ def cr_network(
   validation_data: np.ndarray,
   test_data: np.ndarray,
   /,*,
+  number_of_attributes: int=...,
   population_size: int=...,
   number_of_generations: int=...,
   cross_rate: float=...,
@@ -44,12 +80,14 @@ def cr_network(
     IndType
   ], float]=...,
   plot: bool=False,
+  max_worker_num: int=...,
 ) -> RetType: ...
 def cr_network(
   training_data: np.ndarray,
   _validation_data: np.ndarray,
   _test_data: np.ndarray|None=None,
   /,*,
+  number_of_attributes: int=-1,
   population_size: int=const.POP_SIZE,
   number_of_generations: int=const.NUM_OF_GENERATIONS,
   cross_rate: float=const.CROSS_RATE,
@@ -59,6 +97,7 @@ def cr_network(
     IndType
   ], float]=fitness,
   plot: bool=False,
+  max_worker_num: int=Pop_const.MAX_WORKERS,
 ) -> RetType:
   test_data, validation_data=(
     (_validation_data, None)
@@ -66,14 +105,7 @@ def cr_network(
     (_test_data, _validation_data)
   )
   del _validation_data, _test_data
-
-  def _f(training_data: np.ndarray, validation_data: np.ndarray|None, test_data: np.ndarray) -> t.Callable[[IndType], float]:
-    def f(net_ind: IndType) -> float:
-      params, layer_sizes, layer_types=net_ind.gen
-      params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
-      return 0
-    return f
-  f=_f(training_data, validation_data, test_data)
+  f=__f(training_data, validation_data, test_data, number_of_attributes)
   pop=Population(
     population_size,
     lambda: IndType(
@@ -86,26 +118,28 @@ def cr_network(
         const.NEURON_TYPE,
       ),
     ),
-    IndType.crossover,
-    IndType.get_cp,
     lambda x: fitness_func(f, x),
     cross_rate,
     mutation_rate,
+    max_worker_num=max_worker_num,
   )
 
   generations=Generations(pop, number_of_generations)
+  generations.go_through_generations()
   (
     (max_sol, min_sol),
     (max_of_max, min_of_min),
     (maxs, avgs, mins),
-  )=generations.go_through_generations()
+  )=generations.get_statistics()
 
   if plot:
+    ylim=.5
     if max_of_max!=0:
-      print('Maksymalna wartość:', max_of_max)
+      ylim=max_of_max
+      # print('Maksymalna wartość:', max_of_max)
     import matplotlib.pyplot as plt
     for i, (title, l) in enumerate(zip(
-      ('Max values', 'Avg values', 'Min values'),
+      (f'Max values{'' if max_of_max==0 else f' (max: {max_of_max})'}', 'Avg values', 'Min values'),
       (maxs, avgs, mins)
     )):
       i+=1
@@ -114,20 +148,8 @@ def cr_network(
       plt.xlabel('x')
       plt.ylabel('y')
       plt.xlim((0, len(l)+1))
-      if max_of_max==0:
-        plt.ylim((0, .5))
-      else:
-        plt.ylim((0, max_of_max))
+      plt.ylim((0, ylim))
       plt.title(title)
       plt.show()
 
-  return max_sol
-
-  # seq=krs.models.Sequential()
-  # seq.compile(
-  #   krs.optimizers.Adam(learning_rate=0.001), # type: ignore[arg-type]
-  #   loss=None
-  # )
-  # seq.fit(
-  #   epochs=1
-  # )
+  return generations
