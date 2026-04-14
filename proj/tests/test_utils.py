@@ -149,37 +149,3 @@ def test_cr_net_from_ind(
   # print([l.activation for l in layers])
   assert len(layers)==len(exp_activation_types)
   assert all(l.activation is a for l,a in zip(layers, exp_activation_types))
-
-if __name__=='__main__':
-  import sys
-  ret_tuple=tuple[tuple[t.Any, ...], dict[str, t.Any]]
-  def get_args_kwargs_from_mark(mark: pytest.MarkDecorator, index: int|slice=slice(None)) -> list[ret_tuple]:
-    names_args_kwargs: tuple[str, list[t.Any]]|tuple[tuple[str, ...], list[tuple[t.Any, ...]]]=mark.args
-    names, args_kwargs=names_args_kwargs
-    args: tuple[t.Any, ...]=()
-    kwargs: dict[str, t.Any]={}
-    if isinstance(index, int):
-      args_kwargs=[args_kwargs[index]]
-    else:
-      args_kwargs=args_kwargs[index]
-    return [(
-      (), (
-        {names: a_kw}
-          if isinstance(names, str) else
-        {n: v for n,v in zip(names, a_kw)}
-      )
-    ) for a_kw in args_kwargs]
-  args_kwargs=(((),{}),)
-  func_name=sys.argv[1]
-  func=locals()[func_name]
-  mark=f'mark__{func_name}'
-  if mark in locals():
-    mark=locals()[mark]
-    try:
-      index=int(sys.argv[2]),
-    except IndexError:
-      index=()
-    args_kwargs=get_args_kwargs_from_mark(mark, *index)
-  for args, kwargs in args_kwargs:
-    # print(args, kwargs)
-    func(*args, **kwargs)
