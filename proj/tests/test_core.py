@@ -37,14 +37,14 @@ class MockPlt:
 @pytest.mark.parametrize(
   ('ni_str', 'expected_fit'),
   [
-    ('0 0  1 0  1 1  1 0 1 0 1', 16.),
-    ('0 0  1 0  1 1  1 1 1 1 1', 25.),
-    ('0 0  1 0  1 1  1 1 1 1 0', 25.),
-    ('0 0  1 0  1 1  0 0 0 1 0', 0.),
-    ('0 0  1 0  1 1  0 0 0 0 0', 0.),
-    ('0 0  1 0  1 1  0 0 1 0 0', 0.),
-    ('0 0  1 0  1 1  0 0 1 0 1', 0.),
-    ('0 0  1 0  1 1  0 0 1 1 0', 1.),
+    ('0 0  1 0  1 1  1 0 1 0 1', 1/22),
+    ('0 0  1 0  1 1  1 1 1 1 1', 1/32),
+    ('0 0  1 0  1 1  1 1 1 1 0', 1/31),
+    ('0 0  1 0  1 1  0 0 0 1 0', 1/3),
+    ('0 0  1 0  1 1  0 0 0 0 0', 1.),
+    ('0 0  1 0  1 1  0 0 1 0 0', .2),
+    ('0 0  1 0  1 1  0 0 1 0 1', 1/6),
+    ('0 0  1 0  1 1  0 0 1 1 0', 1/7),
   ]
 )
 def test_fitness(ni_str: str, expected_fit: float) -> None:
@@ -53,7 +53,7 @@ def test_fitness(ni_str: str, expected_fit: float) -> None:
   num_seed=('num_seed', (2, 0, 3))
   type_seed=('type_seed', (2, 0, 3))
   g_schema=(
-    ('x', (5, -5, 25)),
+    ('x', (5, 0, 31)),
   )
   n_schema=3, 2, 7
   t_schema=2, 0, 3
@@ -337,7 +337,7 @@ def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations:
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: 1)
+  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: 0)
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -373,7 +373,7 @@ def test_cr_network_plot_0_in_fitnesses(monkeypatch: pytest.MonkeyPatch, number_
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: 0)
+  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: float('inf'))
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
