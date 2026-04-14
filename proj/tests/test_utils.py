@@ -138,6 +138,8 @@ def test_cr_net_from_ind(
   assert isinstance(model, krs.Model)
   assert isinstance(batch_size, int)
   assert isinstance(epochs, int)
+  assert batch_size==exp_batch
+  assert epochs==exp_epoch
   assert isinstance(model.optimizer, exp_optimalizer_type)
   weights: list[np.ndarray]=model.get_weights()
   # print([w.shape for w in weights])
