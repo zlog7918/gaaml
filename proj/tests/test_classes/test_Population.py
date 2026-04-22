@@ -1,10 +1,11 @@
 import pytest
 import typing as t
 import random as rnd
+from pathlib import Path
 from gaaml.classes import _utils as util
-from gaaml.classes.MaxAvgMinHolder import MaxAvgMinHolder as MAMH
 from gaaml.classes.Population import Population as P
 from gaaml.classes.GenIndividual import GenIndividual as _GI
+from gaaml.classes.MaxAvgMinHolder import MaxAvgMinHolder as MAMH
 
 
 @pytest.mark.parametrize(
@@ -106,7 +107,7 @@ def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None
   assert isinstance(float(to_add), float)
   assert to_add==pytest.approx(exp_to_add)
 
-def test_create() -> None:
+def test_create(tmp_path: Path) -> None:
   # values
   pop_num=5
   bit,min_v,max_v=4,1,11
@@ -125,7 +126,7 @@ def test_create() -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -133,7 +134,8 @@ def test_create() -> None:
   exp_fitnesses=(9,4,5,7,10)
 
   # test
-  pop=P(*schema)
+  pop=P(*schema, save_dir_path=tmp_path)
+  # pop=P(*schema, max_worker_num=1)
 
   # results
   assert isinstance(pop.population, list)
@@ -166,13 +168,220 @@ def test_create() -> None:
     zip(pop.fitnesses_all, exp_fitnesses)
   )
 
+  assert tmp_path.exists()
+  assert tmp_path.is_dir()
+  gen0=(*tmp_path.iterdir(),)
+  assert len(gen0)==1
+  gen0=gen0[0]
+  assert gen0.name=='gen_0'
+  subdirs=(*gen0.iterdir(),)
+  assert len(subdirs)==5
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert all(d.is_dir() for d in subdirs)
+  subsubdirs=[(*d.iterdir(),) for d in subdirs]
+  assert all(len(d)==5 for d in subsubdirs)
+  assert all(ds.is_dir() for d in subsubdirs for ds in d)
+  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+
+mark__test_set_dir=pytest.mark.parametrize(
+  'path_to_dir_path',
+  [
+    lambda p: p.as_posix(),
+    lambda p: p,
+  ]
+)
+@mark__test_set_dir
+def test_set_dir(
+  tmp_path: Path,
+  path_to_dir_path: t.Callable[[Path], Path|str],
+) -> None:
+  # values
+  pop_num=5
+  bit,min_v,max_v=4,1,11
+  input_len=bit
+  def __cr_ind() -> t.Generator[_GI, None, None]:
+    for gi_gen in (
+      '1000', # fit: 8+1=9
+      '0011', # fit: 3+1=4
+      '0100', # fit: 4+1=5
+      '0110', # fit: 6+1=7
+      '1101', # fit: 13+1>11 -> 9+1=10
+    ):
+      gi=_GI(input_len)
+      gi._gen=bytearray(gi_gen.encode())
+      yield gi
+  gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
+  _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
+  cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  crossover_rate=.8
+  mutation_rate=.1
+  schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
+  pop=P(*schema)
+  # pop=P(*schema, max_worker_num=1)
+  dir_path=path_to_dir_path(tmp_path)
+  dir_Path=Path(dir_path)
+
+  # test
+  pop.set_dir(dir_path)
+
+  # results
+  assert dir_Path.exists()
+  assert dir_Path.is_dir()
+  gen0=(*dir_Path.iterdir(),)
+  assert len(gen0)==1
+  gen0=gen0[0]
+  assert gen0.name=='gen_0'
+  subdirs=(*gen0.iterdir(),)
+  assert len(subdirs)==5
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert all(d.is_dir() for d in subdirs)
+  subsubdirs=[(*d.iterdir(),) for d in subdirs]
+  assert all(len(d)==5 for d in subsubdirs)
+  assert all(ds.is_dir() for d in subsubdirs for ds in d)
+  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+
+mark__test_set_dir_after_cr_with_path=pytest.mark.parametrize(
+  ('path_to_dir_path1', 'path_to_dir_path2'),
+  [
+    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2')),
+    (lambda p: (p/'dir1'), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
+  ]
+)
+@mark__test_set_dir_after_cr_with_path
+def test_set_dir_after_cr_with_path(
+  tmp_path: Path,
+  path_to_dir_path1: t.Callable[[Path], Path|str],
+  path_to_dir_path2: t.Callable[[Path], Path|str],
+) -> None:
+  # values
+  pop_num=5
+  bit,min_v,max_v=4,1,11
+  input_len=bit
+  def __cr_ind() -> t.Generator[_GI, None, None]:
+    for gi_gen in (
+      '1000', # fit: 8+1=9
+      '0011', # fit: 3+1=4
+      '0100', # fit: 4+1=5
+      '0110', # fit: 6+1=7
+      '1101', # fit: 13+1>11 -> 9+1=10
+    ):
+      gi=_GI(input_len)
+      gi._gen=bytearray(gi_gen.encode())
+      yield gi
+  gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
+  _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
+  cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  crossover_rate=.8
+  mutation_rate=.1
+  schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
+  # pop=P(*schema, max_worker_num=1)
+  dir_path1=path_to_dir_path1(tmp_path)
+  dir_path2=path_to_dir_path2(tmp_path)
+  dir_Path1=Path(dir_path1)
+  dir_Path2=Path(dir_path2)
+  pop=P(*schema, save_dir_path=dir_path1)
+
+  # test
+  pop.set_dir(dir_path2)
+
+  # results
+  assert dir_Path1.exists()
+  assert len((*dir_Path1.iterdir(),))==0
+  assert dir_Path2.exists()
+  assert dir_Path2.is_dir()
+  gen0=(*dir_Path2.iterdir(),)
+  assert len(gen0)==1
+  gen0=gen0[0]
+  assert gen0.name=='gen_0'
+  subdirs=(*gen0.iterdir(),)
+  assert len(subdirs)==5
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert all(d.is_dir() for d in subdirs)
+  subsubdirs=[(*d.iterdir(),) for d in subdirs]
+  assert all(len(d)==5 for d in subsubdirs)
+  assert all(ds.is_dir() for d in subsubdirs for ds in d)
+  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+
+mark__test_set_dir_after_set_dir=pytest.mark.parametrize(
+  ('path_to_dir_path1', 'path_to_dir_path2'),
+  [
+    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2')),
+    (lambda p: (p/'dir1'), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
+  ]
+)
+@mark__test_set_dir_after_set_dir
+def test_set_dir_after_set_dir(
+  tmp_path: Path,
+  path_to_dir_path1: t.Callable[[Path], Path|str],
+  path_to_dir_path2: t.Callable[[Path], Path|str],
+) -> None:
+  # values
+  pop_num=5
+  bit,min_v,max_v=4,1,11
+  input_len=bit
+  def __cr_ind() -> t.Generator[_GI, None, None]:
+    for gi_gen in (
+      '1000', # fit: 8+1=9
+      '0011', # fit: 3+1=4
+      '0100', # fit: 4+1=5
+      '0110', # fit: 6+1=7
+      '1101', # fit: 13+1>11 -> 9+1=10
+    ):
+      gi=_GI(input_len)
+      gi._gen=bytearray(gi_gen.encode())
+      yield gi
+  gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
+  _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
+  cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  crossover_rate=.8
+  mutation_rate=.1
+  schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
+  pop=P(*schema)
+  # pop=P(*schema, max_worker_num=1)
+  dir_path1=path_to_dir_path1(tmp_path)
+  dir_path2=path_to_dir_path2(tmp_path)
+  dir_Path1=Path(dir_path1)
+  dir_Path2=Path(dir_path2)
+  pop.set_dir(dir_path1)
+
+  # test
+  pop.set_dir(dir_path2)
+
+  # results
+  assert dir_Path1.exists()
+  assert len((*dir_Path1.iterdir(),))==0
+  assert dir_Path2.exists()
+  assert dir_Path2.is_dir()
+  gen0=(*dir_Path2.iterdir(),)
+  assert len(gen0)==1
+  gen0=gen0[0]
+  assert gen0.name=='gen_0'
+  subdirs=(*gen0.iterdir(),)
+  assert len(subdirs)==5
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert all(d.is_dir() for d in subdirs)
+  subsubdirs=[(*d.iterdir(),) for d in subdirs]
+  assert all(len(d)==5 for d in subsubdirs)
+  assert all(ds.is_dir() for d in subsubdirs for ds in d)
+  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+
 def test_population_returns_copy() -> None:
   # values
   pop_num=2
   bit,min_v,max_v=4, 1, 11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -205,7 +414,7 @@ def test_get_max_avg_min() -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -234,7 +443,7 @@ def test_selection_sum_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=7
     return 0 if ret<0 else ret
@@ -280,7 +489,7 @@ def test_selection_sum_not_zero() -> None:
   pop_num=3
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
     return 0 if ret<0 else ret
@@ -322,7 +531,7 @@ def test_selection_no_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
     return 0 if ret<0 else ret
@@ -355,32 +564,46 @@ def test_selection_no_zero() -> None:
     assert any(cgi1 is gi for gi in (gi1, gi2, gi3, gi4, gi5))
     assert any(cgi2 is gi for gi in (gi1, gi2, gi3, gi4, gi5))
 
-def test_next_generation() -> None:
+def test_next_generation(tmp_path: Path) -> None:
   # values
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, save_dir_path=tmp_path)
 
-  for _ in range(50): # random process
+  for i in range(1, 50): # random process
     # test
-    pop.next_generation()
+    pop.next_generation(i)
 
     # results
     assert len(pop.population)==pop_num
     assert len(pop.fitnesses)==pop_num
 
+    assert tmp_path.exists()
+    assert tmp_path.is_dir()
+    gen_dir=tmp_path/f'gen_{i}'
+    print(gen_dir)
+    assert gen_dir.exists()
+    subdirs=(*gen_dir.iterdir(),)
+    assert len(subdirs)==5
+    assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+    assert all(d.is_dir() for d in subdirs)
+    subsubdirs=[(*d.iterdir(),) for d in subdirs]
+    assert all(len(d)==5 for d in subsubdirs)
+    assert all(ds.is_dir() for d in subsubdirs for ds in d)
+    assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+
 @pytest.mark.parametrize(
   'workers',
   [1, 2, 4]
 )
-def test_multi_vs_single_thread_consistency(workers) -> None:
+def test_multi_vs_single_thread_consistency(workers: int) -> None:
   # values
   pop_num=5
   bit,min_v,max_v=4,1,11
@@ -399,7 +622,7 @@ def test_multi_vs_single_thread_consistency(workers) -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -418,7 +641,7 @@ def test_error_change_population() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI):
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -438,7 +661,7 @@ def test_error_change_fitnesses() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI):
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
@@ -458,7 +681,7 @@ def test_error_change_fitnesses_all() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI):
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1

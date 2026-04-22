@@ -1,6 +1,7 @@
 import pytest
-import typing as t
 import itertools
+import typing as t
+from pathlib import Path
 from gaaml.classes.Generations import Generations as G
 from gaaml.classes.Population import Population as _P
 from gaaml.classes.Individual import _BaseIndividual as _BI
@@ -25,15 +26,16 @@ class DummyInd(_BI["DummyInd", int, tuple[int, float], float]):
     return cls(a_gen0+1, a_gen1+.1), cls(b_gen0+1, b_gen1+.1)
 
 class DummyPop(_P[DummyInd]):
-  gen: int=0
+  gen_num: int=0
   def __init__(self, pop_num: int, individual_factory: t.Callable[[], DummyInd]) -> None:
-    calc_fitness_func: t.Callable[[DummyInd], float]=lambda ind: ind.gen
+    calc_fitness_func: t.Callable[[DummyInd, Path], float]=lambda ind, dir: ind.gen
     super().__init__(pop_num, individual_factory, calc_fitness_func, 1., .0, max_worker_num=1)
   @t.override
-  def next_generation(self) -> None:
-    self.gen+=1
+  def next_generation(self, gen_num: int) -> None:
+    self.gen_num+=1
+    assert self.gen_num==gen_num
     self.__selection_list=iter(self.population)
-    return super().next_generation()
+    return super().next_generation(gen_num)
   @t.override
   def _selection(self) -> tuple[DummyInd, DummyInd]:
     ind1=next(self.__selection_list)
@@ -62,7 +64,7 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
   # test
   gens=G(pop, number_of_generations)
 
-  #results
+  # results
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -70,7 +72,7 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
   # private access: gens.__max_of_max, gens.__min_of_min
   max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
 
-  assert pop.gen==0
+  assert pop.gen_num==0
   assert gens.curr_generations==0
   assert len(maxs)==number_of_generations+1
   assert len(avgs)==number_of_generations+1
@@ -104,8 +106,8 @@ def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[
   # test
   ret=gens.get_statistics()
 
-  #results
-  assert pop.gen==0
+  # results
+  assert pop.gen_num==0
   assert gens.curr_generations==0
   assert isinstance(ret, tuple)
   assert len(ret)==3
@@ -141,7 +143,7 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
   # test
   gens.go_through_generations(go_num_generations)
 
-  #results
+  # results
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -149,7 +151,7 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
   # private access: gens.__max_of_max, gens.__min_of_min
   max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
 
-  assert pop.gen==number_of_generations
+  assert pop.gen_num==number_of_generations
   assert gens.curr_generations==number_of_generations
   assert maxs==pytest.approx(expected_max_avg_min[0])
   assert avgs==pytest.approx(expected_max_avg_min[1])
@@ -183,8 +185,8 @@ def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num:
   # test
   ret=gens.get_statistics()
 
-  #results
-  assert pop.gen==number_of_generations
+  # results
+  assert pop.gen_num==number_of_generations
   assert gens.curr_generations==number_of_generations
   assert isinstance(ret, tuple)
   assert len(ret)==3
@@ -218,7 +220,7 @@ def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, 
   # test
   gens.go_through_generations(go_num_generations)
 
-  #results
+  # results
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -226,7 +228,7 @@ def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, 
   # private access: gens.__max_of_max, gens.__min_of_min
   max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
 
-  assert pop.gen==go_num_generations
+  assert pop.gen_num==go_num_generations
   assert gens.curr_generations==go_num_generations
   assert maxs[:go_num_generations+1]==pytest.approx(expected_max_avg_min[0])
   assert avgs[:go_num_generations+1]==pytest.approx(expected_max_avg_min[1])
@@ -258,8 +260,8 @@ def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, ex
   # test
   ret=gens.get_statistics()
 
-  #results
-  assert pop.gen==go_num_generations
+  # results
+  assert pop.gen_num==go_num_generations
   assert gens.curr_generations==go_num_generations
   assert isinstance(ret, tuple)
   assert len(ret)==3
@@ -296,7 +298,7 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
   # test
   gens.go_through_generations(go_num_generations)
 
-  #results
+  # results
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -306,7 +308,7 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
 
   if go_num_generations is None:
     go_num_generations=number_of_generations-1
-  assert pop.gen==go_num_generations+1
+  assert pop.gen_num==go_num_generations+1
   assert gens.curr_generations==go_num_generations+1
   assert maxs[:go_num_generations+2]==pytest.approx(expected_max_avg_min[0])
   assert avgs[:go_num_generations+2]==pytest.approx(expected_max_avg_min[1])
@@ -341,10 +343,10 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
   # test
   ret=gens.get_statistics()
 
-  #results
+  # results
   if go_num_generations is None:
     go_num_generations=number_of_generations-1
-  assert pop.gen==go_num_generations+1
+  assert pop.gen_num==go_num_generations+1
   assert gens.curr_generations==go_num_generations+1
   assert isinstance(ret, tuple)
   assert len(ret)==3
@@ -391,7 +393,7 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
   for i in go_num_generations:
     gens.go_through_generations(i)
 
-  #results
+  # results
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -399,7 +401,7 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
   # private access: gens.__max_of_max, gens.__min_of_min
   max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
 
-  assert pop.gen==sum(go_num_generations)+2
+  assert pop.gen_num==sum(go_num_generations)+2
   assert gens.curr_generations==sum(go_num_generations)+2
   assert maxs[:sum(go_num_generations)+3]==pytest.approx(expected_max_avg_min[0])
   assert avgs[:sum(go_num_generations)+3]==pytest.approx(expected_max_avg_min[1])
@@ -444,8 +446,8 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   # test
   ret=gens.get_statistics()
 
-  #results
-  assert pop.gen==sum(go_num_generations)+2
+  # results
+  assert pop.gen_num==sum(go_num_generations)+2
   assert gens.curr_generations==sum(go_num_generations)+2
   assert isinstance(ret, tuple)
   assert len(ret)==3
@@ -499,7 +501,7 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
   # private access: gens.__max_of_max, gens.__min_of_min
   max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
 
-  assert pop.gen==number_of_generations
+  assert pop.gen_num==number_of_generations
   assert gens.curr_generations==number_of_generations
   assert maxs==pytest.approx(expected_max_avg_min[0])
   assert avgs==pytest.approx(expected_max_avg_min[1])

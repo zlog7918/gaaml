@@ -1,13 +1,14 @@
 import typing as t
 import random as rnd
+from pathlib import Path
 from . import _utils as util
 from . import _consts as const
+from .DirManager import DirManager
 from concurrent.futures import ThreadPoolExecutor
 from .MaxAvgMinHolder import MaxAvgMinHolder as MAMHolder
 
 class Population(t.Generic[util.IndividualType]):
   __calc_avg_from_fittnesses: t.Callable[[list[float]], float]=staticmethod(lambda i: sum(i)/len(i))
-
   __population: list[util.IndividualType]
   @property
   def population(self) -> list[util.IndividualType]:
@@ -19,8 +20,8 @@ class Population(t.Generic[util.IndividualType]):
   @property
   def fitnesses(self) -> list[float]:
     return self.__fitnesses.arr_v
-  __calc_fitness: t.Callable[[util.IndividualType], float]
-  __calc_fitnesses: t.Callable[[], None]
+  __calc_fitness: t.Callable[[util.IndividualType, Path], float]
+  __calc_fitnesses: t.Callable[[int], None]
   __cross_rate: float
   __mutate_rate: float
   __max_worker_num: int
@@ -29,16 +30,20 @@ class Population(t.Generic[util.IndividualType]):
     self,
     pop_num: int,
     individual_factory: t.Callable[[], util.IndividualType],
-    calc_fitness_func: t.Callable[[util.IndividualType], float],
+    calc_fitness_func: t.Callable[[util.IndividualType, Path], float],
     cross_rate: float,
     mutate_rate: float,
     *,
     num_of_fit_calc: int=const.NUM_OF_FIT_CALC,
     max_worker_num: int=const.MAX_WORKERS,
+    save_dir_path: Path|str|None=None
   ) -> None:
     super().__init__()
     self.__population=[individual_factory() for _ in range(pop_num)]
-    self.__calc_fitness=calc_fitness_func
+    def calc_fitness(ind: util.IndividualType, dir: Path) -> float:
+      dir.mkdir(parents=True)
+      return calc_fitness_func(ind, dir)
+    self.__calc_fitness=calc_fitness
     self.__cross_rate=cross_rate
     self.__mutate_rate=mutate_rate
     self.__max_worker_num=max_worker_num
@@ -48,32 +53,47 @@ class Population(t.Generic[util.IndividualType]):
         if self.__max_worker_num>1 else
       self.__calc_fitnesses_seq
     )
-    self.__calc_fitnesses()
+    self.__dir=DirManager(save_dir_path)
+    self.__calc_fitnesses(0)
 
-  def __calc_fitnesses_multi(self) -> None:
+  def set_dir(self, dir: Path|str) -> None:
+    self.__dir.path=dir
+
+  def __calc_fitnesses_multi(self, gen_num: int) -> None:
     fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
     with ThreadPoolExecutor(max_workers=self.__max_worker_num) as executor:
       future_fits=[
         executor.submit(
-          lambda ind: [
-            self.__calc_fitness(ind)
-              for _ in
+          lambda ind_i, ind: [
+            self.__calc_fitness(ind, (
+              self.__dir.path
+                /f'gen_{gen_num}'
+                /f'ind_{ind_i}'
+                /f'iter_{i}'
+            ))
+              for i in
             range(self.__num_of_fit_calc)
-          ], ind
-        ) for ind in self.__population
+          ], ind_i, ind
+        ) for ind_i, ind in enumerate(self.__population)
       ]
       for future in future_fits:
         fit=future.result()
         fitnesses.append(fit)
     self.__fitnesses=fitnesses
-  def __calc_fitnesses_seq(self) -> None:
+  def __calc_fitnesses_seq(self, gen_num: int) -> None:
     fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
     for fit in (
       [
-        self.__calc_fitness(ind)
-          for _ in
+        self.__calc_fitness(ind, (
+          self.__dir.path
+            /f'gen_{gen_num}'
+            /f'ind_{ind_i}'
+            /f'iter_{i}'
+          )
+        )
+          for i in
         range(self.__num_of_fit_calc)
-      ] for ind in self.__population
+      ] for ind_i, ind in enumerate(self.__population)
     ):
       fitnesses.append(fit)
     self.__fitnesses=fitnesses
@@ -124,7 +144,7 @@ class Population(t.Generic[util.IndividualType]):
       return ind_type.crossover(parent1, parent2, cp)
     return parent1, parent2
 
-  def next_generation(self) -> None:
+  def next_generation(self, gen_num: int) -> None:
     new_generation=[]
     pop_len=len(self.__population)
     for _ in range(int((pop_len+1)/2)):
@@ -134,7 +154,7 @@ class Population(t.Generic[util.IndividualType]):
         new_generation.append(child)
 
     self.__population=new_generation[:pop_len]
-    self.__calc_fitnesses()
+    self.__calc_fitnesses(gen_num)
 
   def get_max_avg_min(self) -> tuple[util.IndividualType, util.IndividualType, float, float, float]:
     fitnesses=self.__fitnesses
