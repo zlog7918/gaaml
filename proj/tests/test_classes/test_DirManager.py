@@ -11,7 +11,7 @@ mark__test_create=pytest.mark.parametrize(
   [
     ((lambda p: ()), True),
     ((lambda p: (None,)), True),
-    ((lambda p: (p.as_posix(),)), False),
+    ((lambda p: (str(p),)), False),
     ((lambda p: (p,)), False),
   ]
 )
@@ -37,8 +37,8 @@ def test_create(tmp_path: Path, path_to_args: t.Callable[[Path], tuple[()]|tuple
 mark__test_create_create_dir=pytest.mark.parametrize(
   ('path_to_sub_path'),
   [
-    lambda p: (p/'dir').as_posix(),
-    lambda p: (p/'dir'/'sub').as_posix(),
+    lambda p: str((p/'dir')),
+    lambda p: str((p/'dir'/'sub')),
     lambda p: (p/'dir'),
     lambda p: (p/'dir'/'sub'),
   ]
@@ -75,7 +75,7 @@ mark__test_is_tmp=pytest.mark.parametrize(
   [
     ((lambda p: ()), True),
     ((lambda p: (None,)), True),
-    ((lambda p: (p.as_posix(),)), False),
+    ((lambda p: (str(p),)), False),
     ((lambda p: (p,)), False),
   ]
 )
@@ -98,13 +98,13 @@ mark__test_path_setter=pytest.mark.parametrize(
   ('path_to_args', 'path_to_path_to_set'),
   [
     (lambda p: (), lambda p: (p/'dir2')),
-    (lambda p: (), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (), lambda p: str((p/'dir2'))),
     (lambda p: (None,), lambda p: (p/'dir2')),
-    (lambda p: (None,), lambda p: (p/'dir2').as_posix()),
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (None,), lambda p: str((p/'dir2'))),
+    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2')),
+    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'))),
     (lambda p: ((p/'dir1'),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2').as_posix()),
+    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'))),
   ]
 )
 @mark__test_path_setter
@@ -168,14 +168,14 @@ def test_temp_dir_is_deleted_on_reassignment(
 mark__test_not_tmp_dir_is_cleaned_on_reassignment=pytest.mark.parametrize(
   ('path_to_args', 'path_to_path_to_set'),
   [
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2'/'sub')),
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2').as_posix()),
-    (lambda p: ((p/'dir1').as_posix(),), lambda p: (p/'dir2'/'sub').as_posix()),
+    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2')),
+    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2'/'sub')),
+    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'))),
+    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'/'sub'))),
     (lambda p: ((p/'dir1'),), lambda p: (p/'dir2')),
     (lambda p: ((p/'dir1'),), lambda p: (p/'dir2'/'sub')),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2').as_posix()),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2'/'sub').as_posix()),
+    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'))),
+    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'/'sub'))),
   ]
 )
 @mark__test_not_tmp_dir_is_cleaned_on_reassignment
@@ -207,21 +207,21 @@ mark__test_dir_is_created_on_assignment=pytest.mark.parametrize(
   ('path_to_args', 'exp_is_tmp', 'path_to_path_to_set'),
   [
     (lambda p: (), True, lambda p: (p/'new_dir')),
-    (lambda p: (), True, lambda p: (p/'new_dir').as_posix()),
+    (lambda p: (), True, lambda p: str((p/'new_dir'))),
     (lambda p: (), True, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: (), True, lambda p: (p/'new_dir'/'new_sub').as_posix()),
+    (lambda p: (), True, lambda p: str((p/'new_dir'/'new_sub'))),
     (lambda p: (None,), True, lambda p: (p/'new_dir')),
-    (lambda p: (None,), True, lambda p: (p/'new_dir').as_posix()),
+    (lambda p: (None,), True, lambda p: str((p/'new_dir'))),
     (lambda p: (None,), True, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: (None,), True, lambda p: (p/'new_dir'/'new_sub').as_posix()),
+    (lambda p: (None,), True, lambda p: str((p/'new_dir'/'new_sub'))),
     (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir')),
-    (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir').as_posix()),
+    (lambda p: ((p/'dir'),), False, lambda p: str((p/'new_dir'))),
     (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir'/'new_sub').as_posix()),
-    (lambda p: ((p/'dir').as_posix(),), False, lambda p: (p/'new_dir')),
-    (lambda p: ((p/'dir').as_posix(),), False, lambda p: (p/'new_dir').as_posix()),
-    (lambda p: ((p/'dir').as_posix(),), False, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: ((p/'dir').as_posix(),), False, lambda p: (p/'new_dir'/'new_sub').as_posix()),
+    (lambda p: ((p/'dir'),), False, lambda p: str((p/'new_dir'/'new_sub'))),
+    (lambda p: (str((p/'dir')),), False, lambda p: (p/'new_dir')),
+    (lambda p: (str((p/'dir')),), False, lambda p: str((p/'new_dir'))),
+    (lambda p: (str((p/'dir')),), False, lambda p: (p/'new_dir'/'new_sub')),
+    (lambda p: (str((p/'dir')),), False, lambda p: str((p/'new_dir'/'new_sub'))),
   ]
 )
 @mark__test_dir_is_created_on_assignment
@@ -255,9 +255,9 @@ def test_dir_is_created_on_assignment(
 mark__test_path_setter_moves_contents=pytest.mark.parametrize(
   ('path_to_src', 'path_to_dst'),
   [
-    (lambda p: (p/'src').as_posix(), lambda p: (p/'dst').as_posix()),
-    (lambda p: (p/'src').as_posix(), lambda p: (p/'dst')),
-    (lambda p: (p/'src'), lambda p: (p/'dst').as_posix()),
+    (lambda p: str((p/'src')), lambda p: str((p/'dst'))),
+    (lambda p: str((p/'src')), lambda p: (p/'dst')),
+    (lambda p: (p/'src'), lambda p: str((p/'dst'))),
     (lambda p: (p/'src'), lambda p: (p/'dst')),
   ]
 )
@@ -290,7 +290,7 @@ def test_path_setter_moves_contents(
 mark__test_path_setter_same_path=pytest.mark.parametrize(
   'path_to_dir_path',
   [
-    lambda p: (p/'dir').as_posix(),
+    lambda p: str((p/'dir')),
     lambda p: (p/'dir'),
   ]
 )
@@ -313,7 +313,7 @@ def test_path_setter_same_path(
 mark__test_error_create_path_is_file=pytest.mark.parametrize(
   'path_to_file_path',
   [
-    lambda p: (p/'t.txt').as_posix(),
+    lambda p: str((p/'t.txt')),
     lambda p: (p/'t.txt'),
   ]
 )
@@ -332,12 +332,12 @@ def test_error_create_path_is_file(
     _=DM(file_path)
 
   # results
-  assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.as_posix()}'
+  assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.resolve()}'
 
 mark__test_error_create_if_directory_not_empty=pytest.mark.parametrize(
   'path_to_dir_path',
   [
-    lambda p: p.as_posix(),
+    lambda p: str(p),
     lambda p: p,
   ]
 )
@@ -356,18 +356,18 @@ def test_error_create_if_directory_not_empty(
     _=DM(dir_path)
 
   # results
-  assert str(excinfo.value)==f'Given directory is not empty: {dir_Path.resolve().as_posix()}'
+  assert str(excinfo.value)==f'Given directory is not empty: {dir_Path.resolve()}'
 
 mark__test_error_path_setter_path_is_file=pytest.mark.parametrize(
   ('path_to_args', 'path_to_file_path'),
   [
-    (lambda p: (), lambda p: (p/'t.txt').as_posix()),
+    (lambda p: (), lambda p: str((p/'t.txt'))),
     (lambda p: (), lambda p: (p/'t.txt')),
-    (lambda p: (None,), lambda p: (p/'t.txt').as_posix()),
+    (lambda p: (None,), lambda p: str((p/'t.txt'))),
     (lambda p: (None,), lambda p: (p/'t.txt')),
-    (lambda p: ((p/'dir').as_posix(),), lambda p: (p/'t.txt').as_posix()),
-    (lambda p: ((p/'dir').as_posix(),), lambda p: (p/'t.txt')),
-    (lambda p: ((p/'dir'),), lambda p: (p/'t.txt').as_posix()),
+    (lambda p: (str((p/'dir')),), lambda p: str((p/'t.txt'))),
+    (lambda p: (str((p/'dir')),), lambda p: (p/'t.txt')),
+    (lambda p: ((p/'dir'),), lambda p: str((p/'t.txt'))),
     (lambda p: ((p/'dir'),), lambda p: (p/'t.txt')),
   ]
 )
@@ -389,18 +389,18 @@ def test_error_path_setter_path_is_file(
     dm.path=file_path
 
   # results
-  assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.as_posix()}'
+  assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.resolve()}'
 
 mark__test_error_path_setter_if_directory_not_empty=pytest.mark.parametrize(
   ('path_to_args', 'path_to_dir_path'),
   [
-    (lambda p: (), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (), lambda p: str((p/'dir2'))),
     (lambda p: (), lambda p: (p/'dir2')),
-    (lambda p: (None,), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (None,), lambda p: str((p/'dir2'))),
     (lambda p: (None,), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir').as_posix(),), lambda p: (p/'dir2').as_posix()),
-    (lambda p: ((p/'dir').as_posix(),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir'),), lambda p: (p/'dir2').as_posix()),
+    (lambda p: (str((p/'dir')),), lambda p: str((p/'dir2'))),
+    (lambda p: (str((p/'dir')),), lambda p: (p/'dir2')),
+    (lambda p: ((p/'dir'),), lambda p: str((p/'dir2'))),
     (lambda p: ((p/'dir'),), lambda p: (p/'dir2')),
   ]
 )
@@ -423,14 +423,14 @@ def test_error_path_setter_if_directory_not_empty(
     dm.path=dir_path
 
   # results
-  assert str(excinfo.value)==f'Given directory is not empty: {dir_Path.resolve().as_posix()}'
+  assert str(excinfo.value)==f'Given directory is not empty: {dir_Path.resolve()}'
 
 mark__test_error_path_setter_directory_is_inside_current_dir=pytest.mark.parametrize(
   ('path_to_path', 'path_to_subpath'),
   [
-    (lambda p: (p/'dir').as_posix(), lambda p: (p/'dir'/'sub').as_posix()),
-    (lambda p: (p/'dir').as_posix(), lambda p: (p/'dir'/'sub')),
-    (lambda p: (p/'dir'), lambda p: (p/'dir'/'sub').as_posix()),
+    (lambda p: str((p/'dir')), lambda p: str((p/'dir'/'sub'))),
+    (lambda p: str((p/'dir')), lambda p: (p/'dir'/'sub')),
+    (lambda p: (p/'dir'), lambda p: str((p/'dir'/'sub'))),
     (lambda p: (p/'dir'), lambda p: (p/'dir'/'sub')),
   ]
 )
@@ -451,14 +451,14 @@ def test_error_path_setter_directory_is_inside_current_dir(
     dm.path=subdir_path
 
   # results
-  assert str(excinfo.value)==f'Given path is inside the current directory: {subdir_Path.as_posix()}'
+  assert str(excinfo.value)==f'Given path is inside the current directory: {subdir_Path.resolve()}'
 
 mark__test_error_change_is_tmp=pytest.mark.parametrize(
   'path_to_args',
   [
     lambda p: (),
     lambda p: (None,),
-    lambda p: (p.as_posix(),),
+    lambda p: (str(p),),
     lambda p: (p,),
   ]
 )
