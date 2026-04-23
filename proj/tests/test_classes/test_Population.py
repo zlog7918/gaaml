@@ -107,7 +107,18 @@ def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None
   assert isinstance(float(to_add), float)
   assert to_add==pytest.approx(exp_to_add)
 
-def test_create(tmp_path: Path) -> None:
+mark__test_create=pytest.mark.parametrize(
+  'path_to_dir_path',
+  [
+    lambda p: str(p),
+    lambda p: p,
+  ]
+)
+@mark__test_create
+def test_create(
+  tmp_path: Path,
+  path_to_dir_path: t.Callable[[Path], Path|str],
+) -> None:
   # values
   pop_num=5
   bit,min_v,max_v=4,1,11
@@ -132,9 +143,10 @@ def test_create(tmp_path: Path) -> None:
   mutation_rate=.1
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
   exp_fitnesses=(9,4,5,7,10)
+  dir_path=path_to_dir_path(tmp_path)
 
   # test
-  pop=P(*schema, save_dir_path=tmp_path)
+  pop=P(*schema, save_dir_path=dir_path)
   # pop=P(*schema, max_worker_num=1)
 
   # results
@@ -186,7 +198,7 @@ def test_create(tmp_path: Path) -> None:
 mark__test_set_dir=pytest.mark.parametrize(
   'path_to_dir_path',
   [
-    lambda p: p.as_posix(),
+    lambda p: str(p),
     lambda p: p,
   ]
 )
@@ -245,9 +257,9 @@ def test_set_dir(
 mark__test_set_dir_after_cr_with_path=pytest.mark.parametrize(
   ('path_to_dir_path1', 'path_to_dir_path2'),
   [
-    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2').as_posix()),
-    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2')),
-    (lambda p: (p/'dir1'), lambda p: (p/'dir2').as_posix()),
+    (lambda p: str(p/'dir1'), lambda p: str(p/'dir2')),
+    (lambda p: str(p/'dir1'), lambda p: (p/'dir2')),
+    (lambda p: (p/'dir1'), lambda p: str(p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
   ]
 )
@@ -311,9 +323,9 @@ def test_set_dir_after_cr_with_path(
 mark__test_set_dir_after_set_dir=pytest.mark.parametrize(
   ('path_to_dir_path1', 'path_to_dir_path2'),
   [
-    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2').as_posix()),
-    (lambda p: (p/'dir1').as_posix(), lambda p: (p/'dir2')),
-    (lambda p: (p/'dir1'), lambda p: (p/'dir2').as_posix()),
+    (lambda p: str(p/'dir1'), lambda p: str(p/'dir2')),
+    (lambda p: str(p/'dir1'), lambda p: (p/'dir2')),
+    (lambda p: (p/'dir1'), lambda p: str(p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
   ]
 )
