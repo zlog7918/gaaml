@@ -1,7 +1,7 @@
-import sys
 import pytest
 import numpy as np
 import typing as t
+from pathlib import Path
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 import gaaml.core as core
@@ -47,7 +47,7 @@ class MockPlt:
     ('0 0  1 0  1 1  0 0 1 1 0', 1/7),
   ]
 )
-def test_fitness(ni_str: str, expected_fit: float) -> None:
+def test_fitness(tmp_path: Path, ni_str: str, expected_fit: float) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -62,7 +62,7 @@ def test_fitness(ni_str: str, expected_fit: float) -> None:
   ni.gen[0]._update_fenotype()
 
   # test
-  ret=core.fitness(lambda ni: ni.gen[0].fenotype['x'], ni)
+  ret=core.fitness(lambda ni, dir: ni.gen[0].fenotype['x'], ni, tmp_path)
 
   # results
   assert isinstance(float(ret), float)
@@ -140,6 +140,7 @@ mark__test___f_without_validation=pytest.mark.parametrize(
 )
 @mark__test___f_without_validation
 def test___f_without_validation(
+  tmp_path: Path,
   training_data: np.ndarray,
   test_data: np.ndarray,
   number_of_attributes: int,
@@ -163,22 +164,15 @@ def test___f_without_validation(
   ni._update()
 
   # test
-  # lambda ni: ni.gen[0].fenotype['x'], ni
   ret=core.__f(training_data, None, test_data, number_of_attributes)
-  with pytest.warns() as warninfo:
-    _ret=ret(ni, 0) # type: ignore
+  _ret=ret(ni, tmp_path, 0) # type: ignore
 
   # results
-  assert len(warninfo.list)==3
-  assert all(isinstance(warn.message, DeprecationWarning) for warn in warninfo.list)
-  assert all(
-    str(warn.message).find('__array__ implementation doesn\'t accept a copy keyword, so passing copy=False failed')>=0
-      for warn in
-    warninfo.list
-  )
   assert isinstance(ret, t.Callable)
   assert isinstance(float(_ret), float)
-  print(f'calculated fittness: {_ret}')
+
+  assert (tmp_path/'model_meta.data').exists()
+  assert (tmp_path/'model.weights.h5').exists()
   # assert _ret==pytest.approx(expected_fit)
 
 mark__test___f_with_validation=pytest.mark.parametrize(
@@ -263,6 +257,7 @@ mark__test___f_with_validation=pytest.mark.parametrize(
 )
 @mark__test___f_with_validation
 def test___f_with_validation(
+  tmp_path: Path,
   training_data: np.ndarray,
   validation_data: np.ndarray,
   test_data: np.ndarray,
@@ -288,38 +283,35 @@ def test___f_with_validation(
   # test
   # lambda ni: ni.gen[0].fenotype['x'], ni
   ret=core.__f(training_data, validation_data, test_data, number_of_attributes)
-  with pytest.warns() as warninfo:
-    _ret=ret(ni, 0) # type: ignore
+  _ret=ret(ni, tmp_path, 0) # type: ignore
 
   # results
-  assert len(warninfo.list)==3
-  assert all(isinstance(warn.message, DeprecationWarning) for warn in warninfo.list)
-  assert all(
-    str(warn.message).find('__array__ implementation doesn\'t accept a copy keyword, so passing copy=False failed')>=0
-      for warn in
-    warninfo.list
-  )
   assert isinstance(ret, t.Callable)
   assert isinstance(float(_ret), float)
-  print(f'calculated fitness: {_ret}')
-  # assert _ret==pytest.approx(expected_fit)
+  assert (tmp_path/'model_meta.data').exists()
+  assert (tmp_path/'model.weights.h5').exists()
 
 mark__test_cr_network=pytest.mark.parametrize(
   'number_of_generations',
   [1, 2, 5]
 )
 @mark__test_cr_network
-def test_cr_network(monkeypatch: pytest.MonkeyPatch, number_of_generations: int) -> None:
+def test_cr_network(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  number_of_generations: int
+) -> None:
   # values
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
   population_size=10
-  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: 1)
+  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x, dir: 1)
 
   # test
   ret=core.cr_network(
     training_data,
     test_data,
+    save_dir_path=tmp_path,
     population_size=population_size,
     number_of_generations=number_of_generations,
   )
@@ -332,12 +324,16 @@ def test_cr_network(monkeypatch: pytest.MonkeyPatch, number_of_generations: int)
   'number_of_generations',
   [1, 2, 5]
 )
-def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations: int) -> None:
+def test_cr_network_plot(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  number_of_generations: int,
+) -> None:
   # values
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: 0)
+  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x, dir: 0)
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -347,6 +343,7 @@ def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations:
   ret=core.cr_network(
     training_data,
     test_data,
+    save_dir_path=tmp_path,
     population_size=population_size,
     number_of_generations=number_of_generations,
     plot=True,
@@ -368,12 +365,16 @@ def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations:
   'number_of_generations',
   [1, 2, 5]
 )
-def test_cr_network_plot_0_in_fitnesses(monkeypatch: pytest.MonkeyPatch, number_of_generations: int) -> None:
+def test_cr_network_plot_0_in_fitnesses(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  number_of_generations: int,
+) -> None:
   # values
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x: float('inf'))
+  monkeypatch.setattr(core, "__f", lambda *args, **kwargs: lambda x, dir: float('inf'))
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -383,6 +384,7 @@ def test_cr_network_plot_0_in_fitnesses(monkeypatch: pytest.MonkeyPatch, number_
   ret=core.cr_network(
     training_data,
     test_data,
+    save_dir_path=tmp_path,
     population_size=population_size,
     number_of_generations=number_of_generations,
     plot=True,
@@ -535,7 +537,11 @@ mark__test_error_cr_network_0generations=pytest.mark.parametrize(
   [0, -1, -2]
 )
 @mark__test_error_cr_network_0generations
-def test_error_cr_network_0generations(monkeypatch: pytest.MonkeyPatch, number_of_generations: int) -> None:
+def test_error_cr_network_0generations(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  number_of_generations: int,
+) -> None:
   # values
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -543,7 +549,7 @@ def test_error_cr_network_0generations(monkeypatch: pytest.MonkeyPatch, number_o
   monkeypatch.setattr(
     core,
     "__f",
-    lambda *args, **kwargs: lambda x: 1,
+    lambda *args, **kwargs: lambda x, dir: 1,
   ) # first population also has calculated fittness (before generations obj is created)
 
   # test
@@ -551,6 +557,7 @@ def test_error_cr_network_0generations(monkeypatch: pytest.MonkeyPatch, number_o
     _=core.cr_network(
       training_data,
       test_data,
+      save_dir_path=tmp_path,
       population_size=population_size,
       number_of_generations=number_of_generations,
     )
