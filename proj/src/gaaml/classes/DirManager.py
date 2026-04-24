@@ -49,6 +49,13 @@ class DirManager:
       del self.__cleanup_ref
       self.__dir=Path(self.__dir.name)
 
+  @staticmethod
+  def __move(src: Path, dst: Path) -> None:
+    try:
+      src.rename(dst)
+    except OSError:
+      shutil.move(src, dst)
+
   @path.setter
   def path(self, path: Path|str) -> None:
     if isinstance(path, str):
@@ -59,7 +66,18 @@ class DirManager:
       return
     if path.is_relative_to(curr_path):
       raise ValueError(f'Given path is inside the current directory: {path}')
-    for el in curr_path.iterdir():
-      shutil.move(el, path)
+
+    items=list(curr_path.iterdir())
+    targets=[path/el.name for el in items]
+    moved: list[tuple[Path, Path]]=[]
+    try:
+      for el, target in zip(items, targets):
+        self.__move(el, target)
+        moved.append((target, el))
+    except Exception:
+      for src, dst in reversed(moved):
+        if src.exists():
+          self.__move(src, dst)
+      raise
     self.__cleanup()
     self.__dir=path
