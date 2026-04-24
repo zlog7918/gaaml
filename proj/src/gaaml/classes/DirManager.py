@@ -9,7 +9,8 @@ class DirManager:
   def __init__(self, directory: Path|str|None=None) -> None:
     if directory is None:
       self.__dir=tempfile.TemporaryDirectory()
-      atexit.register(self.__cleanup)
+      self.__cleanup_ref=self.__cleanup
+      atexit.register(self.__cleanup_ref)
       return
     if isinstance(directory, str):
       directory=Path(directory)
@@ -24,11 +25,11 @@ class DirManager:
     if next(path.iterdir(), None) is not None:
       raise ValueError(f'Given directory is not empty: {path}')
     return path.resolve()
-  
+
   @staticmethod
   def __is_tmp(dir: tempfile.TemporaryDirectory[str]|Path) -> t.TypeIs[tempfile.TemporaryDirectory[str]]:
     return isinstance(dir, tempfile.TemporaryDirectory)
-  
+
   @property
   def is_tmp(self) -> bool:
     return self.__is_tmp(self.__dir)
@@ -44,7 +45,8 @@ class DirManager:
   def __cleanup(self) -> None:
     if self.__is_tmp(self.__dir):
       self.__dir.cleanup()
-      atexit.unregister(self.__cleanup)
+      atexit.unregister(self.__cleanup_ref)
+      del self.__cleanup_ref
       self.__dir=Path(self.__dir.name)
 
   @path.setter
