@@ -1,8 +1,6 @@
 import pytest
-import shutil
 import tempfile
 import typing as t
-import functools as ft
 from pathlib import Path
 from gaaml.classes.DirManager import DirManager as DM
 
@@ -287,6 +285,28 @@ def test_path_setter_moves_contents(
   assert dst_file.read_text()=='hello'
   assert not src_file.exists()
 
+def test_move_fallback_used(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  # values
+  src=tmp_path/'src'
+  dst=tmp_path/'dst'
+  dm=DM(src)
+  f=(src/'file.txt')
+  f.write_text('data')
+
+  def fake_rename(self, target):
+    raise OSError()
+  monkeypatch.setattr(Path, "rename", fake_rename)
+
+  # test
+  dm.path=dst
+
+  # results
+  assert (dst/'file.txt').exists()
+  assert not f.exists()
+
 mark__test_path_setter_same_path=pytest.mark.parametrize(
   'path_to_dir_path',
   [
@@ -309,6 +329,43 @@ def test_path_setter_same_path(
 
   # results
   assert dm.path is before
+
+def test_partial_move_rollback(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+):
+  # values
+  src=tmp_path/'src'
+  dst=tmp_path/'dst'
+  dm=DM(src)
+
+  f1=(src/'a.txt')
+  f2=(src/'b.txt')
+  f1.write_text('a')
+  f2.write_text('b')
+
+  # Private access: DM.__move
+  original_move: t.Callable[[Path, Path], None]
+  original_move=DM._DirManager__move # type: ignore
+  counter={'i': 0}
+
+  @staticmethod
+  def flaky_move(s: Path, d: Path) -> None:
+    counter['i']+=1
+    if counter['i']==2:
+      raise RuntimeError("fail mid-move")
+    return original_move(s, d)
+
+  monkeypatch.setattr(DM, "_DirManager__move", flaky_move)
+
+  # test
+  with pytest.raises(RuntimeError):
+    dm.path=dst
+
+  # results
+  assert (src/'a.txt').exists()
+  assert (src/'b.txt').exists()
+  assert not dst.exists() or next(dst.iterdir(), None) is None
 
 mark__test_error_create_path_is_file=pytest.mark.parametrize(
   'path_to_file_path',
