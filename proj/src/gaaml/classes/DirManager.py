@@ -1,3 +1,4 @@
+import atexit
 import shutil
 import tempfile
 import typing as t
@@ -8,6 +9,7 @@ class DirManager:
   def __init__(self, directory: Path|str|None=None) -> None:
     if directory is None:
       self.__dir=tempfile.TemporaryDirectory()
+      atexit.register(self.__cleanup)
       return
     if isinstance(directory, str):
       directory=Path(directory)
@@ -42,6 +44,7 @@ class DirManager:
   def __cleanup(self) -> None:
     if self.__is_tmp(self.__dir):
       self.__dir.cleanup()
+      atexit.unregister(self.__cleanup)
       self.__dir=Path(self.__dir.name)
 
   @path.setter
@@ -54,15 +57,7 @@ class DirManager:
       return
     if path.is_relative_to(curr_path):
       raise ValueError(f'Given path is inside the current directory: {path}')
-    posix_path=str(path)
     for el in curr_path.iterdir():
-      shutil.move(str(el), posix_path)
+      shutil.move(el, path)
     self.__cleanup()
     self.__dir=path
-
-  def close(self) -> None:
-    self.__cleanup()
-  def __enter__(self) -> "DirManager":
-    return self
-  def __exit__(self, exc_type, exc, tb) -> None:
-    self.close()
