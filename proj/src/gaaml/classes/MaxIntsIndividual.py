@@ -9,7 +9,7 @@ from .GenIndividual import (
 class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
   EntryType: t.TypeAlias=tuple[str, util.BitSize_Min_Max]
   GenSchemaType: t.TypeAlias=tuple[EntryType, ...]
-  schema: GenSchemaType
+  __schema: GenSchemaType
   @t.overload
   def __init__(self, gen_schema: GenSchemaType, /) -> None: ...
   @t.overload
@@ -21,13 +21,13 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
       if len({n for n in names})!=len(names):
         raise ValueError('Names can not collide')
       super().__init__(GenIndividual(n))
-      self.schema=a
+      self.__schema=a
     else:
       if b is None or cross_point is None:
         raise ValueError('Illegal argument options')
       a.__same_or_err(b)
       super().__init__(GenIndividual(a.gen, b.gen, cross_point=cross_point))
-      self.schema=a.schema
+      self.__schema=a.__schema
     self._update_fenotype()
 
   def mutate(self) -> None:
@@ -35,7 +35,7 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
     self._update_fenotype()
 
   def _update_fenotype(self) -> None:
-    self.fenotype: dict[str, int]=self.get_fenotype(self.gen, self.schema)
+    self.fenotype: dict[str, int]=self.get_fenotype(self.gen, self.__schema)
 
   @staticmethod
   def get_fenotype(gen: GenIndividual, schema: GenSchemaType) -> dict[str, int]:
@@ -52,7 +52,7 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
 
   _MII=t.TypeVar('_MII', bound="MaxIntsIndividual")
   def __same_or_err(self: _MII, o: _MII) -> None:
-    if self.schema!=o.schema:
+    if self.__schema!=o.__schema:
       raise ValueError('First and second solution do not have equal configuration')
 
   @classmethod

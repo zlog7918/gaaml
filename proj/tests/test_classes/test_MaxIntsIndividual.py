@@ -222,7 +222,23 @@ def test_update_fenotype() -> None:
     assert oryg_fenotype2!=mii.fenotype
     assert mii.fenotype==expected
 
-def test_get_fenotype() -> None:
+@pytest.mark.parametrize(
+  ('b_str', 'expected'),
+  [
+    ('1 0  1 1 0', {'x': 3, 'y': 4}),
+    ('0 0  1 1 0', {'x': 1, 'y': 4}),
+    ('0 1  1 1 0', {'x': 2, 'y': 4}),
+    ('1 1  1 1 0', {'x': 4, 'y': 4}),
+    ('1 0  1 1 1', {'x': 3, 'y': 5}),
+    ('1 0  0 0 0', {'x': 3, 'y': 0}),
+    ('1 0  0 0 1', {'x': 3, 'y': 1}),
+    ('1 0  0 1 0', {'x': 3, 'y': 2}),
+    ('1 0  0 1 1', {'x': 3, 'y': 3}),
+    ('1 0  1 0 0', {'x': 3, 'y': 4}),
+    ('1 0  1 0 1', {'x': 3, 'y': 5}),
+  ]
+)
+def test_get_fenotype(b_str: str, expected: dict[str, int]) -> None:
   """
   x: 2, 1, 4
   x: 3, 0, 5
@@ -244,27 +260,15 @@ def test_get_fenotype() -> None:
     ('y', (y_bit, 0, 5)),
   )
   mii=MII(schema)
+  mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
+  # private access: mii.__schema
+  _schema=mii._MaxIntsIndividual__schema # type: ignore
 
-  for b_str, expected in (
-    ('1 0  1 1 0', {'x': 3, 'y': 4}),
-    ('0 0  1 1 0', {'x': 1, 'y': 4}),
-    ('0 1  1 1 0', {'x': 2, 'y': 4}),
-    ('1 1  1 1 0', {'x': 4, 'y': 4}),
-    ('1 0  1 1 1', {'x': 3, 'y': 5}),
-    ('1 0  0 0 0', {'x': 3, 'y': 0}),
-    ('1 0  0 0 1', {'x': 3, 'y': 1}),
-    ('1 0  0 1 0', {'x': 3, 'y': 2}),
-    ('1 0  0 1 1', {'x': 3, 'y': 3}),
-    ('1 0  1 0 0', {'x': 3, 'y': 4}),
-    ('1 0  1 0 1', {'x': 3, 'y': 5}),
-  ):
-    mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
+  # test
+  fenotype=MII.get_fenotype(mii.gen, _schema)
 
-    # test
-    fenotype=MII.get_fenotype(mii.gen, mii.schema)
-
-    # results
-    assert fenotype==expected
+  # results
+  assert fenotype==expected
 
 def test_error_name_collition_on_create() -> None:
   # values
