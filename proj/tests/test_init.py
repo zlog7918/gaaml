@@ -37,7 +37,7 @@ mark__test_cr_network=pytest.mark.parametrize(
     # (2, np.zeros((2, 2)), np.zeros((2, 2)), -1),
     # (5, np.zeros((2, 2)), np.zeros((2, 2)), -1),
     # (5, np.zeros((10, 3)), np.zeros((8, 3)), -1),
-    # (5, np.zeros((10, 7)), np.zeros((8, 4)), -1),
+    # (5, np.zeros((10, 7)), np.zeros((8, 7)), -2),
   ]
 )
 @mark__test_cr_network
