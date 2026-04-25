@@ -4,6 +4,7 @@ import gaaml
 import pytest
 import numpy as np
 import typing as t
+from pathlib import Path
 from gaaml.classes.Generations import Generations as _G
 
 class MockPlt:
@@ -40,30 +41,29 @@ mark__test_cr_network=pytest.mark.parametrize(
   ]
 )
 @mark__test_cr_network
-def test_cr_network(number_of_generations: int, training_data: np.ndarray, test_data: np.ndarray, number_of_attributes: int) -> None:
+def test_cr_network(
+  tmp_path: Path,
+  number_of_generations: int,
+  training_data: np.ndarray,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+) -> None:
   # values
   population_size=2
 
   # test
-  with pytest.warns() as warninfo:
-    ret=gaaml.cr_network(
-      training_data,
-      test_data,
-      number_of_attributes=number_of_attributes,
-      population_size=population_size,
-      number_of_generations=number_of_generations,
-      max_worker_num=1,
-      num_of_fittnesses_calc=1,
-    )
+  ret=gaaml.cr_network(
+    training_data,
+    test_data,
+    save_dir_path=tmp_path,
+    number_of_attributes=number_of_attributes,
+    population_size=population_size,
+    number_of_generations=number_of_generations,
+    max_worker_num=1,
+    num_of_fittnesses_calc=1,
+  )
 
   # results
-  assert len(warninfo.list)>=2
-  assert all(isinstance(warn.message, DeprecationWarning) for warn in warninfo.list)
-  assert all(
-    str(warn.message).find('__array__ implementation doesn\'t accept a copy keyword, so passing copy=False failed')>=0
-      for warn in
-    warninfo.list
-  )
   assert isinstance(ret, _G)
   assert ret.curr_generations==number_of_generations
 
@@ -76,36 +76,34 @@ mark__test_cr_network_plot=pytest.mark.parametrize(
   ]
 )
 @mark__test_cr_network_plot
-def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations: int, training_data: np.ndarray, test_data: np.ndarray, number_of_attributes: int) -> None:
+def test_cr_network_plot(
+  tmp_path: Path,
+  monkeypatch: pytest.MonkeyPatch,
+  number_of_generations: int,
+  training_data: np.ndarray,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+) -> None:
   # values
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
   population_size=2
 
-  # def fitness_func(lambda _f, net_ind: _f(net_ind))
-
   # test
-  with pytest.warns() as warninfo:
-    ret=gaaml.cr_network(
-      training_data,
-      test_data,
-      number_of_attributes=number_of_attributes,
-      population_size=population_size,
-      number_of_generations=number_of_generations,
-      plot=True,
-      max_worker_num=1,
-      num_of_fittnesses_calc=1,
-    )
+  ret=gaaml.cr_network(
+    training_data,
+    test_data,
+    save_dir_path=tmp_path,
+    number_of_attributes=number_of_attributes,
+    population_size=population_size,
+    number_of_generations=number_of_generations,
+    plot=True,
+    max_worker_num=1,
+    num_of_fittnesses_calc=1,
+  )
 
   # results
-  assert len(warninfo.list)>=2
-  assert all(isinstance(warn.message, DeprecationWarning) for warn in warninfo.list)
-  assert all(
-    str(warn.message).find('__array__ implementation doesn\'t accept a copy keyword, so passing copy=False failed')>=0
-      for warn in
-    warninfo.list
-  )
   assert isinstance(ret, _G)
   assert ret.curr_generations==number_of_generations
   assert mock_plt.figure_calls==3
@@ -119,20 +117,21 @@ def test_cr_network_plot(monkeypatch: pytest.MonkeyPatch, number_of_generations:
   'number_of_generations',
   [0, -1, -2]
 )
-def test_error_cr_network_0generations(number_of_generations: int) -> None:
+def test_error_cr_network_0generations(
+  tmp_path: Path,
+  number_of_generations: int,
+) -> None:
   # values
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
   population_size=2
 
   # test
-  with (
-    pytest.raises(ValueError) as excinfo,
-    pytest.warns() as warninfo,
-  ):
+  with pytest.raises(ValueError) as excinfo:
     _=gaaml.cr_network(
       training_data,
       test_data,
+      save_dir_path=tmp_path,
       population_size=population_size,
       number_of_generations=number_of_generations,
       max_worker_num=1,
@@ -140,11 +139,4 @@ def test_error_cr_network_0generations(number_of_generations: int) -> None:
     )
 
   # results
-  assert len(warninfo.list)>=2
-  assert all(isinstance(warn.message, DeprecationWarning) for warn in warninfo.list)
-  assert all(
-    str(warn.message).find('__array__ implementation doesn\'t accept a copy keyword, so passing copy=False failed')>=0
-      for warn in
-    warninfo.list
-  )
   assert str(excinfo.value)=='max_num_gen: is too small, it should at least equal 1'
