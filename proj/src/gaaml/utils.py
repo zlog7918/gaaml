@@ -1,6 +1,5 @@
 import typing as t
 import keras as krs
-# import torch.nn as nn
 from . import consts as const
 from .classes.NetIndividual import NetIndividual
 
@@ -21,14 +20,7 @@ __keras_optimalization_types: dict[int, type[krs.optimizers.Optimizer]]={
 #   # 1: krs.losses.,
 # }
 
-# __torch_activation_types: dict[int, type[nn.Module]]={
-#   0: nn.ReLU,
-#   1: nn.Tanh,
-#   2: nn.Sigmoid,
-#   3: nn.Softmax,
-# }
-
-def __cr_net_from_ind_keras(net_ind: NetIndividual, input_size: int, output_size: int) -> krs.models.Model:
+def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int) -> krs.models.Model:
   # TODO
   params, layer_sizes, layer_types=net_ind.gen
   params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
@@ -46,26 +38,20 @@ def __cr_net_from_ind_keras(net_ind: NetIndividual, input_size: int, output_size
   )
   return seq
 
-# def __cr_net_from_ind_torch(net_ind: NetIndividual, input_size: int, output_size: int) -> nn.Sequential:
-#   # TODO
-#   params, layer_sizes, layer_types=net_ind.gen
-#   params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
-#   modules=[]
-#   for pn, n, t in zip((input_size, *layer_sizes), (*layer_sizes, output_size), layer_types):
-#     modules.append(nn.Linear(pn, n))
-#     modules.append(__torch_activation_types[t]())
-#   seq=nn.Sequential(*modules)
-#   return seq
-
-# @t.overload
-# def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, type: t.Literal['torch']) -> tuple[nn.Sequential, int, int]: ...
-# @t.overload
-# def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, type: t.Literal['keras']) -> tuple[krs.models.Model, int, int]: ...
+# def swith_backend(backend: t.Literal['torch']|t.Literal['tensorflow']) -> None: ...
+#   # TODO:
+#   # Is possible to switch between tensorflow and torch using:
+#   # krs.config.set_backend()
 def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int) -> tuple[krs.models.Model, int, int]:
-# def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, type: str='keras') -> tuple[krs.models.Model|nn.Sequential, int, int]:
-#   func=__cr_net_from_ind_keras if type=='keras' else __cr_net_from_ind_torch
-  func=__cr_net_from_ind_keras
+# def cr_net_from_ind(
+#   net_ind: NetIndividual,
+#   input_size: int,
+#   output_size: int,
+#   backend: t.Literal['torch']|t.Literal['tensorflow']='tensorflow',
+# ) -> tuple[krs.models.Model, int, int]:
+#   if krs.config.backend()!=backend:
+#     swith_backend(backend)
   params, _, _=net_ind.gen
   params=params.fenotype
-  model=func(net_ind, input_size, output_size)
+  model=__cr_net_from_ind(net_ind, input_size, output_size)
   return (model, params[const.BIN_PART_BATCH_NAME], params[const.BIN_PART_EPOCHS_NAME])
