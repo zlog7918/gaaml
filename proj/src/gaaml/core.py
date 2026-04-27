@@ -147,6 +147,8 @@ def cr_network(
   )
   del _validation_data, _test_data
   f=__f(training_data, validation_data, test_data, number_of_attributes)
+
+  # TODO: do not calcutate run fitting until Generations
   pop=Population(
     population_size,
     lambda: IndType(
