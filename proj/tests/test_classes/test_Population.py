@@ -3,6 +3,7 @@ import typing as t
 import random as rnd
 from pathlib import Path
 from gaaml.classes import _utils as util
+from gaaml.classes import _consts as const
 from gaaml.classes.Population import Population as P
 from gaaml.classes.GenIndividual import GenIndividual as _GI
 from gaaml.classes.MaxAvgMinHolder import MaxAvgMinHolder as MAMH
@@ -187,13 +188,14 @@ def test_create(
   gen0=gen0[0]
   assert gen0.name=='gen_0'
   subdirs=(*gen0.iterdir(),)
-  assert len(subdirs)==5
-  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert len(subdirs)==pop_num
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(pop_num)}
   assert all(d.is_dir() for d in subdirs)
   subsubdirs=[(*d.iterdir(),) for d in subdirs]
-  assert all(len(d)==5 for d in subsubdirs)
+  assert all(len(d)==const.NUM_OF_FIT_CALC for d in subsubdirs)
   assert all(ds.is_dir() for d in subsubdirs for ds in d)
-  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+  iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
+  assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
 
 mark__test_set_dir=pytest.mark.parametrize(
   'path_to_dir_path',
@@ -246,13 +248,14 @@ def test_set_dir(
   gen0=gen0[0]
   assert gen0.name=='gen_0'
   subdirs=(*gen0.iterdir(),)
-  assert len(subdirs)==5
-  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert len(subdirs)==pop_num
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(pop_num)}
   assert all(d.is_dir() for d in subdirs)
   subsubdirs=[(*d.iterdir(),) for d in subdirs]
-  assert all(len(d)==5 for d in subsubdirs)
+  assert all(len(d)==const.NUM_OF_FIT_CALC for d in subsubdirs)
   assert all(ds.is_dir() for d in subsubdirs for ds in d)
-  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+  iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
+  assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
 
 mark__test_set_dir_after_cr_with_path=pytest.mark.parametrize(
   ('path_to_dir_path1', 'path_to_dir_path2'),
@@ -312,13 +315,14 @@ def test_set_dir_after_cr_with_path(
   gen0=gen0[0]
   assert gen0.name=='gen_0'
   subdirs=(*gen0.iterdir(),)
-  assert len(subdirs)==5
-  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert len(subdirs)==pop_num
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(pop_num)}
   assert all(d.is_dir() for d in subdirs)
   subsubdirs=[(*d.iterdir(),) for d in subdirs]
-  assert all(len(d)==5 for d in subsubdirs)
+  assert all(len(d)==const.NUM_OF_FIT_CALC for d in subsubdirs)
   assert all(ds.is_dir() for d in subsubdirs for ds in d)
-  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+  iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
+  assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
 
 mark__test_set_dir_after_set_dir=pytest.mark.parametrize(
   ('path_to_dir_path1', 'path_to_dir_path2'),
@@ -379,13 +383,14 @@ def test_set_dir_after_set_dir(
   gen0=gen0[0]
   assert gen0.name=='gen_0'
   subdirs=(*gen0.iterdir(),)
-  assert len(subdirs)==5
-  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+  assert len(subdirs)==pop_num
+  assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(pop_num)}
   assert all(d.is_dir() for d in subdirs)
   subsubdirs=[(*d.iterdir(),) for d in subdirs]
-  assert all(len(d)==5 for d in subsubdirs)
+  assert all(len(d)==const.NUM_OF_FIT_CALC for d in subsubdirs)
   assert all(ds.is_dir() for d in subsubdirs for ds in d)
-  assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+  iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
+  assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
 
 def test_population_returns_copy() -> None:
   # values
@@ -603,13 +608,14 @@ def test_next_generation(tmp_path: Path) -> None:
     print(gen_dir)
     assert gen_dir.exists()
     subdirs=(*gen_dir.iterdir(),)
-    assert len(subdirs)==5
-    assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(5)}
+    assert len(subdirs)==pop_num
+    assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(pop_num)}
     assert all(d.is_dir() for d in subdirs)
     subsubdirs=[(*d.iterdir(),) for d in subdirs]
-    assert all(len(d)==5 for d in subsubdirs)
+    assert all(len(d)==const.NUM_OF_FIT_CALC for d in subsubdirs)
     assert all(ds.is_dir() for d in subsubdirs for ds in d)
-    assert all({ds.name for ds in d}=={f'iter_{i}' for i in range(5)} for d in subsubdirs)
+    iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
+    assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
 
 @pytest.mark.parametrize(
   'workers',
