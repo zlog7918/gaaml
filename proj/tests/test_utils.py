@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import typing as t
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS']='0'
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 import keras as krs
 from pathlib import Path
@@ -148,6 +149,46 @@ def test_cr_net_from_ind(
   layers: list[krs.layers.Dense]=model.layers
   assert len(layers)==len(exp_activation_types)
   assert all(l.activation is a for l,a in zip(layers, exp_activation_types))
+
+mark__test___is_categorical=pytest.mark.parametrize(
+  ('data', 'dtype', 'exp_is_categorial'),
+  [
+    ([['afsd'], ['fsdfd']], None, True), # one column with only strings
+    # ([['afsd'], ['fsdfd']], np.object_, True), # one column with only strings
+    ([['afsd'], ['fsdfd']], np.dtypes.ObjectDType, True), # one column with only strings
+    ([[0], [2]], None, None), # one column with only ints
+    ([[0], [2]], np.dtypes.ObjectDType, None), # one column with only ints
+    ([[0.], [2.]], None, False), # one column with any other combination
+    ([[0.], [2.]], np.dtypes.ObjectDType, False), # one column with any other combination
+    # ([['afsd', 'jljdas'], ['fsdfd', 'lhsalhds']], None, False),
+    ([[0, 1], [1, 0]], None, None), # multicolumn with only 0 or 1 (exactly one 1 in row)
+    ([[0, 1], [1, 0]], np.dtypes.ObjectDType, None), # multicolumn with only 0 or 1 (exactly one 1 in row)
+    ([[0, 1, 0], [1, 0, 0]], None, None), # multicolumn with only 0 or 1 (exactly one 1 in row)
+    ([[0, 1, 0], [1, 0, 0]], np.dtypes.ObjectDType, None), # multicolumn with only 0 or 1 (exactly one 1 in row)
+    ([[False, True], [True, False]], None, True), # multicolumn with only True or False (exactly one True in row)
+    ([[False, True], [True, False]], np.dtypes.ObjectDType, True), # multicolumn with only True or False (exactly one True in row)
+    ([[False, False, True], [False, True, False]], None, True), # multicolumn with only True or False (exactly one True in row)
+    ([[False, False, True], [False, True, False]], np.dtypes.ObjectDType, True), # multicolumn with only True or False (exactly one True in row)
+    ([[1, 1], [1, 0]], None, False), # multicolumn with any other combination
+    ([[1, 1], [1, 0]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
+    ([[0, 5], [2, 4]], None, False), # multicolumn with any other combination
+    ([[0, 5], [2, 4]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
+    ([[0., 5.], [2., 4.]], None, False), # multicolumn with any other combination
+    ([[0., 5.], [2., 4.]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
+    ([[True, True], [True, False]], None, False), # multicolumn with any other combination
+    ([[True, True], [True, False]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
+  ]
+)
+@mark__test___is_categorical
+def test___is_categorical(data: list[list[t.Any]], dtype: type[np.dtype]|None, exp_is_categorial: bool|None):
+  # values
+  data_np=np.array(data, dtype=dtype)
+
+  # test
+  is_categorial=util.__is_categorical(data_np)
+
+  # results
+  assert is_categorial==exp_is_categorial
 
 mark__test_get_fit_func_without_validation=pytest.mark.parametrize(
   ('training_data', 'test_data', 'number_of_attributes', 'gens_strs'),
@@ -372,10 +413,6 @@ def test_get_fit_func_with_validation(
   assert (tmp_path/'model_meta.data').exists()
   assert (tmp_path/'model.weights.h5').exists()
 
-
-
-
-
 mark__test_error_get_fit_func_not_same_training_vs_test=pytest.mark.parametrize(
   ('training_data', 'validation_data', 'test_data', 'number_of_attributes', 'gens_strs'),
   [
@@ -505,3 +542,59 @@ def test_error_get_fit_func_not_same_validation(training_data: np.ndarray, valid
 
   # results
   assert str(excinfo.value)=='validation_data does not have the same number of attributes in data or output as training_data and test_data'
+
+if __name__=='__main__':
+  from pathlib import Path
+  import sys, inspect, tempfile
+  ret_tuple=tuple[tuple[t.Any, ...], dict[str, t.Any]]
+  def get_args_kwargs_from_mark(mark: pytest.MarkDecorator, index: int|slice=slice(None)) -> list[ret_tuple]:
+    names_args_kwargs: tuple[str, list[t.Any]]|tuple[tuple[str, ...], list[tuple[t.Any, ...]]]=mark.args
+    names, args_kwargs=names_args_kwargs
+    if isinstance(index, int):
+      args_kwargs=[args_kwargs[index]]
+    else:
+      args_kwargs=args_kwargs[index]
+    return [(
+      (), (
+        {names: a_kw}
+          if isinstance(names, str) else
+        {n: v for n,v in zip(names, a_kw)}
+      )
+    ) for a_kw in args_kwargs]
+  args_kwargs=(((),{}),)
+  func_name=sys.argv[1]
+  func=locals()[func_name]
+  mark=f'mark__{func_name}'
+  print_index=lambda i, args, kwargs: print('no index')
+  if mark in locals():
+    mark=locals()[mark]
+    print_index=lambda i, args, kwargs: print(f'index {i} with: {(args, kwargs)}')
+    try:
+      index=int(sys.argv[2]),
+      print_index=(lambda index: (
+        lambda i, args, kwargs: print(f'index {index} with: {(args, kwargs)}')
+      ))(index[0])
+    except IndexError:
+      index=()
+    args_kwargs=get_args_kwargs_from_mark(mark, *index)
+  flags={
+    'monkeypatch',
+    'tmp_path',
+  }
+  params=inspect.signature(func).parameters
+  flags={k: k in params for k in flags}
+  for i, (args, kwargs) in enumerate(args_kwargs):
+    print_index(i, args, kwargs)
+    after_tests: list[t.Callable[[], None]]=[]
+    if flags['monkeypatch']:
+      kwargs['monkeypatch']=pytest.MonkeyPatch()
+    if flags['tmp_path']:
+      tmp_path=tempfile.TemporaryDirectory()
+      after_tests.append(lambda: tmp_path.cleanup())
+      kwargs['tmp_path']=Path(tmp_path.name)
+    # print(args, kwargs)
+    try:
+      func(*args, **kwargs)
+    finally:
+      for a in after_tests:
+        a()
