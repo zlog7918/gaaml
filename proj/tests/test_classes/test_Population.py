@@ -35,7 +35,7 @@ def test_crossover(seed: int, flag: bool) -> None:
   # test
   ret=P.crossover(gi1, gi2, crossover_rate)
 
-  # result
+  # results
   assert isinstance(ret, tuple)
   cgi1, cgi2=ret
   assert isinstance(cgi1, _GI)
@@ -79,7 +79,7 @@ def test_mutate(seed: int, flag: bool) -> None:
   # test
   mgi=P.mutate(gi, mutation_rate)
 
-  # result
+  # results
   assert isinstance(mgi, _GI)
   assert mgi is gi
   assert (mgi.gen==oryg_gen)!=flag
@@ -104,7 +104,7 @@ def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None
   # test
   to_add=P._calc_to_add(handle)
 
-  # result
+  # results
   assert isinstance(float(to_add), float)
   assert to_add==pytest.approx(exp_to_add)
 

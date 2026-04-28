@@ -278,7 +278,7 @@ def test_path_setter_moves_contents(
   # test
   dm.path=dst
 
-  # result
+  # results
   assert dm.path==Path(dst).resolve()
   assert not dst_file_exists
   assert dst_file.exists()
