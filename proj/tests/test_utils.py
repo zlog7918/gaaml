@@ -4,6 +4,7 @@ import typing as t
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
 import keras as krs
+from pathlib import Path
 from gaaml import utils as util
 from gaaml import consts as const
 from gaaml.classes.NetIndividual import NetIndividual as _NI
@@ -125,9 +126,6 @@ def test_cr_net_from_ind(
     ni.gen[i]._update_fenotype()
   ni._update()
 
-  # for i, gen_str in enumerate(gens_strs):
-  #   print(gen_str, len(ni.gen[i].fenotype), ni.gen[i].fenotype)
-
   # test
   ret=util.cr_net_from_ind(ni, *input_output)
 
@@ -148,6 +146,362 @@ def test_cr_net_from_ind(
   assert all(isinstance(w, np.ndarray) for w in weights)
   assert all(w.shape==ws for w, ws in zip(weights, exp_weight_shapes))
   layers: list[krs.layers.Dense]=model.layers
-  # print([l.activation for l in layers])
   assert len(layers)==len(exp_activation_types)
   assert all(l.activation is a for l,a in zip(layers, exp_activation_types))
+
+mark__test_get_fit_func_without_validation=pytest.mark.parametrize(
+  ('training_data', 'test_data', 'number_of_attributes', 'gens_strs'),
+  [
+    (np.zeros((5, 2)), np.zeros((2, 2)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+    (np.zeros((10, 3)), np.zeros((8, 3)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.array([ # sin(x_1)+cos(x_2)
+      [5, 4, -1.6125678955267504],
+      [4, 5, -0.47314030984470196],
+      [1, 5, 1.1251331702711227],
+      [1, 4, 0.18782736394428456],
+      [1, 3, -0.1485215117925489],
+      [1, 2, 0.4253241482607541],
+      [1, 1, 1.3817732906760363],
+      [5, 1, -0.4186219687949987],
+      [4, 1, -0.21650018943978844],
+      [3, 1, 0.681422313928007],
+      [2, 1, 1.4495997326938215],
+      [2, 4, 0.25565380596206977],
+      [3, 4, -0.5125236128037447],
+      [6, 4, -0.9330591190625378],
+      [6, 5, 0.004246687264300386],
+      [5, 5, -0.6752620891999122],
+    ]), np.array([
+      [4, 2, -1.1729493318550706],
+      [4, 3, -1.7467949919083736],
+      [4, 6, 0.20336779134243776],
+      [5, 6, 0.0012460119872275133],
+    ]), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+    (np.array([ # sin(x_1)+cos(x_2) and cos(x_1)+log(x_2)
+      [5, 4, -1.6125678955267504, 1.6699565465831168],
+      [4, 5, -0.47314030984470196, 0.9557942915704883],
+      [1, 5, 1.1251331702711227, 2.14974021830224],
+      [1, 4, 0.18782736394428456, 1.9265966669880303],
+      [1, 3, -0.1485215117925489, 1.6389145945362495],
+      [1, 2, 0.4253241482607541, 1.2334494864280852],
+      [1, 1, 1.3817732906760363, 0.5403023058681398],
+      [5, 1, -0.4186219687949987, 0.28366218546322625],
+      [4, 1, -0.21650018943978844, -0.6536436208636119],
+      [3, 1, 0.681422313928007, -0.9899924966004454],
+      [2, 1, 1.4495997326938215, -0.4161468365471424],
+      [2, 4, 0.25565380596206977, 0.9701475245727482],
+      [3, 4, -0.5125236128037447, 0.39630186451944516],
+      [6, 4, -0.9330591190625378, 2.3464646477702567],
+      [6, 5, 0.004246687264300386, 2.5696081990844664],
+      [5, 5, -0.6752620891999122, 1.8931000978973265],
+      [5, 4, -1.6125678955267504, 1.6699565465831168],
+    ]), np.array([
+      [4, 2, -1.1729493318550706, 0.039503559696333346],
+      [4, 3, -1.7467949919083736, 0.44496866780449784],
+      [4, 6, 0.20336779134243776, 1.1381158483644431],
+      [5, 6, 0.0012460119872275133, 2.075421654691281],
+    ]), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+  ]
+)
+@mark__test_get_fit_func_without_validation
+def test_get_fit_func_without_validation(
+  tmp_path: Path,
+  training_data: np.ndarray,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  gens_strs: tuple[str, str, str],
+) -> None:
+  # values
+  # TODO
+  ni=_NI(
+    const.BIN_PART_LIST_LEN,
+    const.BIN_PART_NEURON_NUM_SEED,
+    const.BIN_PART_NEURON_TYPE_SEED,
+    (
+      const.BIN_PART_REST,
+      const.NEURON_NUM,
+      const.NEURON_TYPE,
+    ),
+  )
+  for i, gen_str in enumerate(gens_strs):
+    ni.gen[i].gen._gen=bytearray(gen_str.replace(' ', '').encode())
+    ni.gen[i]._update_fenotype()
+  ni._update()
+
+  # test
+  ret=util.get_fit_func(training_data, None, test_data, number_of_attributes)
+  _ret=ret(ni, tmp_path, 0) # type: ignore
+
+  # results
+  assert isinstance(ret, t.Callable)
+  assert isinstance(float(_ret), float)
+
+  assert (tmp_path/'model_meta.data').exists()
+  assert (tmp_path/'model.weights.h5').exists()
+  # assert _ret==pytest.approx(expected_fit)
+
+mark__test_get_fit_func_with_validation=pytest.mark.parametrize(
+  ('training_data', 'validation_data', 'test_data', 'number_of_attributes', 'gens_strs'),
+  [
+    (np.zeros((5, 2)), np.zeros((3, 2)), np.zeros((2, 2)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+    (np.zeros((10, 3)), np.zeros((5, 3)), np.zeros((8, 3)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.array([ # sin(x_1)+cos(x_2)
+      [5, 4, -1.6125678955267504],
+      [4, 5, -0.47314030984470196],
+      [1, 5, 1.1251331702711227],
+      [1, 4, 0.18782736394428456],
+      [1, 3, -0.1485215117925489],
+      [1, 2, 0.4253241482607541],
+      [1, 1, 1.3817732906760363],
+      [5, 1, -0.4186219687949987],
+      [4, 1, -0.21650018943978844],
+      [3, 1, 0.681422313928007],
+      [2, 1, 1.4495997326938215],
+      [2, 4, 0.25565380596206977],
+      [3, 4, -0.5125236128037447],
+      [6, 4, -0.9330591190625378],
+      [6, 5, 0.004246687264300386],
+      [5, 5, -0.6752620891999122],
+    ]), np.array([
+      [2, 2, 0.4931505902785393],
+      [2, 3, -0.0806950697747637],
+      [2, 6, 1.8694677134760478],
+      [5, 3, -1.9489167712635838],
+    ]), np.array([
+      [4, 2, -1.1729493318550706],
+      [4, 3, -1.7467949919083736],
+      [4, 6, 0.20336779134243776],
+      [5, 6, 0.0012460119872275133],
+    ]), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+    (np.array([ # sin(x_1)+cos(x_2) and cos(x_1)+log(x_2)
+      [5, 4, -1.6125678955267504, 1.6699565465831168],
+      [4, 5, -0.47314030984470196, 0.9557942915704883],
+      [1, 5, 1.1251331702711227, 2.14974021830224],
+      [1, 4, 0.18782736394428456, 1.9265966669880303],
+      [1, 3, -0.1485215117925489, 1.6389145945362495],
+      [1, 2, 0.4253241482607541, 1.2334494864280852],
+      [1, 1, 1.3817732906760363, 0.5403023058681398],
+      [5, 1, -0.4186219687949987, 0.28366218546322625],
+      [4, 1, -0.21650018943978844, -0.6536436208636119],
+      [3, 1, 0.681422313928007, -0.9899924966004454],
+      [2, 1, 1.4495997326938215, -0.4161468365471424],
+      [2, 4, 0.25565380596206977, 0.9701475245727482],
+      [3, 4, -0.5125236128037447, 0.39630186451944516],
+      [6, 4, -0.9330591190625378, 2.3464646477702567],
+      [6, 5, 0.004246687264300386, 2.5696081990844664],
+      [5, 5, -0.6752620891999122, 1.8931000978973265],
+      [5, 4, -1.6125678955267504, 1.6699565465831168],
+    ]), np.array([
+      [2, 2, 0.4931505902785393, 0.2770003440128029],
+      [2, 3, -0.0806950697747637, 0.6824654521209674],
+      [2, 6, 1.8694677134760478, 1.3756126326809126],
+      [5, 3, -1.9489167712635838, 1.382274474131336],
+    ]), np.array([
+      [4, 2, -1.1729493318550706, 0.039503559696333346],
+      [4, 3, -1.7467949919083736, 0.44496866780449784],
+      [4, 6, 0.20336779134243776, 1.1381158483644431],
+      [5, 6, 0.0012460119872275133, 2.075421654691281],
+    ]), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 00',
+    )),
+  ]
+)
+@mark__test_get_fit_func_with_validation
+def test_get_fit_func_with_validation(
+  tmp_path: Path,
+  training_data: np.ndarray,
+  validation_data: np.ndarray,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  gens_strs: tuple[str, str, str],
+) -> None:
+  # values
+  ni=_NI(
+    const.BIN_PART_LIST_LEN,
+    const.BIN_PART_NEURON_NUM_SEED,
+    const.BIN_PART_NEURON_TYPE_SEED,
+    (
+      const.BIN_PART_REST,
+      const.NEURON_NUM,
+      const.NEURON_TYPE,
+    ),
+  )
+  for i, gen_str in enumerate(gens_strs):
+    ni.gen[i].gen._gen=bytearray(gen_str.replace(' ', '').encode())
+    ni.gen[i]._update_fenotype()
+  ni._update()
+
+  # test
+  # lambda ni: ni.gen[0].fenotype['x'], ni
+  ret=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+  _ret=ret(ni, tmp_path, 0) # type: ignore
+
+  # results
+  assert isinstance(ret, t.Callable)
+  assert isinstance(float(_ret), float)
+  assert (tmp_path/'model_meta.data').exists()
+  assert (tmp_path/'model.weights.h5').exists()
+
+
+
+
+
+mark__test_error_get_fit_func_not_same_training_vs_test=pytest.mark.parametrize(
+  ('training_data', 'validation_data', 'test_data', 'number_of_attributes', 'gens_strs'),
+  [
+    (np.zeros((10, 7)), None, np.zeros((8, 4)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), None, np.zeros((8, 4)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), np.zeros((8, 4)), np.zeros((8, 4)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), np.zeros((8, 7)), np.zeros((8, 4)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), None, np.zeros((8, 6)), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), np.zeros((10, 6)), np.zeros((8, 6)), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), np.zeros((10, 7)), np.zeros((8, 6)), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+  ]
+)
+@mark__test_error_get_fit_func_not_same_training_vs_test
+def test_error_get_fit_func_not_same_training_vs_test(
+  training_data: np.ndarray,
+  validation_data: np.ndarray|None,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  gens_strs: tuple[str, str, str],
+) -> None:
+  # values
+  # TODO
+  ni=_NI(
+    const.BIN_PART_LIST_LEN,
+    const.BIN_PART_NEURON_NUM_SEED,
+    const.BIN_PART_NEURON_TYPE_SEED,
+    (
+      const.BIN_PART_REST,
+      const.NEURON_NUM,
+      const.NEURON_TYPE,
+    ),
+  )
+  for i, gen_str in enumerate(gens_strs):
+    ni.gen[i].gen._gen=bytearray(gen_str.replace(' ', '').encode())
+    ni.gen[i]._update_fenotype()
+  ni._update()
+
+  # test
+  # lambda ni: ni.gen[0].fenotype['x'], ni
+  with pytest.raises(ValueError) as excinfo:
+    _=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+
+  # results
+  assert str(excinfo.value)=='training_data and test_data do not have the same number of attributes in data or output'
+
+mark__test_error_get_fit_func_not_same_validation=pytest.mark.parametrize(
+  ('training_data', 'validation_data', 'test_data', 'number_of_attributes', 'gens_strs'),
+  [
+    (np.zeros((8, 7)), np.zeros((8, 6)), np.zeros((10, 7)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 7)), np.zeros((10, 8)), np.zeros((10, 7)), -1, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 6)), np.zeros((8, 8)), np.zeros((8, 6)), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 6)), np.zeros((8, 5)), np.zeros((8, 6)), -2, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+    (np.zeros((8, 6)), np.zeros((8, 5)), np.zeros((8, 6)), -3, (
+      '0000001  0101000111  0010111011  1  111100000011  0000110100  0000110100',
+      '0000001001  0000000110',
+      '10 01 11',
+    )),
+  ]
+)
+@mark__test_error_get_fit_func_not_same_validation
+def test_error_get_fit_func_not_same_validation(training_data: np.ndarray, validation_data: np.ndarray, test_data: np.ndarray, number_of_attributes: int, gens_strs: tuple[str, str, str]) -> None:
+  # values
+  # TODO
+  ni=_NI(
+    const.BIN_PART_LIST_LEN,
+    const.BIN_PART_NEURON_NUM_SEED,
+    const.BIN_PART_NEURON_TYPE_SEED,
+    (
+      const.BIN_PART_REST,
+      const.NEURON_NUM,
+      const.NEURON_TYPE,
+    ),
+  )
+  for i, gen_str in enumerate(gens_strs):
+    ni.gen[i].gen._gen=bytearray(gen_str.replace(' ', '').encode())
+    ni.gen[i]._update_fenotype()
+  ni._update()
+
+  # test
+  # lambda ni: ni.gen[0].fenotype['x'], ni
+  with pytest.raises(ValueError) as excinfo:
+    _=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+
+  # results
+  assert str(excinfo.value)=='validation_data does not have the same number of attributes in data or output as training_data and test_data'
