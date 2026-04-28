@@ -60,6 +60,9 @@ def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int) -
   model=__cr_net_from_ind(net_ind, input_size, output_size)
   return (model, params[const.BIN_PART_BATCH_NAME], params[const.BIN_PART_EPOCHS_NAME])
 
+def __is_categorical(arr: np.ndarray) -> bool|None:
+  pass
+
 count: int=0
 def get_fit_func(
   training_data: np.ndarray,
