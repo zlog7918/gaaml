@@ -66,14 +66,14 @@ Kod genetyczny będzie składał się z trzech części:
     \begin{itemize}
       \setlength{\itemsep}{0pt}
       \setlength{\parskip}{0pt}
-      \item liczba warstw ukrytych: 7 bitów $\left[1, 128\right]$
+      \item liczba warstw ukrytych: 5 bitów $\left[1, 32\right]$
       \item ziarno generatora liczby neuronów: 10 bitów $\left[0, 1023\right]$
       \item ziarno generatora typów aktywacji: 10 bitów $\left[0, 1023\right]$
       \item optymalizator: 1 bit $\left[0, 1\right]$ (0 \textrightarrow SGD, 1 \textrightarrow Adam)
       \item wskaźnik uczenia się (learning rate): 12 bitów $\left[2^{-13}, 0.5\right]$
       % TODO: maybe this version [2^(-13) - 0.5] → [2^(-13) - 1.]
       % \item wskaźnik uczenia się (learning rate): 13 bitów $\left[2^{-13}, 1.0)\right]$
-      \item liczba epok: 10 bitów $\left[1, 1024\right]$
+      \item liczba epok: 7 bitów $\left[1, 128\right]$
       \item wielkość partii: 10 bitów $\left[1, 1024\right]$
     \end{itemize}
   \item Część list - generowane po części binarnej;
