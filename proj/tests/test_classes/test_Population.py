@@ -464,7 +464,7 @@ def test_selection_sum_zero() -> None:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=7
     return 0 if ret<0 else ret
-  def __cr_ind() -> t.Generator[_GI]:
+  def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '0100', # fit: 4+1=5 -> 5-7=-2 -> 0
       '0011', # fit: 3+1=4 -> 4-7=-3 -> 0
@@ -510,7 +510,7 @@ def test_selection_sum_not_zero() -> None:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
     return 0 if ret<0 else ret
-  def __cr_ind() -> t.Generator[_GI]:
+  def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
       '0010', # fit: 2+1=3 -> 3-3=0
@@ -552,7 +552,7 @@ def test_selection_no_zero() -> None:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
     return 0 if ret<0 else ret
-  def __cr_ind() -> t.Generator[_GI]:
+  def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
       '0011', # fit: 3+1=4 -> 4-3=1
@@ -626,7 +626,7 @@ def test_multi_vs_single_thread_consistency(workers: int) -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def __cr_ind() -> t.Generator[_GI]:
+  def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9
       '0011', # fit: 3+1=4
@@ -671,7 +671,7 @@ def test_error_change_population() -> None:
     pop.population=[cr_ind() for _ in range(pop_num)] # type: ignore
 
   # results
-  assert str(excinfo.value)=='property \'population\' of \'Population\' object has no setter'
+  assert str(excinfo.value) in {'can\'t set attribute \'population\'', 'property \'population\' of \'Population\' object has no setter'}
 
 def test_error_change_fitnesses() -> None:
   # values
@@ -691,7 +691,7 @@ def test_error_change_fitnesses() -> None:
     pop.fitnesses=[0.]*pop_num # type: ignore
 
   # results
-  assert str(excinfo.value)=='property \'fitnesses\' of \'Population\' object has no setter'
+  assert str(excinfo.value) in {'can\'t set attribute \'fitnesses\'', 'property \'fitnesses\' of \'Population\' object has no setter'}
 
 def test_error_change_fitnesses_all() -> None:
   # values
@@ -711,4 +711,4 @@ def test_error_change_fitnesses_all() -> None:
     pop.fitnesses_all=[[0.]]*pop_num # type: ignore
 
   # results
-  assert str(excinfo.value)=='property \'fitnesses_all\' of \'Population\' object has no setter'
+  assert str(excinfo.value) in {'can\'t set attribute \'fitnesses_all\'', 'property \'fitnesses_all\' of \'Population\' object has no setter'}

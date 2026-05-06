@@ -26,24 +26,20 @@ class DirManager:
       raise ValueError(f'Given directory is not empty: {path}')
     return path.resolve()
 
-  @staticmethod
-  def __is_tmp(dir: tempfile.TemporaryDirectory[str]|Path) -> t.TypeIs[tempfile.TemporaryDirectory[str]]:
-    return isinstance(dir, tempfile.TemporaryDirectory)
-
   @property
   def is_tmp(self) -> bool:
-    return self.__is_tmp(self.__dir)
+    return isinstance(self.__dir, tempfile.TemporaryDirectory)
 
   @property
   def path(self) -> Path:
     return (
       Path(self.__dir.name).resolve()
-        if self.__is_tmp(self.__dir) else
+        if isinstance(self.__dir, tempfile.TemporaryDirectory) else
       self.__dir
     )
 
   def __cleanup(self) -> None:
-    if self.__is_tmp(self.__dir):
+    if isinstance(self.__dir, tempfile.TemporaryDirectory):
       self.__dir.cleanup()
       atexit.unregister(self.__cleanup_ref)
       del self.__cleanup_ref

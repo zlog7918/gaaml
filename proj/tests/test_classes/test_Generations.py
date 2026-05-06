@@ -10,16 +10,13 @@ from gaaml.classes.Individual import _BaseIndividual as _BI
 class DummyInd(_BI["DummyInd", int, tuple[int, float], float]):
   def __init__(self, gen_int: int, gen_float: float) -> None:
     super().__init__((gen_int, gen_float), lambda gen: gen[1])
-  @t.override
   def mutate(self) -> None: ...
 
   _DI=t.TypeVar('_DI', bound="DummyInd")
   @classmethod
-  @t.override
   def get_cp(cls: type[_DI], a: _DI, b: _DI) -> int:
     return 0
   @classmethod
-  @t.override
   def crossover(cls: type[_DI], a: _DI, b: _DI, cp: int) -> tuple[_DI, _DI]:
     (a_gen0, a_gen1)=a._gen
     (b_gen0, b_gen1)=b._gen
@@ -30,13 +27,11 @@ class DummyPop(_P[DummyInd]):
   def __init__(self, pop_num: int, individual_factory: t.Callable[[], DummyInd]) -> None:
     calc_fitness_func: t.Callable[[DummyInd, Path], float]=lambda ind, dir: ind.gen
     super().__init__(pop_num, individual_factory, calc_fitness_func, 1., .0, max_worker_num=1)
-  @t.override
   def next_generation(self, gen_num: int) -> None:
     self.gen_num+=1
     assert self.gen_num==gen_num
     self.__selection_list=iter(self.population)
     return super().next_generation(gen_num)
-  @t.override
   def _selection(self) -> tuple[DummyInd, DummyInd]:
     ind1=next(self.__selection_list)
     # if self.__selection_list.

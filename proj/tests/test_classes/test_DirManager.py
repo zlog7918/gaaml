@@ -535,5 +535,5 @@ def test_error_change_is_tmp(
     dm.is_tmp=False # type: ignore
 
   # results
-  assert str(excinfo1.value)=='property \'is_tmp\' of \'DirManager\' object has no setter'
-  assert str(excinfo2.value)=='property \'is_tmp\' of \'DirManager\' object has no setter'
+  assert str(excinfo1.value) in {'can\'t set attribute \'is_tmp\'', 'property \'is_tmp\' of \'DirManager\' object has no setter'}
+  assert str(excinfo2.value) in {'can\'t set attribute \'is_tmp\'', 'property \'is_tmp\' of \'DirManager\' object has no setter'}

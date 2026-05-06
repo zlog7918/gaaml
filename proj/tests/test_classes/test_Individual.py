@@ -53,7 +53,7 @@ def test_base_error_change_gen() -> None:
     i.gen='dummy_text' # type: ignore
 
   # results
-  assert str(excinfo.value)=='property \'gen\' of \'BI_Test\' object has no setter'
+  assert str(excinfo.value) in {'can\'t set attribute \'gen\'', 'property \'gen\' of \'BI_Test\' object has no setter'}
 
 def test_create() -> None:
   # values
@@ -77,4 +77,4 @@ def test_error_change_gen() -> None:
     i.gen='dummy_text' # type: ignore
 
   # results
-  assert str(excinfo.value)=='property \'gen\' of \'I_Test\' object has no setter'
+  assert str(excinfo.value) in {'can\'t set attribute \'gen\'', 'property \'gen\' of \'I_Test\' object has no setter'}

@@ -139,6 +139,7 @@ def get_fit_func(
     raise ValueError('training_data and test_data do not have the same number of attributes in data or output')
   if validation_data is not None and training_data.shape[1]!=validation_data.shape[1]:
     raise ValueError('validation_data does not have the same number of attributes in data or output as training_data and test_data')
+  # print(training_data)
   _training_data=training_data[:,:number_of_attributes], training_data[:,number_of_attributes:]
   training_data_x, training_data_y=(
     np.asarray(
@@ -210,14 +211,20 @@ def get_fit_func(
       training_data_y.shape[1],
       categorial
     )
-    fit_ret=model.fit(
-      training_data_x,
-      training_data_y,
-      batch_size=batch_size,
-      epochs=epochs,
-      validation_data=_validation_data,
-      verbose=verbose, # type: ignore
-    ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
+    with warnings.catch_warnings():
+      warnings.filterwarnings(
+        'ignore',
+        # message='__array__ implementation doesn\'t accept a copy keyword',
+        category=DeprecationWarning,
+      )
+      fit_ret=model.fit(
+        training_data_x,
+        training_data_y,
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_data=_validation_data,
+        verbose=verbose, # type: ignore
+      ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
 
     with open(dir/'model_meta.data', 'x') as meta:
       json.dump(
@@ -231,18 +238,18 @@ def get_fit_func(
         },
         meta,
       )
-    with warnings.catch_warnings(category=DeprecationWarning):
+    with warnings.catch_warnings():
       warnings.filterwarnings(
         'ignore',
-        message='__array__ implementation doesn\'t accept a copy keyword',
+        # message='__array__ implementation doesn\'t accept a copy keyword',
         category=DeprecationWarning,
       )
       model.save_weights(dir/'model.weights.h5')
 
-    ret=model.evaluate(
-      test_data_x,
-      test_data_y,
-      verbose=verbose, # type: ignore
-    )
+      ret=model.evaluate(
+        test_data_x,
+        test_data_y,
+        verbose=verbose, # type: ignore
+      )
     return ret
   return f

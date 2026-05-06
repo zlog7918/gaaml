@@ -14,7 +14,7 @@ IndType=NetIndividual
 RetType=Generations
 
 def fitness(_f: t.Callable[[IndType, Path], float], net_ind: IndType, dir: Path) -> float:
-  ret=_f(net_ind, dir)
+  ret=_f(net_ind, dir) # type: ignore
   ret=1/(ret+1)
   ret=ret if ret>0 else 0
   return ret
@@ -80,10 +80,11 @@ def cr_network(
   max_worker_num: int=Pop_const.MAX_WORKERS,
   num_of_fittnesses_calc: int=Pop_const.NUM_OF_FIT_CALC,
 ) -> RetType:
-  test_data, validation_data=(
-    (_validation_data, None)
+  training_data=np.asarray(training_data)
+  validation_data, test_data=(
+    (None, np.asarray(_validation_data))
       if _test_data is None else
-    (_test_data, _validation_data)
+    (np.asarray(_validation_data), np.asarray(_test_data))
   )
   del _validation_data, _test_data
   fit_func=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
@@ -124,7 +125,7 @@ def cr_network(
       # print('Maksymalna wartość:', max_of_max)
     import matplotlib.pyplot as plt
     for i, (title, l) in enumerate(zip(
-      (f'Max values {'no max' if max_of_max==0 else f'(max: {max_of_max})'}', 'Avg values', 'Min values'),
+      (f'Max values {"no max" if max_of_max==0 else f"(max: {max_of_max})"}', 'Avg values', 'Min values'),
       (maxs, avgs, mins)
     )):
       i+=1

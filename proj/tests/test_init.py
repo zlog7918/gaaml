@@ -34,10 +34,10 @@ mark__test_cr_network=pytest.mark.parametrize(
   ('number_of_generations', 'training_data', 'test_data', 'number_of_attributes'),
   [
     (1, np.zeros((2, 2)), np.zeros((2, 2)), -1),
-    # (2, np.zeros((2, 2)), np.zeros((2, 2)), -1),
-    # (5, np.zeros((2, 2)), np.zeros((2, 2)), -1),
-    # (5, np.zeros((10, 3)), np.zeros((8, 3)), -1),
-    # (5, np.zeros((10, 7)), np.zeros((8, 7)), -2),
+    (2, np.zeros((2, 2)), np.zeros((2, 2)), -1),
+    (5, np.zeros((2, 2)), np.zeros((2, 2)), -1),
+    (5, np.zeros((10, 3)), np.zeros((8, 3)), -1),
+    (5, np.zeros((10, 7)), np.zeros((8, 7)), -2),
   ]
 )
 @mark__test_cr_network
@@ -49,7 +49,7 @@ def test_cr_network(
   number_of_attributes: int,
 ) -> None:
   # values
-  population_size=2
+  population_size=6
 
   # test
   ret=gaaml.cr_network(
@@ -59,8 +59,9 @@ def test_cr_network(
     number_of_attributes=number_of_attributes,
     population_size=population_size,
     number_of_generations=number_of_generations,
-    max_worker_num=1,
-    num_of_fittnesses_calc=1,
+    max_worker_num=9,
+    # max_worker_num=1,
+    # num_of_fittnesses_calc=1,
   )
 
   # results
@@ -71,8 +72,8 @@ mark__test_cr_network_plot=pytest.mark.parametrize(
   ('number_of_generations', 'training_data', 'test_data', 'number_of_attributes'),
   [
     (1, np.zeros((2, 2)), np.zeros((2, 2)), -1),
-    # (2, np.zeros((2, 2)), np.zeros((2, 2)), -1),
-    # (5, np.zeros((2, 2)), np.zeros((2, 2)), -1),
+    (2, np.zeros((2, 2)), np.zeros((2, 2)), -1),
+    (5, np.zeros((2, 2)), np.zeros((2, 2)), -1),
   ]
 )
 @mark__test_cr_network_plot
@@ -88,7 +89,7 @@ def test_cr_network_plot(
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  population_size=2
+  population_size=6
 
   # test
   ret=gaaml.cr_network(
@@ -99,8 +100,9 @@ def test_cr_network_plot(
     population_size=population_size,
     number_of_generations=number_of_generations,
     plot=True,
-    max_worker_num=1,
-    num_of_fittnesses_calc=1,
+    max_worker_num=9,
+    # max_worker_num=1,
+    # num_of_fittnesses_calc=1,
   )
 
   # results
@@ -134,7 +136,7 @@ def test_error_cr_network_0generations(
       save_dir_path=tmp_path,
       population_size=population_size,
       number_of_generations=number_of_generations,
-      max_worker_num=1,
+      # max_worker_num=1,
       num_of_fittnesses_calc=1,
     )
 
