@@ -26,7 +26,6 @@ __keras_optimalization_types: dict[int, type[krs.optimizers.Optimizer]]={
 # }
 
 def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, categorial: bool) -> krs.models.Model:
-  # TODO
   params, layer_sizes, layer_types=net_ind.gen
   params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
   if categorial:

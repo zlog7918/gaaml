@@ -1,3 +1,4 @@
+import gc
 import typing as t
 import random as rnd
 from pathlib import Path
@@ -42,7 +43,8 @@ class Population(t.Generic[util.IndividualType]):
     self.__population=[individual_factory() for _ in range(pop_num)]
     def calc_fitness(ind: util.IndividualType, dir: Path) -> float:
       dir.mkdir(parents=True)
-      return calc_fitness_func(ind, dir)
+      fit=calc_fitness_func(ind, dir)
+      return fit
     self.__calc_fitness=calc_fitness
     self.__cross_rate=cross_rate
     self.__mutate_rate=mutate_rate
@@ -80,6 +82,7 @@ class Population(t.Generic[util.IndividualType]):
         fit=future.result()
         fitnesses.append(fit)
     self.__fitnesses=fitnesses
+    gc.collect()
   def __calc_fitnesses_seq(self, gen_num: int) -> None:
     fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
     for fit in (
@@ -97,6 +100,7 @@ class Population(t.Generic[util.IndividualType]):
     ):
       fitnesses.append(fit)
     self.__fitnesses=fitnesses
+    gc.collect()
 
   @staticmethod
   def _calc_to_add(fitnesses: MAMHolder[list[float]]) -> float:
