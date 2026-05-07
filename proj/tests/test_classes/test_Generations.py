@@ -54,12 +54,14 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
   # values
   number_of_generations=2
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  
   # test
-  gens=G(pop, number_of_generations)
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -95,13 +97,15 @@ def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[
   # values
   number_of_generations=2
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
 
   # test
   ret=gens.get_statistics()
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   assert pop.gen_num==0
   assert gens.curr_generations==0
   assert isinstance(ret, tuple)
@@ -132,13 +136,15 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
   # values
   number_of_generations=2
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -173,14 +179,16 @@ def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num:
   # values
   number_of_generations=2
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(go_num_generations)
 
   # test
   ret=gens.get_statistics()
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   assert pop.gen_num==number_of_generations
   assert gens.curr_generations==number_of_generations
   assert isinstance(ret, tuple)
@@ -209,13 +217,15 @@ def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, 
   # values
   number_of_generations=3
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -248,14 +258,16 @@ def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, ex
   # values
   number_of_generations=2
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(go_num_generations)
 
   # test
   ret=gens.get_statistics()
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   assert pop.gen_num==go_num_generations
   assert gens.curr_generations==go_num_generations
   assert isinstance(ret, tuple)
@@ -286,14 +298,16 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
   # values
   number_of_generations=3
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(1)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -330,8 +344,8 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
   # values
   number_of_generations=3
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(1)
   gens.go_through_generations(go_num_generations)
 
@@ -339,6 +353,8 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
   ret=gens.get_statistics()
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   if go_num_generations is None:
     go_num_generations=number_of_generations-1
   assert pop.gen_num==go_num_generations+1
@@ -379,8 +395,8 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
   # values
   number_of_generations=5
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(1)
   gens.go_through_generations(1)
 
@@ -389,6 +405,8 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
     gens.go_through_generations(i)
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -431,8 +449,8 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   # values
   number_of_generations=5
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   gens.go_through_generations(1)
   gens.go_through_generations(1)
   for i in go_num_generations:
@@ -442,6 +460,8 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   ret=gens.get_statistics()
 
   # results
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   assert pop.gen_num==sum(go_num_generations)+2
   assert gens.curr_generations==sum(go_num_generations)+2
   assert isinstance(ret, tuple)
@@ -478,8 +498,8 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
   # values
   number_of_generations=5
   float_iter=(x/2 for x in range(9))
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
-  gens=G(pop, number_of_generations)
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
+  gens=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
   for i in go_num_generations:
     gens.go_through_generations(i)
 
@@ -489,6 +509,8 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
 
   # results
   assert str(excinfo.value)=='Tried to add next generation(s) after reaching max number of them'
+  # private access: gens.__pop
+  pop: DummyPop=gens._Generations__pop # type: ignore
   # private access: gens.__maxs, gens.__avgs, gens.__mins
   maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
   # private access: gens.__max_sol, gens.__min_sol
@@ -517,11 +539,11 @@ def test_invalid_num_gen(number_of_generations: int) -> None:
   float_iter=range(9)
   pop_num=len(float_iter)
   float_iter=(x/2 for x in float_iter)
-  pop=DummyPop(pop_num, lambda: DummyInd(0, next(float_iter)))
+  pop_args, pop_kwargs=(pop_num, lambda: DummyInd(0, next(float_iter))), {}
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    G(pop, number_of_generations)
+    _=G(number_of_generations, DummyPop, *pop_args, **pop_kwargs)
 
   # results
   assert str(excinfo.value)=='max_num_gen: is too small, it should at least equal 1'

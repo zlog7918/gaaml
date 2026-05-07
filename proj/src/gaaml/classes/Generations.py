@@ -2,18 +2,24 @@ import typing as t
 from . import _utils as util
 from .Population import Population
 
-class Generations(t.Generic[util.IndividualType]):
+_P=t.ParamSpec('_P')
+class Generations(t.Generic[_P, util.IndividualType]):
   __max_sol: util.IndividualType|None=None
   __min_sol: util.IndividualType|None=None
   __max_of_max=-1.
   __min_of_min=float('inf')
   __curr_generations=0
-  def __init__(self, pop: Population[util.IndividualType], max_num_gen: int) -> None:
+  def __init__(
+    self,
+    max_num_gen: int,
+    pop_factory: t.Callable[_P, Population[util.IndividualType]],
+    *args: _P.args,
+    **kwargs: _P.kwargs
+  ) -> None:
     super().__init__()
-    # assert num_gen>0
     if max_num_gen<1:
       raise ValueError('max_num_gen: is too small, it should at least equal 1')
-    self.__pop=pop
+    self.__pop=pop_factory(*args, **kwargs)
     self.__max_num_gen=max_num_gen
     self.__maxs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__avgs: list[float]=[.0]*(self.__max_num_gen+1)

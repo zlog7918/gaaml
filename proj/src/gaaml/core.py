@@ -89,8 +89,7 @@ def cr_network(
   del _validation_data, _test_data
   fit_func=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
 
-  # TODO: do not calcutate run fitting until Generations
-  pop=Population(
+  pop_args, pop_kwargs=(
     population_size,
     lambda: IndType(
       const.BIN_PART_LIST_LEN,
@@ -104,13 +103,14 @@ def cr_network(
     ),
     lambda x, dir: fitness_func(fit_func, x, dir),
     cross_rate,
-    mutation_rate,
-    save_dir_path=save_dir_path,
-    max_worker_num=max_worker_num,
-    num_of_fit_calc=num_of_fittnesses_calc,
-  )
+    mutation_rate
+  ), {
+    'save_dir_path': save_dir_path,
+    'max_worker_num': max_worker_num,
+    'num_of_fit_calc': num_of_fittnesses_calc,
+  }
 
-  generations=Generations(pop, number_of_generations)
+  generations=Generations(number_of_generations, Population, *pop_args, **pop_kwargs)
   generations.go_through_generations()
   (
     (max_sol, min_sol),
