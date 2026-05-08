@@ -2,6 +2,7 @@ import pytest
 import typing as t
 import random as rnd
 from pathlib import Path
+from tqdm.auto import tqdm
 from gaaml.classes import _utils as util
 from gaaml.classes import _consts as const
 from gaaml.classes.Population import Population as P
@@ -142,15 +143,19 @@ def test_create(
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
   exp_fitnesses=(9,4,5,7,10)
   dir_path=path_to_dir_path(tmp_path)
 
   # test
-  pop=P(*schema, save_dir_path=dir_path)
+  pop=P(*schema, fitnesses_progress_output=bar, save_dir_path=dir_path)
   # pop=P(*schema, max_worker_num=1)
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert isinstance(pop.population, list)
   assert isinstance(pop.fitnesses, list)
   assert isinstance(pop.fitnesses_all, list)
@@ -231,8 +236,9 @@ def test_set_dir(
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
   # pop=P(*schema, max_worker_num=1)
   dir_path=path_to_dir_path(tmp_path)
   dir_Path=Path(dir_path)
@@ -241,6 +247,9 @@ def test_set_dir(
   pop.set_dir(dir_path)
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert dir_Path.exists()
   assert dir_Path.is_dir()
   gen0=(*dir_Path.iterdir(),)
@@ -294,18 +303,22 @@ def test_set_dir_after_cr_with_path(
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
   # pop=P(*schema, max_worker_num=1)
   dir_path1=path_to_dir_path1(tmp_path)
   dir_path2=path_to_dir_path2(tmp_path)
   dir_Path1=Path(dir_path1)
   dir_Path2=Path(dir_path2)
-  pop=P(*schema, save_dir_path=dir_path1)
+  pop=P(*schema, fitnesses_progress_output=bar, save_dir_path=dir_path1)
 
   # test
   pop.set_dir(dir_path2)
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert dir_Path1.exists()
   assert len((*dir_Path1.iterdir(),))==0
   assert dir_Path2.exists()
@@ -361,8 +374,9 @@ def test_set_dir_after_set_dir(
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
   # pop=P(*schema, max_worker_num=1)
   dir_path1=path_to_dir_path1(tmp_path)
   dir_path2=path_to_dir_path2(tmp_path)
@@ -374,6 +388,9 @@ def test_set_dir_after_set_dir(
   pop.set_dir(dir_path2)
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert dir_Path1.exists()
   assert len((*dir_Path1.iterdir(),))==0
   assert dir_Path2.exists()
@@ -402,14 +419,18 @@ def test_population_returns_copy() -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   # test
   population_copy=pop.population
   population_copy.append(cr_ind())
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert len(pop.population)==pop_num
 
 def test_get_max_avg_min() -> None:
@@ -435,14 +456,18 @@ def test_get_max_avg_min() -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
   exp_fitnesses=(9,4,5,7,10)
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   # test
   ret=pop.get_max_avg_min()
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert isinstance(ret, tuple)
   assert len(ret)==5
   max_ind, min_ind, max_f, avg_f, min_f=ret
@@ -481,8 +506,9 @@ def test_selection_sum_zero() -> None:
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   for _ in range(25): # random process
     seed=rnd.random()
@@ -500,6 +526,9 @@ def test_selection_sum_zero() -> None:
     cgi1, cgi2=ret
     assert cgi1 is exp_cgi1
     assert cgi2 is exp_cgi2
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
 
 def test_selection_sum_not_zero() -> None:
   # values
@@ -524,8 +553,9 @@ def test_selection_sum_not_zero() -> None:
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   flag=False
   for _ in range(1000):
@@ -541,6 +571,9 @@ def test_selection_sum_not_zero() -> None:
       break
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert flag
 
 def test_selection_no_zero() -> None:
@@ -568,8 +601,9 @@ def test_selection_no_zero() -> None:
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   for _ in range(1000):
     # test
@@ -580,6 +614,9 @@ def test_selection_no_zero() -> None:
     cgi1, cgi2=ret
     assert any(cgi1 is gi for gi in (gi1, gi2, gi3, gi4, gi5))
     assert any(cgi2 is gi for gi in (gi1, gi2, gi3, gi4, gi5))
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
 
 def test_next_generation(tmp_path: Path) -> None:
   # values
@@ -588,22 +625,27 @@ def test_next_generation(tmp_path: Path) -> None:
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
   def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    # dir.mkdir(parents=True)
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema, save_dir_path=tmp_path)
+  pop=P(*schema, fitnesses_progress_output=bar, save_dir_path=tmp_path)
 
   for i in range(1, 50): # random process
     # test
     pop.next_generation(i)
 
     # results
+    assert bar.n==pop_num
+    assert not bar.disable
     assert len(pop.population)==pop_num
     assert len(pop.fitnesses)==pop_num
 
     assert tmp_path.exists()
     assert tmp_path.is_dir()
+    print([*tmp_path.iterdir()])
     gen_dir=tmp_path/f'gen_{i}'
     print(gen_dir)
     assert gen_dir.exists()
@@ -616,6 +658,7 @@ def test_next_generation(tmp_path: Path) -> None:
     assert all(ds.is_dir() for d in subsubdirs for ds in d)
     iter_names={f'iter_{i}' for i in range(const.NUM_OF_FIT_CALC)}
     assert all({ds.name for ds in d}==iter_names for d in subsubdirs)
+  bar.close()
 
 @pytest.mark.parametrize(
   'workers',
@@ -644,13 +687,17 @@ def test_multi_vs_single_thread_consistency(workers: int) -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
   exp_fitnesses=[9,4,5,7,10]
 
   # test
-  pop=P(*schema, max_worker_num=workers)
+  pop=P(*schema, fitnesses_progress_output=bar, max_worker_num=workers)
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert pop.fitnesses==exp_fitnesses
 
 def test_error_change_population() -> None:
@@ -663,14 +710,18 @@ def test_error_change_population() -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   # test
   with pytest.raises(AttributeError) as excinfo:
     pop.population=[cr_ind() for _ in range(pop_num)] # type: ignore
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert str(excinfo.value) in {'can\'t set attribute \'population\'', 'property \'population\' of \'Population\' object has no setter'}
 
 def test_error_change_fitnesses() -> None:
@@ -683,14 +734,18 @@ def test_error_change_fitnesses() -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   # test
   with pytest.raises(AttributeError) as excinfo:
     pop.fitnesses=[0.]*pop_num # type: ignore
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert str(excinfo.value) in {'can\'t set attribute \'fitnesses\'', 'property \'fitnesses\' of \'Population\' object has no setter'}
 
 def test_error_change_fitnesses_all() -> None:
@@ -703,12 +758,16 @@ def test_error_change_fitnesses_all() -> None:
     return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
+  bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
   schema=pop_num, cr_ind, calc_fitness_func, crossover_rate, mutation_rate
-  pop=P(*schema)
+  pop=P(*schema, fitnesses_progress_output=bar)
 
   # test
   with pytest.raises(AttributeError) as excinfo:
     pop.fitnesses_all=[[0.]]*pop_num # type: ignore
 
   # results
+  assert bar.n==pop_num
+  assert not bar.disable
+  bar.close()
   assert str(excinfo.value) in {'can\'t set attribute \'fitnesses_all\'', 'property \'fitnesses_all\' of \'Population\' object has no setter'}

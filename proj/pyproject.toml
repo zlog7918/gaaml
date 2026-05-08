@@ -6,6 +6,7 @@ authors = [{ name="Szymon Wasążnik", email="zlog@zlog.pl" }]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+  "tqdm",
   "numpy",
   "keras",
   "matplotlib",

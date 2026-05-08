@@ -2,6 +2,7 @@ import gc
 import typing as t
 import random as rnd
 from pathlib import Path
+from tqdm.auto import tqdm
 from . import _utils as util
 from . import _consts as const
 from .DirManager import DirManager
@@ -35,9 +36,10 @@ class Population(t.Generic[util.IndividualType]):
     cross_rate: float,
     mutate_rate: float,
     *,
+    fitnesses_progress_output: tqdm|None,
     num_of_fit_calc: int=const.NUM_OF_FIT_CALC,
     max_worker_num: int=const.MAX_WORKERS,
-    save_dir_path: Path|str|None=None
+    save_dir_path: Path|str|None=None,
   ) -> None:
     super().__init__()
     self.__population=[individual_factory() for _ in range(pop_num)]
@@ -45,6 +47,7 @@ class Population(t.Generic[util.IndividualType]):
       dir.mkdir(parents=True)
       fit=calc_fitness_func(ind, dir)
       return fit
+    self.__fpo=fitnesses_progress_output
     self.__calc_fitness=calc_fitness
     self.__cross_rate=cross_rate
     self.__mutate_rate=mutate_rate
@@ -80,6 +83,8 @@ class Population(t.Generic[util.IndividualType]):
       ]
       for future in future_fits:
         fit=future.result()
+        if self.__fpo is not None:
+          self.__fpo.update()
         fitnesses.append(fit)
     self.__fitnesses=fitnesses
     gc.collect()
@@ -98,6 +103,8 @@ class Population(t.Generic[util.IndividualType]):
         range(self.__num_of_fit_calc)
       ] for ind_i, ind in enumerate(self.__population)
     ):
+      if self.__fpo is not None:
+        self.__fpo.update()
       fitnesses.append(fit)
     self.__fitnesses=fitnesses
     gc.collect()
@@ -149,6 +156,8 @@ class Population(t.Generic[util.IndividualType]):
     return parent1, parent2
 
   def next_generation(self, gen_num: int) -> None:
+    if self.__fpo is not None:
+      self.__fpo.reset()
     new_generation=[]
     pop_len=len(self.__population)
     for _ in range(int((pop_len+1)/2)):

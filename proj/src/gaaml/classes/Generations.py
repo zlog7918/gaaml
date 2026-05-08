@@ -1,4 +1,5 @@
 import typing as t
+from tqdm.auto import tqdm
 from . import _utils as util
 from .Population import Population
 
@@ -12,14 +13,16 @@ class Generations(t.Generic[_P, util.IndividualType]):
   def __init__(
     self,
     max_num_gen: int,
-    pop_factory: t.Callable[_P, Population[util.IndividualType]],
+    generations_progress_output: tqdm|None,
+    pop_factory: t.Callable[_P, Population[util.IndividualType]]=Population,
     *args: _P.args,
-    **kwargs: _P.kwargs
+    **kwargs: _P.kwargs,
   ) -> None:
     super().__init__()
     if max_num_gen<1:
       raise ValueError('max_num_gen: is too small, it should at least equal 1')
     self.__pop=pop_factory(*args, **kwargs)
+    self.__gpo=generations_progress_output
     self.__max_num_gen=max_num_gen
     self.__maxs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__avgs: list[float]=[.0]*(self.__max_num_gen+1)
@@ -34,6 +37,9 @@ class Generations(t.Generic[_P, util.IndividualType]):
     if num_gen<1:
       raise IndexError('Tried to add next generation(s) after reaching max number of them')
     for _ in range(num_gen):
+      if self.__gpo is not None:
+        # self.__fpo.reset()
+        self.__gpo.update()
       self.__curr_generations+=1
       self.__pop.next_generation(self.__curr_generations)
       self.__arrange_min_max()

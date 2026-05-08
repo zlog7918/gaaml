@@ -200,7 +200,6 @@ def get_fit_func(
   def f(
     net_ind: NetIndividual,
     dir: Path,
-    verbose: t.Literal[0]|t.Literal[1]|t.Literal[2]|t.Literal['auto']='auto',
   ) -> float:
     global count
     count+=1
@@ -222,7 +221,7 @@ def get_fit_func(
         batch_size=batch_size,
         epochs=epochs,
         validation_data=_validation_data,
-        verbose=verbose, # type: ignore
+        verbose=0, # type: ignore
       ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
 
     with open(dir/'model_meta.data', 'x') as meta:
@@ -248,7 +247,7 @@ def get_fit_func(
       ret=model.evaluate(
         test_data_x,
         test_data_y,
-        verbose=verbose, # type: ignore
+        verbose=0, # type: ignore
       )
     return ret
   return f

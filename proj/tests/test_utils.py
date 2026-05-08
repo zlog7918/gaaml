@@ -509,7 +509,7 @@ def test_get_fit_func(
 
   # test
   ret=util.get_fit_func(_training_data, _validation_data, _test_data, number_of_attributes, is_categorial)
-  _ret=ret(ni, tmp_path, 0) # type: ignore
+  _ret=ret(ni, tmp_path)
 
   # results
   assert isinstance(ret, t.Callable)
