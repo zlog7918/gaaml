@@ -123,16 +123,16 @@ def cr_network(
 
   generations=Generations(number_of_generations, bar1, Population, *pop_args, **pop_kwargs)
   generations.go_through_generations()
-  (
-    (max_sol, min_sol),
-    (max_of_max, min_of_min),
-    (maxs, avgs, mins),
-  )=generations.get_statistics()
   if bar1 is not None and bar2 is not None:
     bar2.close()
     bar1.close()
 
   if plot:
+    (
+      (max_sol, min_sol),
+      (max_of_max, min_of_min),
+      (maxs, avgs, mins),
+    )=generations.get_statistics()
     ylim=.5
     if max_of_max!=0:
       ylim=max_of_max
@@ -147,7 +147,7 @@ def cr_network(
       plt.plot(list(range(len(l))), l, marker='o', color='b', linestyle='-')
       plt.xlabel('x')
       plt.ylabel('y')
-      plt.xlim((0, len(l)+1))
+      plt.xlim((0, len(l)))
       plt.ylim((0, ylim))
       plt.title(title)
       plt.show()

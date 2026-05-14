@@ -215,7 +215,7 @@ def get_fit_func(
         # message='__array__ implementation doesn\'t accept a copy keyword',
         category=DeprecationWarning,
       )
-      fit_ret=model.fit(
+      fit_ret: krs.callbacks.History=model.fit(
         training_data_x,
         training_data_y,
         batch_size=batch_size,
@@ -232,7 +232,8 @@ def get_fit_func(
           'batch': batch_size,
           'backend': krs.config.backend(),
           'hidden_len': len(model.get_weights())//2-1,
-          'fit_ret': str(fit_ret),
+          'fit_ret': str(fit_ret.history),
+          # 'fit_ret_epoch': str(fit_ret.epoch),
         },
         meta,
       )
