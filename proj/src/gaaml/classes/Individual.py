@@ -1,5 +1,7 @@
 import abc
+import json
 import typing as t
+from pathlib import Path
 
 _T=t.TypeVar('_T')
 _RT=t.TypeVar('_RT')
@@ -23,6 +25,21 @@ class _BaseIndividual(t.Generic[_BI, _CPType, _T, _RT], metaclass=abc.ABCMeta):
   @classmethod
   @abc.abstractmethod
   def crossover(cls: type[_BI], a: _BI, b: _BI, cp: _CPType) -> tuple[_BI, _BI]: ...
+
+  @abc.abstractmethod
+  def _save_format(self) -> dict[str, object]: ...
+  def save_to(self, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'x') as model_save:
+      json.dump(self._save_format(), model_save)
+  # @classmethod
+  # @abc.abstractmethod
+  # def _load_from_format(cls, saved_model: dict[str, object]) -> _BI: ...
+  # @classmethod
+  # def load_from(cls, path: Path) -> _BI:
+  #   with open(path, 'x') as saved_model:
+  #     return cls._load_from_format(json.load(saved_model))
+
 
 _I=t.TypeVar('_I', bound="Individual")
 class Individual(t.Generic[_I, _CPType, _T], _BaseIndividual[_I, _CPType, _T, _T], metaclass=abc.ABCMeta):
