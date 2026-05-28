@@ -1,21 +1,38 @@
 import pytest
 from gaaml.classes import _utils as util
 
-def test_center_of_range() -> None:
-  # values
-  p_s=(3, -1, 3, 2)
-  k_s=(8, 6, 7, -5)
-  e_s=(5, 2, 5, -1)
+mark__test_create_from_two=pytest.mark.parametrize(
+  ('p', 'k', 'exp'),
+  [
+    *zip(
+      (3, -1, 3, 2),
+      (8, 6, 7, -5),
+      (5, 2, 5, -1),
+    )
+  ],
+)
+@mark__test_create_from_two
+def test_create_from_two(p: int, k: int, exp: int) -> None:
+  # values ^
 
-  for p, k, expected in zip(p_s, k_s, e_s):
-    # test
-    ret=util._center_of_range(p, k)
+  # test
+  ret=util._center_of_range(p, k)
 
-    # results
-    assert isinstance(ret, int)
-    assert ret==expected
+  # results
+  assert isinstance(ret, int)
+  assert ret==exp
 
-def test_get_i_in_range() -> None:
+mark__test_get_i_in_range=pytest.mark.parametrize(
+  ('v', 'exp'),
+  [
+    *zip(
+      (0, .1, .4, .87, 1, 2),
+      (0, 0, 2, 4, 5, 5),
+    )
+  ],
+)
+@mark__test_get_i_in_range
+def test_get_i_in_range(v: float, exp: int) -> None:
   """
   In: l=[.3, .4, .6, .8, .9, 1] and v=.87
   Out: i=4
@@ -26,16 +43,13 @@ def test_get_i_in_range() -> None:
   """
   # values
   l=[.3, .4, .6, .8, .9, 1]
-  v_s=(0, .1, .4, .87, 1, 2)
-  expected_s=(0, 0, 2, 4, 5, 5)
 
-  for v, expected in zip(v_s, expected_s):
-    # test
-    ret=util.get_i_in_range(l, v)
+  # test
+  ret=util.get_i_in_range(l, v)
 
-    # results
-    assert isinstance(ret, int)
-    assert ret==expected
+  # results
+  assert isinstance(ret, int)
+  assert ret==exp
 
 def test_randint() -> None:
   # values
@@ -51,98 +65,83 @@ def test_randint() -> None:
     assert p<=ret
     assert ret<=k
 
-def test_int_to_bin() -> None:
+mark__test_int_to_bin=pytest.mark.parametrize(
+  ('val', 'length', 'exp_gen_str'),
+  [
+    (22, 6, '0 1 0 1 1 0'),
+    (22, 5, '1 0 1 1 0'),
+    (22, 0, ''),
+    (22, 4, '0 1 1 0'), # 1 0 1 1 0
+  ],
+)
+@mark__test_int_to_bin
+def test_int_to_bin(val: int, length: int, exp_gen_str: str) -> None:
   """
   value=22
   bin: 1 0 1 1 0 (22d)
   """
-  # values
-  val=22
-  length=5
+  # values ^
 
   # test
   ret=util.int_to_bin(val, length)
 
   # results
-  expected=bytearray('1 0 1 1 0'.replace(' ', '').encode())
+  expected=bytearray(exp_gen_str.replace(' ', '').encode())
   assert isinstance(ret, bytearray)
   assert len(ret)==length
   assert ret==expected
 
-def test_correct_gen_to_min_max1() -> None:
+mark__test_correct_gen_to_min_max=pytest.mark.parametrize(
+  ('gen_str', 'max_v', 'min_v', 'exp_val_in_str'),
+  [
+    ('1 1 1 0 1', 27, 5, '1 0 1 0 1'),
+    ('1 0 1 1 1', 27, 5, '1 0 1 1 0'),
+    ('1 1 0 1 1', 26, 5, '1 0 0 1 1'),
+  ],
+)
+@mark__test_correct_gen_to_min_max
+def test_correct_gen_to_min_max(gen_str: str, max_v: int, min_v: int, exp_val_in_str: str) -> None:
   """
-  gen: 1 1 1 0 1 (29d)
-  max_v=27
-  min_v=5
+  case 0:
+    gen: 1 1 1 0 1 (29d)
+    max_v=27
+    min_v=5
 
-  max: 1 0 1 1 0 (22d)
-  min: 0 0 0 0 0 (0d)
+    max: 1 0 1 1 0 (22d)
+    min: 0 0 0 0 0 (0d)
 
-  ret: 1 0 1 0 1 (21d)
-  ret=21+5=26
-  """
-  # values
-  gen=bytearray('1 1 1 0 1'.replace(' ', '').encode())
+    ret: 1 0 1 0 1 (21d)
+    ret=21+5=26
 
-  max_val=27
-  min_val=5
+  case 1:
+    gen: 1 0 1 1 1 (23d)
+    max_v=27
+    min_v=5
 
-  # test
-  ret=util.correct_gen_to_min_max(gen, min_val, max_val)
+    max: 1 0 1 1 0 (22d)
+    min: 0 0 0 0 0 (0d)
 
-  # results
-  expected=int(bytearray('1 0 1 0 1'.replace(' ', '').encode()), 2)+min_val
-  assert isinstance(ret, int)
-  assert ret==expected
+    ret: 1 0 1 1 0 (22d)
+    ret=22+5=27
 
-def test_correct_gen_to_min_max2() -> None:
-  """
-  gen: 1 0 1 1 1 (23d)
-  max_v=27
-  min_v=5
+  case 2:
+    gen: 1 1 0 1 1 (27d)
+    max_v=26
+    min_v=5
 
-  max: 1 0 1 1 0 (22d)
-  min: 0 0 0 0 0 (0d)
+    max: 1 0 1 0 1 (21d)
+    min: 0 0 0 0 0 (0d)
 
-  ret: 1 0 1 1 0 (22d)
-  ret=22+5=27
-  """
-  # values
-  gen=bytearray('1 0 1 1 1'.replace(' ', '').encode())
-
-  max_val=27
-  min_val=5
-
-  # test
-  ret=util.correct_gen_to_min_max(gen, min_val, max_val)
-
-  # results
-  expected=int(bytearray('1 0 1 1 0'.replace(' ', '').encode()), 2)+min_val
-  assert isinstance(ret, int)
-  assert ret==expected
-
-def test_correct_gen_to_min_max3() -> None:
-  """
-  gen: 1 1 0 1 1 (27d)
-  max_v=26
-  min_v=5
-
-  max: 1 0 1 0 1 (21d)
-  min: 0 0 0 0 0 (0d)
-
-  ret: 1 0 0 1 1 (19d)
-  ret=19+5=24
+    ret: 1 0 0 1 1 (19d)
+    ret=19+5=24
   """
   # values
-  gen=bytearray('1 1 0 1 1'.replace(' ', '').encode())
-
-  max_val=26
-  min_val=5
+  gen=bytearray(gen_str.replace(' ', '').encode())
 
   # test
-  ret=util.correct_gen_to_min_max(gen, min_val, max_val)
+  ret=util.correct_gen_to_min_max(gen, min_v, max_v)
 
   # results
-  expected=int(bytearray('1 0 0 1 1'.replace(' ', '').encode()), 2)+min_val
+  expected=int(bytearray(exp_val_in_str.replace(' ', '').encode()), 2)+min_v
   assert isinstance(ret, int)
   assert ret==expected
