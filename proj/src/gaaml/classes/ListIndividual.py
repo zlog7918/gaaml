@@ -16,7 +16,7 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   def __init__(self, a: "int|ListIndividual", b: "GenSchemaType|ListIndividual", /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       (_min, _max), it_size=b
-      if a>_max or a<_min:
+      if a<_min or _max<a:
         raise ValueError('List size out of allowed range')
       l=a*it_size
       super().__init__(util.int_to_bin(rnd.getrandbits(l), l))
@@ -80,3 +80,9 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   @classmethod
   def crossover(cls: type[_LI], a: _LI, b: _LI, cp: CPType) -> tuple[_LI, _LI]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=(cp[1], cp[0])))
+
+  def _save_format(self) -> dict[str, object]:
+    return {
+      'name': self.__class__.__name__,
+      'gen': self._gen.decode()
+    }
