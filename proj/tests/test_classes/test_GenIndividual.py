@@ -118,40 +118,20 @@ def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
   assert isinstance(gi_s[1], GI)
   assert gi_s[1].gen==bytearray(expected_strs[1].encode())
 
-def test_save_to(tmp_path: Path) -> None:
+def test_save_format() -> None:
   # values
   input_len=5
   gi=GI(input_len)
-  path=tmp_path/'test_model.json'
 
   # test
-  gi.save_to(path)
+  result=gi._save_format()
 
   # results
-  assert path.exists()
-  assert path.is_file()
-
-  with open(path) as saved_model:
-    data=json.load(saved_model)
-
-  assert data=={
+  assert isinstance(result, dict)
+  assert result=={
     'name': GI.__name__,
     'gen': gi.gen.decode(),
   }
-
-def test_save_to_create_parent(tmp_path: Path) -> None:
-  # values
-  input_len=5
-  gi=GI(input_len)
-  path=tmp_path/'a'/'b'/'c'/'test_model.json'
-
-  # test
-  gi.save_to(path)
-
-  # results
-  assert path.exists()
-  assert path.is_file()
-  assert path.parent.exists()
 
 mark__test_error_not_same_type=pytest.mark.parametrize(
   'func',
@@ -203,19 +183,6 @@ def test_error_outside_range(
     _=func(gi1, gi2, cp)
   # results
   assert str(excinfo.value)=='Cross point is outside of solution'
-
-def test_save_to_exists_error(tmp_path: Path) -> None:
-  # values
-  input_len=5
-  gi=GI(input_len)
-  path=tmp_path/'test_model.json'
-
-  # setup
-  path.touch()
-
-  # test/results
-  with pytest.raises(FileExistsError):
-    gi.save_to(path)
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',
