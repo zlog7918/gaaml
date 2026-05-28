@@ -1,7 +1,5 @@
-import json
 import pytest
 import typing as t
-from pathlib import Path
 from gaaml.classes.GenIndividual import GenIndividual as GI
 
 def test_create() -> None:
@@ -68,8 +66,10 @@ def test_create_from_two(cp: int, expected_str: str) -> None:
   # values
   input_len=5
   gi1=GI(input_len)
-  gi1._gen=bytearray('01100'.encode())
   gi2=GI(input_len)
+
+  # setup
+  gi1._gen=bytearray('01100'.encode())
   gi2._gen=bytearray('10001'.encode())
 
   # test
@@ -104,8 +104,10 @@ def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
   # values
   input_len=5
   gi1=GI(input_len)
-  gi1._gen=bytearray('01100'.encode())
   gi2=GI(input_len)
+
+  # setup
+  gi1._gen=bytearray('01100'.encode())
   gi2._gen=bytearray('10001'.encode())
 
   # test
@@ -121,7 +123,11 @@ def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
 def test_save_format() -> None:
   # values
   input_len=5
+  gen_str='1 0 1 1 0'
   gi=GI(input_len)
+
+  # setup
+  gi._gen=bytearray(gen_str.replace(' ', '').encode())
 
   # test
   result=gi._save_format()
@@ -130,7 +136,7 @@ def test_save_format() -> None:
   assert isinstance(result, dict)
   assert result=={
     'name': GI.__name__,
-    'gen': gi.gen.decode(),
+    'gen': gen_str.replace(' ', ''),
   }
 
 mark__test_error_not_same_type=pytest.mark.parametrize(

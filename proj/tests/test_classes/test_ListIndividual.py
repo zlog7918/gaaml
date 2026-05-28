@@ -26,8 +26,9 @@ def test_save_format() -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
   gen_str='0 1 1  1 0 0  1 1 1  0 0 1  1 0 1'
-
   li=LI(input_len, schema)
+
+  # setup
   li._gen=bytearray(gen_str.replace(' ', '').encode())
 
   # test
@@ -139,8 +140,10 @@ def test_create_from_two(cp: tuple[int, int], expected_str: str) -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
+
+  # setup
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   # test
@@ -177,8 +180,10 @@ def test_create_from_two_too_long(cp: tuple[int, int], expected_str: str) -> Non
   max_list_size=3
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
+
+  # setup
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
 
   # test
@@ -220,8 +225,10 @@ def test_crossover(cp: tuple[int, int], expected_strs: tuple[str, str]) -> None:
   max_list_size=50
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
+
+  # setup
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
   (expected_str1, expected_str2)=expected_strs
 
@@ -261,8 +268,10 @@ def test_crossover_too_long(cp: tuple[int, int], expected_strs: tuple[str, str])
   max_list_size=3
   schema=((min_list_size, max_list_size), item_size)
   li1=LI(input_len1, schema)
-  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2=LI(input_len2, schema)
+
+  # setup
+  li1._gen=bytearray('0 1 1  1 1 1'.replace(' ', '').encode())
   li2._gen=bytearray('1 1 0  0 1 0  0 0 1'.replace(' ', '').encode())
   (expected_str1, expected_str2)=expected_strs
 
