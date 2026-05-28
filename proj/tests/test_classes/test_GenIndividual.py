@@ -1,4 +1,7 @@
+import json
 import pytest
+import typing as t
+from pathlib import Path
 from gaaml.classes.GenIndividual import GenIndividual as GI
 
 def test_create() -> None:
@@ -41,7 +44,19 @@ def test_get_cp() -> None:
     assert 0<=cp
     assert cp<=input_len
 
-def test_create_from_two() -> None:
+mark__test_create_from_two=pytest.mark.parametrize(
+  ('cp', 'expected_str'),
+  [
+    (0, '10001'),
+    (1, '00001'),
+    (2, '01001'),
+    (3, '01101'),
+    (4, '01101'),
+    (5, '01100'),
+  ],
+)
+@mark__test_create_from_two
+def test_create_from_two(cp: int, expected_str: str) -> None:
   """
   0 1 1|0 0
   1 0 0|0 1
@@ -57,18 +72,26 @@ def test_create_from_two() -> None:
   gi2=GI(input_len)
   gi2._gen=bytearray('10001'.encode())
 
-  for cp, expected_str in zip(
-    range(input_len+1),
-    ['10001', '00001', '01001', '01101', '01101', '01100']
-  ):
-    # test
-    gi=GI(gi1, gi2, cross_point=cp)
+  # test
+  gi=GI(gi1, gi2, cross_point=cp)
 
-    # results
-    assert gi.gen==bytearray(expected_str.encode())
-    assert len(gi.gen)==input_len
+  # results
+  assert gi.gen==bytearray(expected_str.encode())
+  assert len(gi.gen)==input_len
 
-def test_crossover() -> None:
+mark__test_crossover=pytest.mark.parametrize(
+  ('cp', 'expected_strs'),
+  [
+    (0, ('10001', '01100')),
+    (1, ('00001', '11100')),
+    (2, ('01001', '10100')),
+    (3, ('01101', '10000')),
+    (4, ('01101', '10000')),
+    (5, ('01100', '10001')),
+  ],
+)
+@mark__test_crossover
+def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
   """
   0 1 1|0 0
   1 0 0|0 1
@@ -85,21 +108,63 @@ def test_crossover() -> None:
   gi2=GI(input_len)
   gi2._gen=bytearray('10001'.encode())
 
-  for cp, expected_strs in zip(
-    range(input_len+1),
-    [('10001', '01100'), ('00001', '11100'), ('01001', '10100'), ('01101', '10000'), ('01101', '10000'), ('01100', '10001')]
-  ):
-    # test
-    gi_s=GI.crossover(gi1, gi2, cp)
+  # test
+  gi_s=GI.crossover(gi1, gi2, cp)
 
-    # results
-    assert isinstance(gi_s, tuple)
-    assert isinstance(gi_s[0], GI)
-    assert gi_s[0].gen==bytearray(expected_strs[0].encode())
-    assert isinstance(gi_s[1], GI)
-    assert gi_s[1].gen==bytearray(expected_strs[1].encode())
+  # results
+  assert isinstance(gi_s, tuple)
+  assert isinstance(gi_s[0], GI)
+  assert gi_s[0].gen==bytearray(expected_strs[0].encode())
+  assert isinstance(gi_s[1], GI)
+  assert gi_s[1].gen==bytearray(expected_strs[1].encode())
 
-def test_error_not_same_type_on_get_cp() -> None:
+def test_save_to(tmp_path: Path) -> None:
+  # values
+  input_len=5
+  gi=GI(input_len)
+  path=tmp_path/'test_model.json'
+
+  # test
+  gi.save_to(path)
+
+  # results
+  assert path.exists()
+  assert path.is_file()
+
+  with open(path) as saved_model:
+    data=json.load(saved_model)
+
+  assert data=={
+    'name': GI.__name__,
+    'gen': gi.gen.decode(),
+  }
+
+def test_save_to_create_parent(tmp_path: Path) -> None:
+  # values
+  input_len=5
+  gi=GI(input_len)
+  path=tmp_path/'a'/'b'/'c'/'test_model.json'
+
+  # test
+  gi.save_to(path)
+
+  # results
+  assert path.exists()
+  assert path.is_file()
+  assert path.parent.exists()
+
+mark__test_error_not_same_type=pytest.mark.parametrize(
+  'func',
+  [
+    lambda gi1, gi2: GI.get_cp(gi1, gi2),
+    lambda gi1, gi2: GI.crossover(gi1, gi2, 2),
+    lambda gi1, gi2: GI(gi1, gi2, cross_point=2),
+  ],
+)
+@mark__test_error_not_same_type
+def test_error_not_same_type(
+  func: t.Callable[[GI, GI], object],
+) -> None:
   # values
   input_len1=5
   input_len2=6
@@ -108,86 +173,72 @@ def test_error_not_same_type_on_get_cp() -> None:
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=GI.get_cp(gi1, gi2)
+    _=func(gi1, gi2)
 
   # results
   assert str(excinfo.value)=='First and second solution are not equal in size'
 
-def test_error_not_same_type_on_crossover() -> None:
+
+mark__test_error_outside_range=pytest.mark.parametrize(
+  ('func', 'cp'),
+  [
+    (lambda gi1, gi2, cp: GI.crossover(gi1, gi2, cp), -1),
+    (lambda gi1, gi2, cp: GI.crossover(gi1, gi2, cp), 6),
+    (lambda gi1, gi2, cp: GI(gi1, gi2, cross_point=cp), -1),
+    (lambda gi1, gi2, cp: GI(gi1, gi2, cross_point=cp), 6),
+  ],
+)
+@mark__test_error_outside_range
+def test_error_outside_range(
+  func: t.Callable[[GI, GI, int], object],
+  cp: int,
+) -> None:
   # values
-  input_len1=5
-  input_len2=6
-  gi1=GI(input_len1)
-  gi2=GI(input_len2)
+  input_len=5
+  gi1=GI(input_len)
+  gi2=GI(input_len)
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=GI.crossover(gi1, gi2, 2)
-
+    _=func(gi1, gi2, cp)
   # results
-  assert str(excinfo.value)=='First and second solution are not equal in size'
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
-def test_error_not_same_type_on_create() -> None:
+def test_save_to_exists_error(tmp_path: Path) -> None:
   # values
-  input_len1=5
-  input_len2=6
-  gi1=GI(input_len1)
-  gi2=GI(input_len2)
+  input_len=5
+  gi=GI(input_len)
+  path=tmp_path/'test_model.json'
 
+  # setup
+  path.touch()
+
+  # test/results
+  with pytest.raises(FileExistsError):
+    gi.save_to(path)
+
+mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
+  'func_args_kwargs',
+  [
+    lambda gi1, gi2: ((gi1, None), {'cross_point': 2}),
+    lambda gi1, gi2: ((gi1, gi2), {}),
+    lambda gi1, gi2: ((gi1, gi2), {'cross_point': None}),
+    lambda gi1, gi2: ((gi1, None), {}),
+    lambda gi1, gi2: ((gi1, None), {'cross_point': None}),
+  ],
+)
+@mark__test_error_illegal_argument_on_create
+def test_error_illegal_argument_on_create(
+  func_args_kwargs: t.Callable[[GI, GI], tuple[tuple[t.Any, ...], dict[str, t.Any]]],
+) -> None:
+  # values
+  input_len=5
+  gi1=GI(input_len)
+  gi2=GI(input_len)
+  args, kwargs=func_args_kwargs(gi1, gi2)
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=GI(gi1, gi2, cross_point=2)
+    _=GI(*args, **kwargs) # type: ignore
 
   # results
-  assert str(excinfo.value)=='First and second solution are not equal in size'
-
-def test_error_outside_range_on_crossover() -> None:
-  # values
-  input_len=5
-  gi1=GI(input_len)
-  gi2=GI(input_len)
-
-  # test
-  with pytest.raises(ValueError) as excinfo1:
-    _=GI.crossover(gi1, gi2, -1)
-  with pytest.raises(ValueError) as excinfo2:
-    _=GI.crossover(gi1, gi2, 6)
-
-  # results
-  assert str(excinfo1.value)=='Cross point is outside of solution'
-  assert str(excinfo2.value)=='Cross point is outside of solution'
-
-def test_error_outside_range_on_create() -> None:
-  # values
-  input_len=5
-  gi1=GI(input_len)
-  gi2=GI(input_len)
-
-  # test
-  with pytest.raises(ValueError) as excinfo1:
-    _=GI(gi1, gi2, cross_point=-1)
-  with pytest.raises(ValueError) as excinfo2:
-    _=GI(gi1, gi2, cross_point=6)
-
-  # results
-  assert str(excinfo1.value)=='Cross point is outside of solution'
-  assert str(excinfo2.value)=='Cross point is outside of solution'
-
-def test_error_illegal_argument_on_create() -> None:
-  # values
-  input_len=5
-  gi1=GI(input_len)
-  gi2=GI(input_len)
-  for args, kwargs in (
-    ((gi1, None), {'cross_point': 2}),
-    ((gi1, gi2), {}),
-    ((gi1, gi2), {'cross_point': None}),
-    ((gi1, None), {}),
-    ((gi1, None), {'cross_point': None}),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=GI(*args, **kwargs) # type: ignore
-
-    # results
-    assert str(excinfo.value)=='Illegal argument options'
+  assert str(excinfo.value)=='Illegal argument options'
