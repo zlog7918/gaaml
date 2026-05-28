@@ -11,7 +11,6 @@ from .MaxAvgMinHolder import MaxAvgMinHolder as MAMHolder
 
 class Population(t.Generic[util.IndividualType]):
   __calc_avg_from_fittnesses: t.Callable[[list[float]], float]=staticmethod(lambda i: sum(i)/len(i))
-  __population: list[util.IndividualType]
   @property
   def population(self) -> list[util.IndividualType]:
     return self.__population[:]
@@ -22,12 +21,7 @@ class Population(t.Generic[util.IndividualType]):
   @property
   def fitnesses(self) -> list[float]:
     return self.__fitnesses.arr_v
-  __calc_fitness: t.Callable[[util.IndividualType, Path], float]
-  __calc_fitnesses: t.Callable[[int], None]
-  __cross_rate: float
-  __mutate_rate: float
-  __max_worker_num: int
-  __num_of_fit_calc: int
+  # __calc_fitnesses: t.Callable[[int], None]
   def __init__(
     self,
     pop_num: int,
@@ -42,21 +36,24 @@ class Population(t.Generic[util.IndividualType]):
     save_dir_path: Path|str|None=None,
   ) -> None:
     super().__init__()
-    self.__population=[individual_factory() for _ in range(pop_num)]
+    self.__population: list[util.IndividualType]=[individual_factory() for _ in range(pop_num)]
     def calc_fitness(ind: util.IndividualType, dir: Path) -> float:
       dir.mkdir(parents=True)
       fit=calc_fitness_func(ind, dir)
       return fit
-    self.__fpo=fitnesses_progress_output
-    self.__calc_fitness=calc_fitness
-    self.__cross_rate=cross_rate
-    self.__mutate_rate=mutate_rate
-    self.__max_worker_num=max_worker_num
-    self.__num_of_fit_calc=num_of_fit_calc
-    self.__calc_fitnesses=(
-      self.__calc_fitnesses_multi
+    self.__fpo: tqdm|None=fitnesses_progress_output
+    self.__calc_fitness: t.Callable[
+      [util.IndividualType, Path],
+      float,
+    ]=calc_fitness
+    self.__cross_rate: float=cross_rate
+    self.__mutate_rate: float=mutate_rate
+    self.__max_worker_num: int=max_worker_num
+    self.__num_of_fit_calc: int=num_of_fit_calc
+    self.__yield_fits=(
+      self.__yield_fits_multi
         if self.__max_worker_num>1 else
-      self.__calc_fitnesses_seq
+      self.__yield_fits_seq
     )
     self.__dir=DirManager(save_dir_path)
     self.__calc_fitnesses(0)
@@ -64,45 +61,46 @@ class Population(t.Generic[util.IndividualType]):
   def set_dir(self, dir: Path|str) -> None:
     self.__dir.path=dir
 
-  def __calc_fitnesses_multi(self, gen_num: int) -> None:
-    fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
+  def __calc_ind_fitnesses(
+    self,
+    gen_num: int,
+    ind_i: int,
+    ind: util.IndividualType,
+  ) -> list[float]:
+    path = self.__dir.path/f'gen_{gen_num}'/f'ind_{ind_i}'
+    ind.save_to(path/'model.gen')
+    return [
+      self.__calc_fitness(ind, path/f'iter_{i}')
+        for i in
+      range(self.__num_of_fit_calc)
+    ]
+
+  def __yield_fits_multi(self, gen_num: int):
     with ThreadPoolExecutor(max_workers=self.__max_worker_num) as executor:
       future_fits=[
         executor.submit(
-          lambda ind_i, ind: [
-            self.__calc_fitness(ind, (
-              self.__dir.path
-                /f'gen_{gen_num}'
-                /f'ind_{ind_i}'
-                /f'iter_{i}'
-            ))
-              for i in
-            range(self.__num_of_fit_calc)
-          ], ind_i, ind
-        ) for ind_i, ind in enumerate(self.__population)
+          self.__calc_ind_fitnesses,
+          gen_num,
+          ind_i,
+          ind,
+        )
+          for ind_i, ind in
+        enumerate(self.__population)
       ]
       for future in future_fits:
-        fit=future.result()
-        if self.__fpo is not None:
-          self.__fpo.update()
-        fitnesses.append(fit)
-    self.__fitnesses=fitnesses
-    gc.collect()
-  def __calc_fitnesses_seq(self, gen_num: int) -> None:
+        yield future.result()
+
+  def __yield_fits_seq(self, gen_num: int):
+    for ind_i, ind in enumerate(self.__population):
+      yield self.__calc_ind_fitnesses(
+        gen_num,
+        ind_i,
+        ind,
+      )
+
+  def __calc_fitnesses(self, gen_num: int) -> None:
     fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
-    for fit in (
-      [
-        self.__calc_fitness(ind, (
-          self.__dir.path
-            /f'gen_{gen_num}'
-            /f'ind_{ind_i}'
-            /f'iter_{i}'
-          )
-        )
-          for i in
-        range(self.__num_of_fit_calc)
-      ] for ind_i, ind in enumerate(self.__population)
-    ):
+    for fit in self.__yield_fits(gen_num):
       if self.__fpo is not None:
         self.__fpo.update()
       fitnesses.append(fit)
