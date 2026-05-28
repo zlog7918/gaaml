@@ -238,7 +238,7 @@ def test_error_illegal_argument_on_create(
   args, kwargs=func_args_kwargs(gi1, gi2)
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=GI(*args, **kwargs) # type: ignore
+    _=GI(*args, **kwargs)
 
   # results
   assert str(excinfo.value)=='Illegal argument options'
