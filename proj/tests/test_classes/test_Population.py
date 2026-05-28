@@ -18,12 +18,12 @@ def bar_asserts(bar: tqdm, n: int, *, close: bool=True):
 def _gen_i_path_asserts(gen_dir: Path, gi_s: list[_GI]):
   n=len(gi_s)
   assert gen_dir.is_dir()
-  subdirs=(*gen_dir.iterdir(),)
+  subdirs=tuple(gen_dir.iterdir())
   subdirs=sorted(subdirs)
   assert len(subdirs)==n
   assert {d.name for d in subdirs}=={f'ind_{i}' for i in range(n)}
   assert all(d.is_dir() for d in subdirs)
-  subsubdirs=[(*d.iterdir(),) for d in subdirs]
+  subsubdirs=[tuple(d.iterdir()) for d in subdirs]
   subsubdirs=sorted(subsubdirs)
   model_paths=list(map(lambda dirs: next(filter(lambda dir: not dir.is_dir(), dirs)), subsubdirs))
   subsubdirs=list(map(lambda dirs, model_path: tuple(filter(lambda dir: dir!=model_path, dirs)), subsubdirs, model_paths))
@@ -44,7 +44,7 @@ def _gen_i_path_asserts(gen_dir: Path, gi_s: list[_GI]):
 def gen0_path_asserts(root_dir: Path, gi_s: tuple[_GI, ...]):
   assert root_dir.exists()
   assert root_dir.is_dir()
-  gen0=(*root_dir.iterdir(),)
+  gen0=tuple(root_dir.iterdir())
   assert len(gen0)==1
   gen0=gen0[0]
   assert gen0.name=='gen_0'
@@ -52,7 +52,7 @@ def gen0_path_asserts(root_dir: Path, gi_s: tuple[_GI, ...]):
 def gen_i_path_asserts(root_dir: Path, gen_i: int, gi_s: list[_GI]):
   assert root_dir.exists()
   assert root_dir.is_dir()
-  assert len((*root_dir.iterdir(),))==gen_i+1
+  assert len(tuple(root_dir.iterdir()))==gen_i+1
   gen_dir=root_dir/f'gen_{gen_i}'
   assert gen_dir.exists()
   _gen_i_path_asserts(gen_dir, list(gi_s))
@@ -339,7 +339,7 @@ def test_set_dir_after_cr_with_path(
   # results
   bar_asserts(bar, pop_num)
   assert dir_Path1.exists()
-  assert len((*dir_Path1.iterdir(),))==0
+  assert len(tuple(dir_Path1.iterdir()))==0
   gen0_path_asserts(dir_Path2, (gi1, gi2, gi3, gi4, gi5))
 
 mark__test_set_dir_after_set_dir=pytest.mark.parametrize(
@@ -394,7 +394,7 @@ def test_set_dir_after_set_dir(
   # results
   bar_asserts(bar, pop_num)
   assert dir_Path1.exists()
-  assert len((*dir_Path1.iterdir(),))==0
+  assert len(tuple(dir_Path1.iterdir()))==0
   gen0_path_asserts(dir_Path2, (gi1, gi2, gi3, gi4, gi5))
 
 def test_population_returns_copy() -> None:
