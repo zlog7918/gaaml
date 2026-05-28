@@ -129,8 +129,8 @@ def cr_network(
 
   if plot:
     (
-      (max_sol, min_sol),
-      (max_of_max, min_of_min),
+      (_, _),
+      (max_of_max, _),
       (maxs, avgs, mins),
     )=generations.get_statistics()
     ylim=.5
