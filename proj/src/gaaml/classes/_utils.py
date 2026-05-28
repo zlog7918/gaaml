@@ -51,13 +51,12 @@ def randint(a: int, b: int) -> int:
 def int_to_bin(value: int, length: int|None) -> bytearray:
   b=bin(value)[2:]
   b=bytearray(
-    # int(el)
     ord(el)
       for el in
     (
       b
         if length is None else
-      b.zfill(length)
+      reversed(tuple(reversed(b.zfill(length)))[:length])
     )
   )
   return b
