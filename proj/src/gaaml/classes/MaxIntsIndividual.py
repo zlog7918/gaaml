@@ -63,3 +63,9 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, GenIndividual]):
   @classmethod
   def crossover(cls: type[_MII], a: _MII, b: _MII, cp: CPType) -> tuple[_MII, _MII]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=cp))
+
+  def _save_format(self) -> dict[str, object]:
+    return {
+      'name': self.__class__.__name__,
+      'gen': self._gen._save_format()
+    }

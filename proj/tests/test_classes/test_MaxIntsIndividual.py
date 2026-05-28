@@ -1,6 +1,7 @@
 import pytest
+import typing as t
 from gaaml.classes import _utils as util
-from gaaml.classes.GenIndividual import GenIndividual as GI
+from gaaml.classes.GenIndividual import GenIndividual as _GI
 from gaaml.classes.MaxIntsIndividual import MaxIntsIndividual as MII
 
 def test_create() -> None:
@@ -22,7 +23,7 @@ def test_create() -> None:
     mii=MII(schema)
 
     # results
-    assert isinstance(mii.gen, GI)
+    assert isinstance(mii.gen, _GI)
     assert isinstance(mii.gen.gen, bytearray)
     assert len(mii.gen.gen)==expected
     assert isinstance(mii.fenotype, dict)
@@ -86,7 +87,19 @@ def test_get_cp() -> None:
     assert 0<=cp
     assert cp<=expected_len
 
-def test_create_from_two() -> None:
+mark__test_create_from_two=pytest.mark.parametrize(
+  ('cp', 'expected_str'),
+  [
+    (0, '1 1  1 0 1'),
+    (1, '1 1  1 0 1'),
+    (2, '1 0  1 0 1'),
+    (3, '1 0  0 0 1'),
+    (4, '1 0  0 1 1'),
+    (5, '1 0  0 1 0'),
+  ]
+)
+@mark__test_create_from_two
+def test_create_from_two(cp: int, expected_str: str) -> None:
   """
           x     y
   bits1: 1 0  0 1 0
@@ -109,30 +122,35 @@ def test_create_from_two() -> None:
   )
   mii1=MII(schema)
   mii2=MII(schema)
-  expected_len=x_bit+y_bit
+
+  # setup
   mii1.gen._gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
   mii2.gen._gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
 
-  for cp, expected_str in zip(range(expected_len+1), (
-    '1 1  1 0 1',
-    '1 1  1 0 1',
-    '1 0  1 0 1',
-    '1 0  0 0 1',
-    '1 0  0 1 1',
-    '1 0  0 1 0',
-  )):
-    # test
-    mii=MII(mii1, mii2, cross_point=cp)
+  # test
+  mii=MII(mii1, mii2, cross_point=cp)
 
-    # results
-    assert mii.gen.gen==bytearray(expected_str.replace(' ', '').encode())
-    assert {*mii.fenotype.keys()}=={'x', 'y'}
-    assert isinstance(mii.fenotype['x'], int)
-    assert isinstance(mii.fenotype['y'], int)
-    assert mii.fenotype['x']==util.correct_gen_to_min_max(mii.gen.gen[:x_bit], x_min, x_max)
-    assert mii.fenotype['y']==util.correct_gen_to_min_max(mii.gen.gen[x_bit:x_bit+y_bit], y_min, y_max)
+  # results
+  assert mii.gen.gen==bytearray(expected_str.replace(' ', '').encode())
+  assert {*mii.fenotype.keys()}=={'x', 'y'}
+  assert isinstance(mii.fenotype['x'], int)
+  assert isinstance(mii.fenotype['y'], int)
+  assert mii.fenotype['x']==util.correct_gen_to_min_max(mii.gen.gen[:x_bit], x_min, x_max)
+  assert mii.fenotype['y']==util.correct_gen_to_min_max(mii.gen.gen[x_bit:x_bit+y_bit], y_min, y_max)
 
-def test_crossover() -> None:
+mark__test_crossover=pytest.mark.parametrize(
+  ('cp', 'expected_strs'),
+  [
+    (0, ('1 1  1 0 1', '1 0  0 1 0')),
+    (1, ('1 1  1 0 1', '1 0  0 1 0')),
+    (2, ('1 0  1 0 1', '1 1  0 1 0')),
+    (3, ('1 0  0 0 1', '1 1  1 1 0')),
+    (4, ('1 0  0 1 1', '1 1  1 0 0')),
+    (5, ('1 0  0 1 0', '1 1  1 0 1')),
+  ]
+)
+@mark__test_crossover
+def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
   """
           x     y
   bits1: 1 0  0 1 0
@@ -152,27 +170,38 @@ def test_crossover() -> None:
   )
   mii1=MII(schema)
   mii2=MII(schema)
-  expected_len=x_bit+y_bit
+  (expected_str1, expected_str2)=expected_strs
+
+  # setup
   mii1.gen._gen=bytearray('1 0  0 1 0'.replace(' ', '').encode())
   mii2.gen._gen=bytearray('1 1  1 0 1'.replace(' ', '').encode())
 
-  for cp, (expected_str1, expected_str2) in zip(range(expected_len+1), (
-    ('1 1  1 0 1', '1 0  0 1 0'),
-    ('1 1  1 0 1', '1 0  0 1 0'),
-    ('1 0  1 0 1', '1 1  0 1 0'),
-    ('1 0  0 0 1', '1 1  1 1 0'),
-    ('1 0  0 1 1', '1 1  1 0 0'),
-    ('1 0  0 1 0', '1 1  1 0 1'),
-  )):
-    # test
-    li_s=MII.crossover(mii1, mii2, cp)
+  # test
+  li_s=MII.crossover(mii1, mii2, cp)
 
-    # results
-    assert isinstance(li_s, tuple)
-    assert li_s[0].gen.gen==bytearray(expected_str1.replace(' ', '').encode())
-    assert li_s[1].gen.gen==bytearray(expected_str2.replace(' ', '').encode())
+  # results
+  assert isinstance(li_s, tuple)
+  assert li_s[0].gen.gen==bytearray(expected_str1.replace(' ', '').encode())
+  assert li_s[1].gen.gen==bytearray(expected_str2.replace(' ', '').encode())
 
-def test_update_fenotype() -> None:
+mark__test_update_fenotype=pytest.mark.parametrize(
+  ('b_str', 'expected'),
+  [
+    ('1 0  1 1 0', {'x': 3, 'y': 4}),
+    ('0 0  1 1 0', {'x': 1, 'y': 4}),
+    ('0 1  1 1 0', {'x': 2, 'y': 4}),
+    ('1 1  1 1 0', {'x': 4, 'y': 4}),
+    ('1 0  1 1 1', {'x': 3, 'y': 5}),
+    ('1 0  0 0 0', {'x': 3, 'y': 0}),
+    ('1 0  0 0 1', {'x': 3, 'y': 1}),
+    ('1 0  0 1 0', {'x': 3, 'y': 2}),
+    ('1 0  0 1 1', {'x': 3, 'y': 3}),
+    ('1 0  1 0 0', {'x': 3, 'y': 4}),
+    ('1 0  1 0 1', {'x': 3, 'y': 5}),
+  ]
+)
+@mark__test_update_fenotype
+def test_update_fenotype(b_str: str, expected: dict[str, int]) -> None:
   """
   x: 2, 1, 4
   x: 3, 0, 5
@@ -194,35 +223,23 @@ def test_update_fenotype() -> None:
     ('y', (y_bit, 0, 5)),
   )
   mii=MII(schema)
+
+  # setup
   mii.gen._gen=bytearray('0 0  0 0 0'.replace(' ', '').encode())
   mii._update_fenotype()
+  oryg_fenotype1={k: v for k,v in mii.fenotype.items()}
+  mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
+  oryg_fenotype2={k: v for k,v in mii.fenotype.items()}
 
-  for b_str, expected in (
-    ('1 0  1 1 0', {'x': 3, 'y': 4}),
-    ('0 0  1 1 0', {'x': 1, 'y': 4}),
-    ('0 1  1 1 0', {'x': 2, 'y': 4}),
-    ('1 1  1 1 0', {'x': 4, 'y': 4}),
-    ('1 0  1 1 1', {'x': 3, 'y': 5}),
-    ('1 0  0 0 0', {'x': 3, 'y': 0}),
-    ('1 0  0 0 1', {'x': 3, 'y': 1}),
-    ('1 0  0 1 0', {'x': 3, 'y': 2}),
-    ('1 0  0 1 1', {'x': 3, 'y': 3}),
-    ('1 0  1 0 0', {'x': 3, 'y': 4}),
-    ('1 0  1 0 1', {'x': 3, 'y': 5}),
-  ):
-    oryg_fenotype1={k: v for k,v in mii.fenotype.items()}
-    mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
-    oryg_fenotype2={k: v for k,v in mii.fenotype.items()}
+  # test
+  mii._update_fenotype()
 
-    # test
-    mii._update_fenotype()
+  # results
+  assert oryg_fenotype1==oryg_fenotype2
+  assert oryg_fenotype2!=mii.fenotype
+  assert mii.fenotype==expected
 
-    # results
-    assert oryg_fenotype1==oryg_fenotype2
-    assert oryg_fenotype2!=mii.fenotype
-    assert mii.fenotype==expected
-
-@pytest.mark.parametrize(
+mark__test_get_fenotype=pytest.mark.parametrize(
   ('b_str', 'expected'),
   [
     ('1 0  1 1 0', {'x': 3, 'y': 4}),
@@ -238,6 +255,7 @@ def test_update_fenotype() -> None:
     ('1 0  1 0 1', {'x': 3, 'y': 5}),
   ]
 )
+@mark__test_get_fenotype
 def test_get_fenotype(b_str: str, expected: dict[str, int]) -> None:
   """
   x: 2, 1, 4
@@ -260,15 +278,35 @@ def test_get_fenotype(b_str: str, expected: dict[str, int]) -> None:
     ('y', (y_bit, 0, 5)),
   )
   mii=MII(schema)
-  mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
   # private access: mii.__schema
   _schema=mii._MaxIntsIndividual__schema # type: ignore
+
+  # setup
+  mii.gen._gen=bytearray(b_str.replace(' ', '').encode())
 
   # test
   fenotype=MII.get_fenotype(mii.gen, _schema)
 
   # results
   assert fenotype==expected
+
+def test_save_format() -> None:
+  # values
+  schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  mii=MII(schema)
+
+  # test
+  result=mii._save_format()
+
+  # results
+  assert isinstance(result, dict)
+  assert result=={
+    'name': MII.__name__,
+    'gen': mii._gen._save_format(),
+  }
 
 def test_error_name_collition_on_create() -> None:
   # values
@@ -285,72 +323,118 @@ def test_error_name_collition_on_create() -> None:
   # results
   assert str(excinfo.value)=='Names can not collide'
 
-def test_error_not_same_conf_on_get_cp() -> None:
-  # values
-  schema1=(('x', (2, 1, 4)), ('y', (3, 0, 5)))
-  mii1=MII(schema1)
-  for schema2 in (
+mark__test_error_not_same_conf_on_get_cp=pytest.mark.parametrize(
+  'schema2',
+  [
     (('x', (2, 2, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (3, 1, 5))),
     (('x', (2, 1, 3)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (3, 0, 4))),
     (('x', (3, 1, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ):
-    mii2=MII(schema2)
-
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII.get_cp(mii1, mii2)
-
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
-
-def test_error_not_same_conf_on_crossover() -> None:
+  ]
+)
+@mark__test_error_not_same_conf_on_get_cp
+def test_error_not_same_conf_on_get_cp(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
   # values
   schema1=(('x', (2, 1, 4)), ('y', (3, 0, 5)))
   mii1=MII(schema1)
+  mii2=MII(schema2)
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII.get_cp(mii1, mii2)
+
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
+
+mark__test_error_not_same_conf_on_crossover=pytest.mark.parametrize(
+  'schema2',
+  [
+    (('x', (2, 2, 4)), ('y', (3, 0, 5))),
+    (('x', (2, 1, 4)), ('y', (3, 1, 5))),
+    (('x', (2, 1, 3)), ('y', (3, 0, 5))),
+    (('x', (2, 1, 4)), ('y', (3, 0, 4))),
+    (('x', (3, 1, 4)), ('y', (3, 0, 5))),
+    (('x', (2, 1, 4)), ('y', (4, 0, 5))),
+  ]
+)
+@mark__test_error_not_same_conf_on_crossover
+def test_error_not_same_conf_on_crossover(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
+  # values
+  schema1=(('x', (2, 1, 4)), ('y', (3, 0, 5)))
+  mii1=MII(schema1)
+  mii2=MII(schema2)
   dummy_cp=1
-  for schema2 in (
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII.crossover(mii1, mii2, dummy_cp)
+
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
+
+mark__test_error_not_same_conf_on_create=pytest.mark.parametrize(
+  'schema2',
+  [
     (('x', (2, 2, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (3, 1, 5))),
     (('x', (2, 1, 3)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (3, 0, 4))),
     (('x', (3, 1, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ):
-    mii2=MII(schema2)
-
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII.crossover(mii1, mii2, dummy_cp)
-
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
-
-def test_error_not_same_conf_on_create() -> None:
+  ]
+)
+@mark__test_error_not_same_conf_on_create
+def test_error_not_same_conf_on_create(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
   # values
   schema1=(('x', (2, 1, 4)), ('y', (3, 0, 5)))
   mii1=MII(schema1)
+  mii2=MII(schema2)
   dummy_cp=1
-  for schema2 in (
-    (('x', (2, 2, 4)), ('y', (3, 0, 5))),
-    (('x', (2, 1, 4)), ('y', (3, 1, 5))),
-    (('x', (2, 1, 3)), ('y', (3, 0, 5))),
-    (('x', (2, 1, 4)), ('y', (3, 0, 4))),
-    (('x', (3, 1, 4)), ('y', (3, 0, 5))),
-    (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ):
-    mii2=MII(schema2)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII(mii1, mii2, cross_point=dummy_cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII(mii1, mii2, cross_point=dummy_cp)
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
 
-def test_error_outside_range_on_create() -> None:
+mark__test_error_outside_range_on_create=pytest.mark.parametrize(
+  'cp',
+  [
+    -1,
+    6,
+  ]
+)
+@mark__test_error_outside_range_on_create
+def test_error_outside_range_on_create(cp: int) -> None:
+  # values
+  x_bit=2
+  y_bit=3
+  schema=(
+    ('x', (x_bit, 1, 4)),
+    ('y', (y_bit, 0, 5)),
+  )
+  mii1=MII(schema)
+  mii2=MII(schema)
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII(mii1, mii2, cross_point=cp)
+
+  # results
+  assert str(excinfo.value)=='Cross point is outside of solution'
+
+mark__test_error_outside_range_on_crossover=pytest.mark.parametrize(
+  'cp',
+  [
+    -1,
+    6,
+  ]
+)
+@mark__test_error_outside_range_on_crossover
+def test_error_outside_range_on_crossover(cp: int) -> None:
   # values
   x_bit=2
   y_bit=3
@@ -362,18 +446,27 @@ def test_error_outside_range_on_create() -> None:
   mii2=MII(schema)
   expected_len=x_bit+y_bit
 
-  for cp in (
-    -1,
-    expected_len+1,
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII(mii1, mii2, cross_point=cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII.crossover(mii1, mii2, cp)
 
-    # results
-    assert str(excinfo.value)=='Cross point is outside of solution'
+  # results
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
-def test_error_outside_range_on_crossover() -> None:
+mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
+  'func_args_kwargs',
+  [
+    lambda mii1, mii2: ((mii1, None), {'cross_point': 1}),
+    lambda mii1, mii2: ((mii1, mii2), {}),
+    lambda mii1, mii2: ((mii1, mii2), {'cross_point': None}),
+    lambda mii1, mii2: ((mii1, None), {}),
+    lambda mii1, mii2: ((mii1, None), {'cross_point': None}),
+  ],
+)
+@mark__test_error_illegal_argument_on_create
+def test_error_illegal_argument_on_create(
+  func_args_kwargs: t.Callable[[MII, MII], tuple[tuple[t.Any, ...], dict[str, t.Any]]],
+) -> None:
   # values
   x_bit=2
   y_bit=3
@@ -383,40 +476,11 @@ def test_error_outside_range_on_crossover() -> None:
   )
   mii1=MII(schema)
   mii2=MII(schema)
-  expected_len=x_bit+y_bit
+  args, kwargs=func_args_kwargs(mii1, mii2)
 
-  for cp in (
-    -1,
-    expected_len+1,
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII.crossover(mii1, mii2, cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII(*args, **kwargs)
 
-    # results
-    assert str(excinfo.value)=='Cross point is outside of solution'
-
-def test_error_illegal_argument_on_create() -> None:
-  # values
-  x_bit=2
-  y_bit=3
-  schema=(
-    ('x', (x_bit, 1, 4)),
-    ('y', (y_bit, 0, 5)),
-  )
-  mii1=MII(schema)
-  mii2=MII(schema)
-
-  for args, kwargs in (
-    ((mii1, None), {'cross_point': 1}),
-    ((mii1, mii2), {}),
-    ((mii1, mii2), {'cross_point': None}),
-    ((mii1, None), {}),
-    ((mii1, None), {'cross_point': None}),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=MII(*args, **kwargs) # type: ignore
-
-    # results
-    assert str(excinfo.value)=='Illegal argument options'
+  # results
+  assert str(excinfo.value)=='Illegal argument options'
