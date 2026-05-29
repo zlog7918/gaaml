@@ -58,3 +58,9 @@ class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, ListIndi
   @classmethod
   def crossover(cls: type[_MILI], a: _MILI, b: _MILI, cp: CPType) -> tuple[_MILI, _MILI]:
     return (cls(a, b, cross_point=cp), cls(b, a, cross_point=(cp[1], cp[0])))
+
+  def _save_format(self) -> dict[str, object]:
+    return {
+      'name': self.__class__.__name__,
+      'gen': self._gen._save_format()
+    }
