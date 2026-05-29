@@ -1,3 +1,4 @@
+import json
 import pytest
 import typing as t
 from gaaml.classes import _utils as util
@@ -307,6 +308,18 @@ def test_save_format() -> None:
     'name': MII.__name__,
     'gen': mii._gen._save_format(),
   }
+
+def test_save_format_returns_serializable_data():
+  # values
+  schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  mii=MII(schema)
+  result=mii._save_format()
+
+  # test/results
+  _=json.dumps(result)
 
 def test_error_name_collition_on_create() -> None:
   # values

@@ -1,3 +1,4 @@
+import json
 import pytest
 import typing as t
 from gaaml.classes.GenIndividual import GenIndividual as GI
@@ -138,6 +139,15 @@ def test_save_format() -> None:
     'name': GI.__name__,
     'gen': gen_str.replace(' ', ''),
   }
+
+def test_save_format_returns_serializable_data():
+  # values
+  input_len=5
+  gi=GI(input_len)
+  result=gi._save_format()
+
+  # test/results
+  _=json.dumps(result)
 
 mark__test_error_not_same_type=pytest.mark.parametrize(
   'func',

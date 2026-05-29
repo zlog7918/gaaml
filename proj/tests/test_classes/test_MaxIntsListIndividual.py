@@ -1,3 +1,4 @@
+import json
 import pytest
 import typing as t
 from gaaml.classes.ListIndividual import ListIndividual as _LI
@@ -374,6 +375,24 @@ def test_save_format() -> None:
     'name': MILI.__name__,
     'gen': mili.gen._save_format(),
   }
+
+def test_save_format_returns_serializable_data():
+  # values
+  input_len=5
+  item_size=3
+  min_elem_val=1
+  max_elem_val=6
+  min_list_size=1
+  max_list_size=50
+  schema=(
+    (min_list_size, max_list_size),
+    (item_size, min_elem_val, max_elem_val),
+  )
+  mili=MILI(input_len, schema)
+  result=mili._save_format()
+
+  # test/results
+  _=json.dumps(result)
 
 def test_error_list_size_too_small_on_create() -> None:
   # values

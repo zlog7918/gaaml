@@ -1,3 +1,4 @@
+import json
 import pytest
 import typing as t
 from gaaml.classes.ListIndividual import ListIndividual as LI
@@ -17,49 +18,6 @@ def test_create() -> None:
     # results
     assert isinstance(li.gen, bytearray)
     assert len(li.gen)==input_len*item_size
-
-def test_save_format() -> None:
-  # values
-  input_len=5
-  item_size=3
-  min_list_size=1
-  max_list_size=50
-  schema=((min_list_size, max_list_size), item_size)
-  gen_str='0 1 1  1 0 0  1 1 1  0 0 1  1 0 1'
-  li=LI(input_len, schema)
-
-  # setup
-  li._gen=bytearray(gen_str.replace(' ', '').encode())
-
-  # test
-  result=li._save_format()
-
-  # results
-  assert isinstance(result, dict)
-  assert result=={
-    'name': LI.__name__,
-    'gen': gen_str.replace(' ', ''),
-  }
-
-def test_save_format_empty_gen() -> None:
-  # values
-  input_len=0
-  item_size=1
-  min_list_size=0
-  max_list_size=10
-  schema=((min_list_size, max_list_size), item_size)
-
-  li=LI(input_len, schema)
-
-  # test
-  result=li._save_format()
-
-  # results
-  assert isinstance(result, dict)
-  assert result=={
-    'name': LI.__name__,
-    'gen': '',
-  }
 
 def test_mutate() -> None:
   # values
@@ -282,6 +240,61 @@ def test_crossover_too_long(cp: tuple[int, int], expected_strs: tuple[str, str])
   assert isinstance(li_s, tuple)
   assert li_s[0].gen==bytearray(expected_str1.replace(' ', '').encode())
   assert li_s[1].gen==bytearray(expected_str2.replace(' ', '').encode())
+
+def test_save_format() -> None:
+  # values
+  input_len=5
+  item_size=3
+  min_list_size=1
+  max_list_size=50
+  schema=((min_list_size, max_list_size), item_size)
+  gen_str='0 1 1  1 0 0  1 1 1  0 0 1  1 0 1'
+  li=LI(input_len, schema)
+
+  # setup
+  li._gen=bytearray(gen_str.replace(' ', '').encode())
+
+  # test
+  result=li._save_format()
+
+  # results
+  assert isinstance(result, dict)
+  assert result=={
+    'name': LI.__name__,
+    'gen': gen_str.replace(' ', ''),
+  }
+
+def test_save_format_empty_gen() -> None:
+  # values
+  input_len=0
+  item_size=1
+  min_list_size=0
+  max_list_size=10
+  schema=((min_list_size, max_list_size), item_size)
+  li=LI(input_len, schema)
+
+  # test
+  result=li._save_format()
+
+  # results
+  assert isinstance(result, dict)
+  assert result=={
+    'name': LI.__name__,
+    'gen': '',
+  }
+
+def test_save_format_returns_serializable_data():
+  # values
+  input_len=5
+  item_size=3
+  min_list_size=1
+  max_list_size=50
+  schema=((min_list_size, max_list_size), item_size)
+  li=LI(input_len, schema)
+  result=li._save_format()
+
+  # test/results
+  _=json.dumps(result)
 
 def test_error_list_size_too_small_on_create() -> None:
   # values
