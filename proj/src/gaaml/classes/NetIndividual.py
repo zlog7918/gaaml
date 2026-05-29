@@ -141,3 +141,14 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[MaxIntsIndividual,
       cls(a, b, cross_point=cp),
       cls(b, a, cross_point=(c0, (bc1, ac1), (bc2, ac2))),
     )
+
+  def _save_format(self) -> dict[str, object]:
+    gen_g, gen_l, gen_t=self._gen
+    return {
+      'name': self.__class__.__name__,
+      'gen': {
+        'g': gen_g._save_format(),
+        'l': gen_l._save_format(),
+        't': gen_t._save_format(),
+      }
+    }

@@ -1,19 +1,12 @@
+import json
 import pytest
+import typing as t
 from gaaml.classes import _utils as util
 from gaaml.classes.NetIndividual import NetIndividual as NI
 from gaaml.classes.MaxIntsIndividual import MaxIntsIndividual as _MII
 from gaaml.classes.MaxIntsListIndividual import MaxIntsListIndividual as _MILI
 
-# @pytest.mark.parametrize(
-#   ('l', 'exp_l'),
-#   [
-#     (4, 6),
-#     (7, 9),
-#     (16, 18),
-#     (1, 3),
-#   ]
-# )
-@pytest.mark.parametrize(
+mark__test_type_len_modifier=pytest.mark.parametrize(
   ('l', 'exp_l'),
   [
     (4, 5),
@@ -22,6 +15,7 @@ from gaaml.classes.MaxIntsListIndividual import MaxIntsListIndividual as _MILI
     (1, 2),
   ]
 )
+@mark__test_type_len_modifier
 def test_type_len_modifier(l: int, exp_l: int) -> None:
   # values ^
 
@@ -235,13 +229,7 @@ def test_create_from_two() -> None:
   n_schema=3, 2, 7
   t_schema=2, 0, 3
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
-  ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
-  ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
   len_name, _=layers_len
   num_seed_name, _=num_seed
   type_seed_name, _=type_seed
@@ -249,6 +237,14 @@ def test_create_from_two() -> None:
     (x_name, _),
     (y_name, _),
   )=g_schema
+
+  # setup
+  ni1.gen[0]._gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
+  ni1.gen[1]._gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
+  ni1.gen[2]._gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
+  ni2.gen[0]._gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
+  ni2.gen[1]._gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
+  ni2.gen[2]._gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
 
   for cp, (exp_str0, exp_str1, exp_str2), (exp_feno0, exp_feno1, exp_feno2) in (
     (
@@ -326,21 +322,22 @@ def test_crossover() -> None:
   n_schema=3, 2, 7
   t_schema=2, 0, 3
   ni1=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni1.gen[0].gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
-  ni1.gen[1].gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2].gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
   ni2=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
-  ni2.gen[0].gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
-  ni2.gen[1].gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2].gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
   len_name, _=layers_len
-
   num_seed_name, _=num_seed
   type_seed_name, _=type_seed
   (
     (x_name, _),
     (y_name, _),
   )=g_schema
+
+  # setup
+  ni1.gen[0]._gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
+  ni1.gen[1]._gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
+  ni1.gen[2]._gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
+  ni2.gen[0]._gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
+  ni2.gen[1]._gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
+  ni2.gen[2]._gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
 
   for (
     cp,
@@ -469,8 +466,9 @@ def test_update_fenotype() -> None:
       )
     ),
   ):
+    # setup
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i]._gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
 
     oryg_fenotype0={k: v for k,v in ni.gen[0].fenotype.items()}
@@ -496,6 +494,50 @@ def test_update_fenotype() -> None:
     assert isinstance(mili_t.fenotype, list)
     assert (mili_t.fenotype!=oryg_fenotype2)==feno_corr2
     assert mili_t.fenotype==exp_feno2
+
+def test_save_format():
+  # values
+  layers_len=('len', (2, 1, 4))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  n_schema=3, 2, 7
+  t_schema=2, 0, 3
+  ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
+  gen_g, gen_l, gen_t=ni.gen
+
+  # test
+  ret=ni._save_format()
+
+  # results
+  assert ret=={
+      "name": NI.__name__,
+      "gen": {
+          "g": gen_g._save_format(),
+          "l": gen_l._save_format(),
+          "t": gen_t._save_format(),
+      },
+  }
+
+def test_save_format_returns_serializable_data():
+  # values
+  layers_len=('len', (2, 1, 4))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  n_schema=3, 2, 7
+  t_schema=2, 0, 3
+  ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
+  result=ni._save_format()
+
+  # test/results
+  _=json.dumps(result)
 
 def test_error_name_collition_on_create1() -> None:
   # values
@@ -630,7 +672,59 @@ def test_error_name_collition_on_create7() -> None:
   # results
   assert str(excinfo.value)=='Names can not collide'
 
-def test_error_not_same_conf_on_get_cp() -> None:
+mark__test_error_not_same_conf_on_get_cp=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_conf_on_get_cp
+def test_error_not_same_conf_on_get_cp(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -643,49 +737,44 @@ def test_error_not_same_conf_on_get_cp() -> None:
   t_schema=2, 0, 3
 
   schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
   ni1=NI(*schema1)
+  ni2=NI(*schema2)
 
-  for schema2 in (
-    (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.get_cp(ni1, ni2)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.get_cp(ni1, ni2)
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
-
-def test_error_not_same_gen_size_on_get_cp() -> None:
+mark__test_error_not_same_gen_size_on_get_cp=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_gen_size_on_get_cp
+def test_error_not_same_gen_size_on_get_cp(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -698,23 +787,70 @@ def test_error_not_same_gen_size_on_get_cp() -> None:
   t_schema=2, 0, 3
 
   schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
   ni1=NI(*schema1)
+  ni2=NI(*schema2)
 
-  for schema2 in (
-    (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.get_cp(ni1, ni2)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.get_cp(ni1, ni2)
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal gen size'
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal gen size'
-
-def test_error_not_same_conf_on_create() -> None:
+mark__test_error_not_same_conf_on_create=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_conf_on_create
+def test_error_not_same_conf_on_create(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -727,50 +863,123 @@ def test_error_not_same_conf_on_create() -> None:
   t_schema=2, 0, 3
 
   schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
+  ni1=NI(*schema1)
+  ni2=NI(*schema2)
+  dummy_cp=1, (1, 1), (1, 1)
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI(ni1, ni2, cross_point=dummy_cp)
+
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
+
+mark__test_error_not_same_gen_size_on_create=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_gen_size_on_create
+def test_error_not_same_gen_size_on_create(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
+  # values
+  layers_len=('len', (2, 1, 4))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  n_schema=3, 2, 7
+  t_schema=2, 0, 3
+
+  schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
   ni1=NI(*schema1)
   dummy_cp=1, (1, 1), (1, 1)
 
-  for schema2 in (
-    (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
+  ni2=NI(*schema2)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI(ni1, ni2, cross_point=dummy_cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI(ni1, ni2, cross_point=dummy_cp)
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal gen size'
 
-def test_error_not_same_gen_size_on_create() -> None:
+mark__test_error_not_same_conf_on_crossover=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_conf_on_crossover
+def test_error_not_same_conf_on_crossover(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -783,24 +992,45 @@ def test_error_not_same_gen_size_on_create() -> None:
   t_schema=2, 0, 3
 
   schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
   ni1=NI(*schema1)
+  ni2=NI(*schema2)
   dummy_cp=1, (1, 1), (1, 1)
 
-  for schema2 in (
-    (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.crossover(ni1, ni2, dummy_cp)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI(ni1, ni2, cross_point=dummy_cp)
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal configuration'
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal gen size'
-
-def test_error_not_same_conf_on_crossover() -> None:
+mark__test_error_not_same_gen_size_on_crossover=pytest.mark.parametrize(
+  'calc_schema2',
+  [
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
+    lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
+    # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
+  ]
+)
+@mark__test_error_not_same_gen_size_on_crossover
+def test_error_not_same_gen_size_on_crossover(
+  calc_schema2: t.Callable[
+    [
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      tuple[int, int, int],
+      tuple[int, int, int],
+    ],
+    tuple[
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      NI.GenSchemaType,
+    ],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -811,82 +1041,42 @@ def test_error_not_same_conf_on_crossover() -> None:
   )
   n_schema=3, 2, 7
   t_schema=2, 0, 3
-
   schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
+  schema2=calc_schema2(layers_len, num_seed, type_seed, g_schema, n_schema, t_schema)
   ni1=NI(*schema1)
+  ni2=NI(*schema2)
   dummy_cp=1, (1, 1), (1, 1)
 
-  for schema2 in (
-    (('len', (2, 2, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (2, 1, 3)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len', (3, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (('len2', (2, 1, 4)), num_seed, type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 0, 2)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (2, 1, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed', (3, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, ('num_seed2', (2, 0, 3)), type_seed, (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 0, 2)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (2, 1, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed', (3, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, ('type_seed2', (2, 0, 3)), (g_schema, n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('y', (3, 0, 5)),), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 3)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 2, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (3, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x2', (2, 1, 4)),('y', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y2', (3, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (4, 0, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 1, 5))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, ((('x', (2, 1, 4)),('y', (3, 0, 5)),('z', (3, 0, 6))), n_schema, t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 2, 8), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, (3, 1, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.crossover(ni1, ni2, dummy_cp)
 
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.crossover(ni1, ni2, dummy_cp)
+  # results
+  assert str(excinfo.value)=='First and second solution do not have equal gen size'
 
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal configuration'
-
-def test_error_not_same_gen_size_on_crossover() -> None:
-  # values
-  layers_len=('len', (2, 1, 4))
-  num_seed=('num_seed', (2, 0, 3))
-  type_seed=('type_seed', (2, 0, 3))
-  g_schema=(
-    ('x', (2, 1, 4)),
-    ('y', (3, 0, 5)),
-  )
-  n_schema=3, 2, 7
-  t_schema=2, 0, 3
-
-  schema1=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
-  ni1=NI(*schema1)
-  dummy_cp=1, (1, 1), (1, 1)
-
-  for schema2 in (
-    (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
-    (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
-    # (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ):
-    ni2=NI(*schema2)
-
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.crossover(ni1, ni2, dummy_cp)
-
-    # results
-    assert str(excinfo.value)=='First and second solution do not have equal gen size'
-
-def test_error_outside_range_on_create() -> None:
+mark__test_error_outside_range_on_create=pytest.mark.parametrize(
+  'cp_calc_func',
+  [
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (-1, (1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (gen0_bit+1, (1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (-1, -1%n_bit), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (-1%n_bit, -1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (-1, -1%t_bit)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (-1%t_bit, -1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (len1*n_bit+1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, len2*n_bit+1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
+    # lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, 1)),
+  ]
+)
+@mark__test_error_outside_range_on_create
+def test_error_outside_range_on_create(
+  cp_calc_func: t.Callable[
+    [int, int, int, int, int],
+    tuple[int, tuple[int, int], tuple[int, int]],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -914,28 +1104,38 @@ def test_error_outside_range_on_create() -> None:
   n_bit, _, _=n_schema
   t_bit, _, _=t_schema
   gen0_bit=len_bit+num_seed_bit+type_seed_bit+x_bit+y_bit
+  cp=cp_calc_func(len1, len2, gen0_bit, n_bit, t_bit)
 
-  for cp in (
-    (-1, (1, 1), (1, 1)),
-    (gen0_bit+1, (1, 1), (1, 1)),
-    (1, (-1, -1%n_bit), (1, 1)),
-    (1, (-1%n_bit, -1), (1, 1)),
-    (1, (1, 1), (-1, -1%t_bit)),
-    (1, (1, 1), (-1%t_bit, -1)),
-    (1, (len1*n_bit+1, 1), (1, 1)),
-    (1, (1, len2*n_bit+1), (1, 1)),
-    (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
-    (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
-    # (1, (1, 1), (1, 1)),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI(ni1, ni2, cross_point=cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI(ni1, ni2, cross_point=cp)
 
-    # results
-    assert str(excinfo.value)=='Cross point is outside of solution'
+  # results
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
-def test_error_outside_range_on_crossover() -> None:
+mark__test_error_outside_range_on_crossover=pytest.mark.parametrize(
+  'cp_calc_func',
+  [
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (-1, (1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (gen0_bit+1, (1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (-1, -1%n_bit), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (-1%n_bit, -1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (-1, -1%t_bit)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (-1%t_bit, -1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (len1*n_bit+1, 1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, len2*n_bit+1), (1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
+    lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
+    # lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, 1)),
+  ]
+)
+@mark__test_error_outside_range_on_crossover
+def test_error_outside_range_on_crossover(
+  cp_calc_func: t.Callable[
+    [int, int, int, int, int],
+    tuple[int, tuple[int, int], tuple[int, int]],
+  ]
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -963,26 +1163,14 @@ def test_error_outside_range_on_crossover() -> None:
   n_bit, _, _=n_schema
   t_bit, _, _=t_schema
   gen0_bit=len_bit+num_seed_bit+type_seed_bit+x_bit+y_bit
+  cp=cp_calc_func(len1, len2, gen0_bit, n_bit, t_bit)
 
-  for cp in (
-    (-1, (1, 1), (1, 1)),
-    (gen0_bit+1, (1, 1), (1, 1)),
-    (1, (-1, -1%n_bit), (1, 1)),
-    (1, (-1%n_bit, -1), (1, 1)),
-    (1, (1, 1), (-1, -1%t_bit)),
-    (1, (1, 1), (-1%t_bit, -1)),
-    (1, (len1*n_bit+1, 1), (1, 1)),
-    (1, (1, len2*n_bit+1), (1, 1)),
-    (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
-    (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
-    # (1, (1, 1), (1, 1)),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI.crossover(ni1, ni2, cp)
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI.crossover(ni1, ni2, cp)
 
-    # results
-    assert str(excinfo.value)=='Cross point is outside of solution'
+  # results
+  assert str(excinfo.value)=='Cross point is outside of solution'
 
 def test_error_not_same_elem_size_on_create1() -> None:
   # values
@@ -1084,7 +1272,7 @@ def test_error_not_same_elem_size_on_crossover2() -> None:
   # results
   assert str(excinfo.value)=='First and second solution do not have equal gen size'
 
-@pytest.mark.parametrize(
+mark__test_error_too_short_on_create_from_two=pytest.mark.parametrize(
   'cp',
   [
     (1, (0, 3), (1, 1)),
@@ -1098,6 +1286,7 @@ def test_error_not_same_elem_size_on_crossover2() -> None:
     # (1, (1, 1), (1, 1)),
   ]
 )
+@mark__test_error_too_short_on_create_from_two
 def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:
   # values
   layers_len=('len', (2, 2, 5))
@@ -1112,6 +1301,8 @@ def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tupl
   schema=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
   ni1=NI(*schema)
   ni2=NI(*schema)
+
+  # setup
   for ni, (str0, str1, str2) in (
     (
       ni1,
@@ -1131,7 +1322,7 @@ def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tupl
     ),
   ):
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i]._gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
     ni._update()
 
@@ -1142,8 +1333,7 @@ def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tupl
   # results
   assert str(excinfo.value)=='Solution too short'
 
-
-@pytest.mark.parametrize(
+mark__test_error_too_short_on_crossover=pytest.mark.parametrize(
   'cp',
   [
     # first too short
@@ -1166,6 +1356,7 @@ def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tupl
     (1, (1, 1), (5, 1)),
   ]
 )
+@mark__test_error_too_short_on_crossover
 def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:
   # values
   layers_len=('len', (2, 2, 5))
@@ -1180,6 +1371,8 @@ def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int,
   schema=layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)
   ni1=NI(*schema)
   ni2=NI(*schema)
+
+  # setup
   for ni, (str0, str1, str2) in (
     (
       ni1,
@@ -1199,7 +1392,7 @@ def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int,
     ),
   ):
     for i, _str in zip(range(3), (str0, str1, str2)):
-      ni.gen[i].gen._gen=bytearray(_str.replace(' ', '').encode())
+      ni.gen[i]._gen._gen=bytearray(_str.replace(' ', '').encode())
       ni.gen[i]._update_fenotype()
     ni._update()
 
@@ -1210,7 +1403,90 @@ def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int,
   # results
   assert str(excinfo.value)=='Solution too short'
 
-def test_error_illegal_argument_on_create() -> None:
+mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
+  'func_args_kwargs',
+  [
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, None), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, None), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, num_seed, type_seed, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, None), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': None}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, ni2), {}),
+    lambda ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp: ((ni1, ni2), {'cross_point': None}),
+  ],
+)
+@mark__test_error_illegal_argument_on_create
+def test_error_illegal_argument_on_create(
+  func_args_kwargs: t.Callable[
+    [
+      NI,
+      NI,
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[str, tuple[int, int, int]],
+      tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]],
+      tuple[int, int, int],
+      tuple[int, int, int],
+      tuple[int, tuple[int, int], tuple[int, int]],
+    ],
+    tuple[tuple[t.Any, ...], dict[str, t.Any]]
+  ],
+) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -1226,74 +1502,11 @@ def test_error_illegal_argument_on_create() -> None:
   ni1=NI(*schema)
   ni2=NI(*schema)
   dummy_cp=(1, (1, 1), (1, 1))
+  args, kwargs=func_args_kwargs(ni1, ni2, layers_len, num_seed, type_seed, g_schema, n_schema, t_schema, dummy_cp)
 
-  for args, kwargs in (
-    ((layers_len, num_seed), {}),
-    ((layers_len, num_seed, None), {}),
-    ((layers_len, num_seed, None, None), {}),
-    ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {}),
-    ((layers_len, num_seed, type_seed), {}),
-    ((layers_len, num_seed, type_seed, None), {}),
-    ((layers_len, ni2), {}),
-    ((layers_len, ni2, None), {}),
-    ((layers_len, ni2, None, None), {}),
-    ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {}),
-    ((layers_len, ni2, type_seed), {}),
-    ((layers_len, ni2, type_seed, None), {}),
-    ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {}),
-    ((ni1, num_seed), {}),
-    ((ni1, num_seed, None), {}),
-    ((ni1, num_seed, None, None), {}),
-    ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {}),
-    ((ni1, num_seed, type_seed), {}),
-    ((ni1, num_seed, type_seed, None), {}),
-    ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {}),
-    ((layers_len, num_seed), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed, None), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed, None, None), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed, type_seed), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed, type_seed, None), {'cross_point': dummy_cp}),
-    ((layers_len, ni2), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, None), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, None, None), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, type_seed), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, type_seed, None), {'cross_point': dummy_cp}),
-    ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
-    ((ni1, num_seed), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, None), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, None, None), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, type_seed), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, type_seed, None), {'cross_point': dummy_cp}),
-    ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': dummy_cp}),
-    ((layers_len, num_seed), {'cross_point': None}),
-    ((layers_len, num_seed, None), {'cross_point': None}),
-    ((layers_len, num_seed, None, None), {'cross_point': None}),
-    ((layers_len, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
-    ((layers_len, num_seed, type_seed), {'cross_point': None}),
-    ((layers_len, num_seed, type_seed, None), {'cross_point': None}),
-    ((layers_len, ni2), {'cross_point': None}),
-    ((layers_len, ni2, None), {'cross_point': None}),
-    ((layers_len, ni2, None, None), {'cross_point': None}),
-    ((layers_len, ni2, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
-    ((layers_len, ni2, type_seed), {'cross_point': None}),
-    ((layers_len, ni2, type_seed, None), {'cross_point': None}),
-    ((layers_len, ni2, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': None}),
-    ((ni1, num_seed), {'cross_point': None}),
-    ((ni1, num_seed, None), {'cross_point': None}),
-    ((ni1, num_seed, None, None), {'cross_point': None}),
-    ((ni1, num_seed, None, (g_schema, n_schema, t_schema)), {'cross_point': None}),
-    ((ni1, num_seed, type_seed), {'cross_point': None}),
-    ((ni1, num_seed, type_seed, None), {'cross_point': None}),
-    ((ni1, num_seed, type_seed, (g_schema, n_schema, t_schema)), {'cross_point': None}),
-    ((ni1, ni2), {}),
-    ((ni1, ni2), {'cross_point': None}),
-  ):
-    # test
-    with pytest.raises(ValueError) as excinfo:
-      _=NI(*args, **kwargs) # type: ignore
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI(*args, **kwargs)
 
-    # results
-    assert str(excinfo.value)=='Illegal argument options'
+  # results
+  assert str(excinfo.value)=='Illegal argument options'
