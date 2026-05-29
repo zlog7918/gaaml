@@ -697,7 +697,7 @@ mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
 @mark__test_error_illegal_argument_on_create
 def test_error_illegal_argument_on_create(
   func_args_kwargs: t.Callable[
-    [LI, LI, int, tuple[tuple[int, int], int]],
+    [LI, LI, int, LI.GenSchemaType],
     tuple[tuple[t.Any, ...], dict[str, t.Any]]
   ],
 ) -> None:
