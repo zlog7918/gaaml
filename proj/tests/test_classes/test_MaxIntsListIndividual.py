@@ -1012,7 +1012,7 @@ def test_error_illegal_argument_on_create(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=MILI(*args, **kwargs) # type: ignore
+    _=MILI(*args, **kwargs)
 
   # results
   assert str(excinfo.value)=='Illegal argument options'
