@@ -34,7 +34,7 @@ class MockPlt:
     self.figures[self.curr_fig]['ylim']=ylim
   def title(self, *_: t.Any, **__: t.Any) -> None: ...
 
-@pytest.mark.parametrize(
+mark__test_fitness=pytest.mark.parametrize(
   ('ni_str', 'expected_fit'),
   [
     ('0 0  1 0  1 1  1 0 1 0 1', 1/22),
@@ -47,6 +47,7 @@ class MockPlt:
     ('0 0  1 0  1 1  0 0 1 1 0', 1/7),
   ]
 )
+@mark__test_fitness
 def test_fitness(tmp_path: Path, ni_str: str, expected_fit: float) -> None:
   # values
   layers_len=('len', (2, 1, 4))
@@ -97,10 +98,11 @@ def test_cr_network(
   assert isinstance(ret, _G)
   assert ret.curr_generations==number_of_generations
 
-@pytest.mark.parametrize(
+mark__test_cr_network_plot=pytest.mark.parametrize(
   'number_of_generations',
   [1, 2, 5]
 )
+@mark__test_cr_network_plot
 def test_cr_network_plot(
   tmp_path: Path,
   monkeypatch: pytest.MonkeyPatch,
@@ -134,14 +136,15 @@ def test_cr_network_plot(
   assert mock_plt.plot_calls==3
   assert mock_plt.show_calls==3
   for k in mock_plt.figures.keys():
-    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+2)
+    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+1)
   for k in mock_plt.figures.keys():
     assert mock_plt.figures[k]['ylim']==(0, 1)
 
-@pytest.mark.parametrize(
+mark__test_cr_network_plot_0_in_fitnesses=pytest.mark.parametrize(
   'number_of_generations',
   [1, 2, 5]
 )
+@mark__test_cr_network_plot_0_in_fitnesses
 def test_cr_network_plot_0_in_fitnesses(
   tmp_path: Path,
   monkeypatch: pytest.MonkeyPatch,
@@ -175,7 +178,7 @@ def test_cr_network_plot_0_in_fitnesses(
   assert mock_plt.plot_calls==3
   assert mock_plt.show_calls==3
   for k in mock_plt.figures.keys():
-    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+2)
+    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+1)
   for k in mock_plt.figures.keys():
     assert mock_plt.figures[k]['ylim']==(0, .5)
 
