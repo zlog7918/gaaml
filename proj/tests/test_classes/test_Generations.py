@@ -22,6 +22,11 @@ class DummyInd(_BI["DummyInd", int, tuple[int, float], float]):
     (a_gen0, a_gen1)=a._gen
     (b_gen0, b_gen1)=b._gen
     return cls(a_gen0+1, a_gen1+.1), cls(b_gen0+1, b_gen1+.1)
+  def _save_format(self) -> dict[str, object]:
+    return {
+      'name': self.__class__.__name__,
+      'gen': self._gen,
+    }
 
 class DummyPop(_P[DummyInd]):
   gen_num: int=0
