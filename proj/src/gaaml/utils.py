@@ -250,46 +250,41 @@ def get_fit_func(
       output_size,
       categorial,
     )
-    with warnings.catch_warnings():
-      warnings.filterwarnings(
-        'ignore',
-        # message='__array__ implementation doesn\'t accept a copy keyword',
-        category=DeprecationWarning,
-      )
-      fit_ret: krs.callbacks.History=model.fit(
-        training_data_x,
-        training_data_y,
-        batch_size=batch_size,
-        epochs=epochs,
-        validation_data=_validation_data,
-        verbose=0, # type: ignore
-      ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
+    fit_ret: krs.callbacks.History=model.fit(
+      training_data_x,
+      training_data_y,
+      batch_size=batch_size,
+      epochs=epochs,
+      validation_data=_validation_data,
+      verbose=0, # type: ignore
+    ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
 
-    with open(dir/'model_meta.data', 'x') as meta:
-      json.dump(
-        {
-          'id': count,
-          'epoch': epochs,
-          'batch': batch_size,
-          'backend': krs.config.backend(),
-          'hidden_len': len(model.get_weights())//2-1,
-          'fit_ret': str(fit_ret.history),
-          # 'fit_ret_epoch': str(fit_ret.epoch),
-        },
-        meta,
-      )
+    # get_weights() and save_weights() throw warning
     with warnings.catch_warnings():
       warnings.filterwarnings(
         'ignore',
         # message='__array__ implementation doesn\'t accept a copy keyword',
         category=DeprecationWarning,
       )
+      with open(dir/'model_meta.data', 'x') as meta:
+        json.dump(
+          {
+            'id': count,
+            'epoch': epochs,
+            'batch': batch_size,
+            'backend': krs.config.backend(),
+            'hidden_len': len(model.get_weights())//2-1,
+            'fit_ret': str(fit_ret.history),
+            # 'fit_ret_epoch': str(fit_ret.epoch),
+          },
+          meta,
+        )
       model.save_weights(dir/'model.weights.h5')
 
-      ret=model.evaluate(
-        test_data_x,
-        test_data_y,
-        verbose=0, # type: ignore
-      )
+    ret=model.evaluate(
+      test_data_x,
+      test_data_y,
+      verbose=0, # type: ignore
+    )
     return ret
   return f

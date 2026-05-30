@@ -183,7 +183,13 @@ def test_cr_net_from_ind(
   assert batch_size==exp_batch
   assert epochs==exp_epoch
   assert isinstance(model.optimizer, exp_optimalizer_type)
-  weights: list[np.ndarray]=model.get_weights()
+  with warnings.catch_warnings():
+    warnings.filterwarnings(
+      'ignore',
+      # message='__array__ implementation doesn\'t accept a copy keyword',
+      category=DeprecationWarning,
+    )
+    weights: list[np.ndarray]=model.get_weights()
   assert isinstance(weights, list)
   assert len(weights)==len(exp_weight_shapes)
   assert all(isinstance(w, np.ndarray) for w in weights)
