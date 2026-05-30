@@ -60,6 +60,167 @@ class DummyPop(_P[DummyInd]):
       ind2=self.population[0]
     return ind1, ind2
 
+def bar_asserts(bar: tqdm, n: int, *, close: bool=True) -> None:
+  assert bar.n==n
+  assert not bar.disable
+  if close:
+    bar.close()
+
+def get_priv_pop(
+  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+) -> DummyPop:
+  pop=gens._Generations__pop # type: ignore
+  return pop
+def num_generations_asserts(
+  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  *,
+  curr_generation: int,
+) -> None:
+  pop=get_priv_pop(gens)
+  assert pop.gen_num==curr_generation
+  assert gens.curr_generations==curr_generation
+
+def get_privates(
+  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+) -> tuple[
+  list[float],
+  list[float],
+  list[float],
+  DummyInd,
+  DummyInd,
+  float,
+  float,
+]:
+  maxs=gens._Generations__maxs # type: ignore
+  avgs=gens._Generations__avgs # type: ignore
+  mins=gens._Generations__mins # type: ignore
+  max_sol=gens._Generations__max_sol # type: ignore
+  min_sol=gens._Generations__min_sol # type: ignore
+  max_of_max=gens._Generations__max_of_max # type: ignore
+  min_of_min=gens._Generations__min_of_min # type: ignore
+  return (
+    maxs,
+    avgs,
+    mins,
+    max_sol,
+    min_sol,
+    max_of_max,
+    min_of_min,
+  )
+
+def generations_asserts(
+  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  *,
+  curr_generation: int,
+  expected_max_avg_min: tuple[
+    list[float],
+    list[float],
+    list[float],
+  ],
+  expected_len: int|None=None,
+) -> None:
+  (
+    maxs,
+    avgs,
+    mins,
+    max_sol,
+    min_sol,
+    max_of_max,
+    min_of_min,
+  )=get_privates(gens)
+  exp_maxs, exp_avgs, exp_mins=expected_max_avg_min
+  num_generations_asserts(gens, curr_generation=curr_generation)
+  if expected_len is not None:
+    assert len(maxs)==expected_len
+    assert len(avgs)==expected_len
+    assert len(mins)==expected_len
+  assert maxs[:curr_generation+1]==pytest.approx(exp_maxs)
+  assert avgs[:curr_generation+1]==pytest.approx(exp_avgs)
+  assert mins[:curr_generation+1]==pytest.approx(exp_mins)
+  assert isinstance(max_sol, DummyInd)
+  assert isinstance(min_sol, DummyInd)
+  assert max_sol._gen==pytest.approx((
+    curr_generation,
+    max(exp_maxs),
+  ))
+  assert min_sol._gen==pytest.approx((
+    0,
+    min(exp_mins),
+  ))
+  assert max_of_max==pytest.approx(max(exp_maxs))
+  assert min_of_min==pytest.approx(min(exp_mins))
+
+def statistics_asserts(
+  ret: tuple[
+    tuple[DummyInd, DummyInd],
+    tuple[float, float],
+    tuple[list[float], list[float], list[float]],
+  ],
+  *,
+  curr_generation: int,
+  expected_max_avg_min: tuple[
+    list[float],
+    list[float],
+    list[float],
+  ],
+) -> None:
+  exp_maxs, exp_avgs, exp_mins=expected_max_avg_min
+  exp_max_of_max, exp_min_of_min=max(exp_maxs), min(exp_mins)
+
+  assert isinstance(ret, tuple)
+  assert len(ret)==3
+  (
+    (max_sol, min_sol),
+    (max_of_max, min_of_min),
+    (maxs, avgs, mins),
+  )=ret
+  assert maxs==pytest.approx(exp_maxs)
+  assert avgs==pytest.approx(exp_avgs)
+  assert mins==pytest.approx(exp_mins)
+  assert isinstance(max_sol, DummyInd)
+  assert isinstance(min_sol, DummyInd)
+  assert max_sol._gen==pytest.approx((
+    curr_generation,
+    exp_max_of_max,
+  ))
+  assert min_sol._gen==pytest.approx((
+    0,
+    exp_min_of_min,
+  ))
+  assert max_of_max==pytest.approx(exp_max_of_max)
+  assert min_of_min==pytest.approx(exp_min_of_min)
+
+def create_gens(
+  number_of_generations: int,
+  pop_num: int,
+) -> tuple[
+  G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  tqdm,
+  tqdm,
+]:
+  float_iter=(x/2 for x in range(9))
+  bar1=tqdm(
+    total=number_of_generations,
+    desc='Generations',
+    position=0,
+    mininterval=0,
+  )
+  bar2=tqdm(
+    total=pop_num,
+    desc='Calculated fitnesses',
+    position=1,
+    mininterval=0,
+  )
+  gens=G(
+    number_of_generations,
+    bar1,
+    DummyPop,
+    pop_num,
+    bar2,
+    lambda: DummyInd(0, next(float_iter)),
+  )
+  return gens, bar1, bar2
+
 @pytest.mark.parametrize(
   ('pop_num', 'expected_max_avg_min'),
   [
@@ -81,36 +242,14 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
   gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
-  assert pop.gen_num==0
-  assert gens.curr_generations==0
-  assert len(maxs)==number_of_generations+1
-  assert len(avgs)==number_of_generations+1
-  assert len(mins)==number_of_generations+1
-  assert maxs[:1]==pytest.approx(expected_max_avg_min[0])
-  assert avgs[:1]==pytest.approx(expected_max_avg_min[1])
-  assert mins[:1]==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((0, expected_max_avg_min[0][0]))
-  assert min_sol._gen==pytest.approx((0, expected_max_avg_min[2][0]))
-  assert max_of_max==pytest.approx(expected_max_avg_min[0][0])
-  assert min_of_min==pytest.approx(expected_max_avg_min[2][0])
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=0,
+    expected_max_avg_min=expected_max_avg_min,
+    expected_len=number_of_generations+1,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('pop_num', 'expected_max_avg_min'),
@@ -124,39 +263,20 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
 def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
 
   # test
   ret=gens.get_statistics()
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  assert pop.gen_num==0
-  assert gens.curr_generations==0
-  assert isinstance(ret, tuple)
-  assert len(ret)==3
-  (max_sol, min_sol), (max_of_max, min_of_min), (maxs, avgs, mins)=ret
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((0, expected_max_avg_min[0][0]))
-  assert min_sol._gen==pytest.approx((0, expected_max_avg_min[2][0]))
-  assert max_of_max==pytest.approx(expected_max_avg_min[0][0])
-  assert min_of_min==pytest.approx(expected_max_avg_min[2][0])
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  num_generations_asserts(gens, curr_generation=0)
+  statistics_asserts(
+    ret,
+    curr_generation=0,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -172,43 +292,19 @@ def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[
 def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
-  assert pop.gen_num==number_of_generations
-  assert gens.curr_generations==number_of_generations
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((number_of_generations, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=number_of_generations,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -224,40 +320,21 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
 def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(go_num_generations)
 
   # test
   ret=gens.get_statistics()
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  assert pop.gen_num==number_of_generations
-  assert gens.curr_generations==number_of_generations
-  assert isinstance(ret, tuple)
-  assert len(ret)==3
-  (max_sol, min_sol), (max_of_max, min_of_min), (maxs, avgs, mins)=ret
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((number_of_generations, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  num_generations_asserts(gens, curr_generation=number_of_generations)
+  statistics_asserts(
+    ret,
+    curr_generation=number_of_generations,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -271,43 +348,19 @@ def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num:
 def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
-  assert pop.gen_num==go_num_generations
-  assert gens.curr_generations==go_num_generations
-  assert maxs[:go_num_generations+1]==pytest.approx(expected_max_avg_min[0])
-  assert avgs[:go_num_generations+1]==pytest.approx(expected_max_avg_min[1])
-  assert mins[:go_num_generations+1]==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((go_num_generations, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=go_num_generations,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -320,41 +373,22 @@ def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, 
 )
 def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
-  number_of_generations=2
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  number_of_generations=3
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(go_num_generations)
 
   # test
   ret=gens.get_statistics()
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  assert pop.gen_num==go_num_generations
-  assert gens.curr_generations==go_num_generations
-  assert isinstance(ret, tuple)
-  assert len(ret)==3
-  (max_sol, min_sol), (max_of_max, min_of_min), (maxs, avgs, mins)=ret
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((go_num_generations, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  num_generations_asserts(gens, curr_generation=go_num_generations)
+  statistics_asserts(
+    ret,
+    curr_generation=go_num_generations,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -370,46 +404,22 @@ def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, ex
 def test_go_through_generations_after_going_part_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(1)
 
   # test
   gens.go_through_generations(go_num_generations)
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
   if go_num_generations is None:
     go_num_generations=number_of_generations-1
-  assert pop.gen_num==go_num_generations+1
-  assert gens.curr_generations==go_num_generations+1
-  assert maxs[:go_num_generations+2]==pytest.approx(expected_max_avg_min[0])
-  assert avgs[:go_num_generations+2]==pytest.approx(expected_max_avg_min[1])
-  assert mins[:go_num_generations+2]==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((go_num_generations+1, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=go_num_generations+1,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -425,11 +435,7 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
 def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(1)
   gens.go_through_generations(go_num_generations)
 
@@ -437,31 +443,17 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
   ret=gens.get_statistics()
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
   if go_num_generations is None:
     go_num_generations=number_of_generations-1
-  assert pop.gen_num==go_num_generations+1
-  assert gens.curr_generations==go_num_generations+1
-  assert isinstance(ret, tuple)
-  assert len(ret)==3
-  (max_sol, min_sol), (max_of_max, min_of_min), (maxs, avgs, mins)=ret
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((go_num_generations+1, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  curr_generation=go_num_generations+1
+  num_generations_asserts(gens, curr_generation=curr_generation)
+  statistics_asserts(
+    ret,
+    curr_generation=curr_generation,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -485,11 +477,7 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
 def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(1)
   gens.go_through_generations(1)
 
@@ -498,33 +486,13 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
     gens.go_through_generations(i)
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
-  assert pop.gen_num==sum(go_num_generations)+2
-  assert gens.curr_generations==sum(go_num_generations)+2
-  assert maxs[:sum(go_num_generations)+3]==pytest.approx(expected_max_avg_min[0])
-  assert avgs[:sum(go_num_generations)+3]==pytest.approx(expected_max_avg_min[1])
-  assert mins[:sum(go_num_generations)+3]==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((sum(go_num_generations)+2, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=sum(go_num_generations)+2,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -548,11 +516,7 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
 def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   gens.go_through_generations(1)
   gens.go_through_generations(1)
   for i in go_num_generations:
@@ -562,29 +526,15 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   ret=gens.get_statistics()
 
   # results
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  assert pop.gen_num==sum(go_num_generations)+2
-  assert gens.curr_generations==sum(go_num_generations)+2
-  assert isinstance(ret, tuple)
-  assert len(ret)==3
-  (max_sol, min_sol), (max_of_max, min_of_min), (maxs, avgs, mins)=ret
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((sum(go_num_generations)+2, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  curr_generation=sum(go_num_generations)+2
+  num_generations_asserts(gens, curr_generation=curr_generation)
+  statistics_asserts(
+    ret,
+    curr_generation=curr_generation,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
@@ -606,11 +556,7 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
 def test_error_go_through_generations_after_going_to_the_end(go_num_generations: tuple[int|None, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
-  float_iter=(x/2 for x in range(9))
-  bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
-  bar2=tqdm(total=pop_num, desc='Calculated fitnesses', position=1, mininterval=0)
-  pop_args, pop_kwargs=(pop_num, bar2, lambda: DummyInd(0, next(float_iter))), {}
-  gens=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
   for i in go_num_generations:
     gens.go_through_generations(i)
 
@@ -620,33 +566,13 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
 
   # results
   assert str(excinfo.value)=='Tried to add next generation(s) after reaching max number of them'
-  # private access: gens.__pop
-  pop: DummyPop=gens._Generations__pop # type: ignore
-  # private access: gens.__maxs, gens.__avgs, gens.__mins
-  maxs, avgs, mins=gens._Generations__maxs, gens._Generations__avgs, gens._Generations__mins # type: ignore
-  # private access: gens.__max_sol, gens.__min_sol
-  max_sol, min_sol=gens._Generations__max_sol, gens._Generations__min_sol # type: ignore
-  # private access: gens.__max_of_max, gens.__min_of_min
-  max_of_max, min_of_min=gens._Generations__max_of_max, gens._Generations__min_of_min # type: ignore
-
-  assert pop.gen_num==number_of_generations
-  assert gens.curr_generations==number_of_generations
-  assert maxs==pytest.approx(expected_max_avg_min[0])
-  assert avgs==pytest.approx(expected_max_avg_min[1])
-  assert mins==pytest.approx(expected_max_avg_min[2])
-  assert isinstance(max_sol, DummyInd)
-  assert isinstance(min_sol, DummyInd)
-  assert max_sol._gen==pytest.approx((number_of_generations, max(expected_max_avg_min[0])))
-  assert min_sol._gen==pytest.approx((0, min(expected_max_avg_min[2])))
-  assert max_of_max==pytest.approx(max(expected_max_avg_min[0]))
-  assert min_of_min==pytest.approx(min(expected_max_avg_min[2]))
-
-  assert bar1.n==gens.curr_generations
-  assert not bar1.disable
-  assert bar2.n==pop_num
-  assert not bar2.disable
-  bar2.close()
-  bar1.close()
+  generations_asserts(
+    gens,
+    curr_generation=number_of_generations,
+    expected_max_avg_min=expected_max_avg_min,
+  )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
 
 @pytest.mark.parametrize(
   'number_of_generations',
@@ -666,11 +592,6 @@ def test_invalid_num_gen(number_of_generations: int) -> None:
     _=G(number_of_generations, bar1, DummyPop, *pop_args, **pop_kwargs)
 
   # results
-  assert bar1.n==0
-  assert not bar1.disable
-  assert bar2.n==0
-  assert not bar2.disable
-
   assert str(excinfo.value)=='max_num_gen: is too small, it should at least equal 1'
-  bar2.close()
-  bar1.close()
+  bar_asserts(bar2, 0)
+  bar_asserts(bar1, 0)
