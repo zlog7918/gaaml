@@ -15,9 +15,8 @@ from .classes.NetIndividual import NetIndividual
 IndType=NetIndividual
 RetType=Generations
 
-def fitness(_f: t.Callable[[IndType, Path], float], net_ind: IndType, dir: Path) -> float:
-  ret=_f(net_ind, dir)
-  ret=1/(ret+1)
+def fitness_corrector(net_ind: IndType, fit: float) -> float:
+  ret=1/(fit+1)
   ret=ret if ret>0 else 0
   return ret
 
@@ -32,11 +31,10 @@ def cr_network(
   number_of_generations: int=...,
   cross_rate: float=...,
   mutation_rate: float=...,
-  fitness_func: t.Callable[[
-    t.Callable[[IndType, Path], float],
-    IndType,
-    Path,
-  ], float]=...,
+  fitness_func: t.Callable[
+    [IndType, float],
+    float,
+  ]=fitness_corrector,
   max_worker_num: int=...,
   num_of_fittnesses_calc: int=...,
   output_progress: bool=True,
@@ -54,11 +52,10 @@ def cr_network(
   number_of_generations: int=...,
   cross_rate: float=...,
   mutation_rate: float=...,
-  fitness_func: t.Callable[[
-    t.Callable[[IndType, Path], float],
-    IndType,
-    Path,
-  ], float]=...,
+  fitness_func: t.Callable[
+    [IndType, float],
+    float,
+  ]=fitness_corrector,
   max_worker_num: int=...,
   num_of_fittnesses_calc: int=...,
   output_progress: bool=True,
@@ -75,11 +72,10 @@ def cr_network(
   number_of_generations: int=const.NUM_OF_GENERATIONS,
   cross_rate: float=const.CROSS_RATE,
   mutation_rate: float=const.MUTATE_RATE,
-  fitness_func: t.Callable[[
-    t.Callable[[IndType, Path], float],
-    IndType,
-    Path,
-  ], float]=fitness,
+  fitness_func: t.Callable[
+    [IndType, float],
+    float,
+  ]=fitness_corrector,
   max_worker_num: int=Pop_const.MAX_WORKERS,
   num_of_fittnesses_calc: int=Pop_const.NUM_OF_FIT_CALC,
   output_progress: bool=True,
@@ -111,7 +107,7 @@ def cr_network(
         const.NEURON_TYPE,
       ),
     ),
-    lambda x, dir: fitness_func(fit_func, x, dir),
+    lambda net_ind, dir: fitness_func(net_ind, fit_func(net_ind, dir)),
     cross_rate,
     mutation_rate
   ), {

@@ -48,7 +48,7 @@ mark__test_fitness=pytest.mark.parametrize(
   ]
 )
 @mark__test_fitness
-def test_fitness(tmp_path: Path, ni_str: str, expected_fit: float) -> None:
+def test_fitness(ni_str: str, expected_fit: float) -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -63,7 +63,7 @@ def test_fitness(tmp_path: Path, ni_str: str, expected_fit: float) -> None:
   ni.gen[0]._update_fenotype()
 
   # test
-  ret=core.fitness(lambda ni, dir: ni.gen[0].fenotype['x'], ni, tmp_path)
+  ret=core.fitness_corrector(ni, ni.gen[0].fenotype['x'])
 
   # results
   assert isinstance(float(ret), float)
