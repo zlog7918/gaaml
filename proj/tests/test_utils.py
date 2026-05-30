@@ -1,14 +1,21 @@
 import pytest
+import warnings
+import importlib
 import numpy as np
 import typing as t
+from pathlib import Path
+from types import FunctionType
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+  import torch
+  import tensorflow as tf
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS']='0'
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-import keras as krs
-from pathlib import Path
 from gaaml import utils as util
 from gaaml import consts as const
 from gaaml.classes.NetIndividual import NetIndividual as _NI
+import keras as krs
 
 mark__test_cr_net_from_ind=pytest.mark.parametrize(
   ('input_output', 'gens_strs', 'categorial', 'exp_epoch', 'exp_batch', 'exp_optimalizer_type', 'exp_activation_types', 'exp_weight_shapes'),
@@ -184,6 +191,166 @@ def test_cr_net_from_ind(
   layers: list[krs.layers.Dense]=model.layers
   assert len(layers)==len(exp_activation_types)
   assert all(l.activation is a for l,a in zip(layers, exp_activation_types))
+
+def datas_factory() -> tuple[np.ndarray, ...]:
+  return (
+    np.array([1, 2, 3], dtype=np.float32),
+    np.array([[4, 5], [6, 7]], dtype=np.int64),
+  )
+
+def numpy_asserts(
+  ret: tuple[object, ...],
+  datas: tuple[np.ndarray, ...],
+) -> None:
+  assert isinstance(ret, tuple)
+  assert len(ret)==len(datas)
+
+  for arr, data in zip(ret, datas):
+    assert isinstance(arr, np.ndarray)
+    np.testing.assert_array_equal(arr, data)
+
+def torch_asserts(
+  ret: tuple[object, ...],
+  datas: tuple[np.ndarray, ...],
+) -> None:
+  _torch=t.cast("torch", pytest.importorskip("torch"))
+  assert isinstance(ret, tuple)
+  assert len(ret)==len(datas)
+  for tensor, data in zip(ret, datas):
+    assert isinstance(tensor, _torch.Tensor)
+    np.testing.assert_array_equal(
+      tensor.detach().cpu().numpy(),
+      data,
+    )
+
+def tensorflow_asserts(
+  ret: tuple[object, ...],
+  datas: tuple[np.ndarray, ...],
+) -> None:
+  _tf=t.cast("tf", pytest.importorskip("tensorflow"))
+  assert isinstance(ret, tuple)
+  assert len(ret)==len(datas)
+  for tensor, data in zip(ret, datas):
+    assert isinstance(tensor, _tf.Tensor)
+    np.testing.assert_array_equal(
+      tensor.numpy(),
+      data,
+    )
+
+def check_if_backend_available(backend: str) -> bool:
+  module_file=True
+  try:
+    match backend:
+      case "torch":
+        import torch
+        module_file=torch.__file__
+      case "tensorflow":
+        import tensorflow as tf
+        module_file=tf.__file__
+      case _:
+        return True
+  except ImportError:
+    return False
+  return module_file is not None
+
+mark__test_cr_func_to_conv_to_tensor_backend=pytest.mark.parametrize(
+  ("backend", "assert_func"),
+  [
+    ("torch", torch_asserts),
+    ("tensorflow", tensorflow_asserts),
+  ],
+)
+@mark__test_cr_func_to_conv_to_tensor_backend
+def test_cr_func_to_conv_to_tensor_backend(
+  monkeypatch: pytest.MonkeyPatch,
+  backend: str,
+  assert_func: t.Callable[[
+    t.Union[
+      tuple["torch.Tensor", ...],
+      tuple["tf.Tensor", ...],
+      tuple[np.ndarray, ...]
+    ],
+    tuple[np.ndarray, ...]
+  ], None],
+) -> None:
+  # setup
+  if not check_if_backend_available(backend):
+    pytest.skip(f"{backend} not installed")
+  monkeypatch.setattr(krs.config, "backend", lambda: backend)
+
+  # values
+  datas=datas_factory()
+  conv=util.__cr_func_to_conv_to_tensor()
+
+  # test
+  ret=conv(datas)
+
+  # results
+  assert isinstance(conv, FunctionType)
+  assert_func(ret, datas)
+
+def test_cr_func_to_conv_to_tensor_unknown_backend(
+  monkeypatch: pytest.MonkeyPatch,
+) -> None:
+  # setup
+  monkeypatch.setattr(krs.config, "backend", lambda: "unknown_backend")
+
+  # values
+  datas=datas_factory()
+
+  # test
+  with warnings.catch_warnings(record=True) as warns:
+    warnings.simplefilter("always")
+    conv=util.__cr_func_to_conv_to_tensor()
+  ret=conv(datas)
+
+  # results
+  assert len(warns)==1
+  warn=warns[0]
+  assert warn.category is ResourceWarning
+  assert str(warn.message)==(
+    "Unknown backend: will not convert to tensor"
+  )
+  assert isinstance(conv, FunctionType)
+  numpy_asserts(ret, datas)
+
+mark__test_conv_to_tensor_initialized=pytest.mark.parametrize(
+  ("backend", "assert_func"),
+  [
+    ("torch", torch_asserts),
+    ("tensorflow", tensorflow_asserts),
+    ("unknown_backend", numpy_asserts),
+  ],
+)
+@mark__test_conv_to_tensor_initialized
+def test_conv_to_tensor_initialized(
+  monkeypatch: pytest.MonkeyPatch,
+  backend: str,
+  assert_func: t.Callable[[
+    t.Union[
+      tuple["torch.Tensor", ...],
+      tuple["tf.Tensor", ...],
+      tuple[np.ndarray, ...]
+    ],
+    tuple[np.ndarray, ...]
+  ], None],
+) -> None:
+  # setup
+  if not check_if_backend_available(backend):
+    pytest.skip(f"{backend} not installed")
+  monkeypatch.setattr(krs.config, "backend", lambda: backend)
+  with warnings.catch_warnings(record=False):
+    warnings.filterwarnings('ignore', category=ResourceWarning)
+    reloaded_util=t.cast(util, importlib.reload(util))
+
+  # values
+  datas=datas_factory()
+
+  # test
+  ret=reloaded_util.__conv_to_tensor(datas)
+
+  # results
+  assert_func(ret, datas)
 
 mark__test___detect_type_group=pytest.mark.parametrize(
   ('data', 'dtype', 'exp_type'),
@@ -485,13 +652,12 @@ def test_get_fit_func(
   is_categorial: bool,
   gens_strs: tuple[str, str, str],
 ) -> None:
+  # values
   _training_data=np.array(training_data, dtype=np.dtypes.ObjectDType)
   _validation_data=None
   if validation_data is not None:
     _validation_data=np.array(validation_data, dtype=np.dtypes.ObjectDType)
   _test_data=np.array(test_data, dtype=np.dtypes.ObjectDType)
-
-  # values
   ni=_NI(
     const.BIN_PART_LIST_LEN,
     const.BIN_PART_NEURON_NUM_SEED,
@@ -502,6 +668,8 @@ def test_get_fit_func(
       const.NEURON_TYPE,
     ),
   )
+
+  # setup
   for i, gen_str in enumerate(gens_strs):
     ni.gen[i].gen._gen=bytearray(gen_str.replace(' ', '').encode())
     ni.gen[i]._update_fenotype()
@@ -692,8 +860,6 @@ def test_error_get_fit_func_not_valid_type(
   # results
   # print(excinfo.value)
   assert str(excinfo.value)=='Given type is not valid for given data'
-
-
 
 mark__test_error_get_fit_func_conv_not_correct=pytest.mark.parametrize(
   ('training_data', 'validation_data', 'test_data', 'number_of_attributes', 'is_categorial'),

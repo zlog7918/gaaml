@@ -1,3 +1,7 @@
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+  import torch
+  import tensorflow as tf
 import json
 import warnings
 import numpy as np
@@ -24,6 +28,29 @@ __keras_optimalization_types: dict[int, type[krs.optimizers.Optimizer]]={
 #   0: krs.losses.MeanSquaredError,
 #   # 1: krs.losses.,
 # }
+
+def __cr_func_to_conv_to_tensor() -> t.Union[
+  t.Callable[[tuple[np.ndarray, ...]], tuple["torch.Tensor", ...]],
+  t.Callable[[tuple[np.ndarray, ...]], tuple["tf.Tensor", ...]],
+  t.Callable[[tuple[np.ndarray, ...]], tuple[np.ndarray, ...]],
+]:
+  match(krs.config.backend()):
+    case 'torch':
+      import torch
+      def __conv_to_tensor_torch(datas: tuple[np.ndarray, ...]) -> tuple[torch.Tensor, ...]:
+        return tuple(torch.from_numpy(data) for data in datas)
+      return __conv_to_tensor_torch
+    case 'tensorflow':
+      import tensorflow as tf
+      def __conv_to_tensor_tf(datas: tuple[np.ndarray, ...]) -> tuple[tf.Tensor, ...]:
+        return tuple(tf.convert_to_tensor(data) for data in datas)
+      return __conv_to_tensor_tf
+    case _:
+      warnings.warn('Unknown backend: will not convert to tensor', ResourceWarning)
+      def __do_not_conv(datas: tuple[np.ndarray, ...]) -> tuple[np.ndarray, ...]:
+        return datas
+      return __do_not_conv
+__conv_to_tensor=__cr_func_to_conv_to_tensor()
 
 def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, categorial: bool) -> krs.models.Model:
   params, layer_sizes, layer_types=net_ind.gen
@@ -197,6 +224,20 @@ def get_fit_func(
   if assumed_categorial is not None and categorial!=assumed_categorial:
     raise ValueError('Given type is not valid for given data')
   del assumed_categorial
+
+  input_size, output_size=(
+    training_data_x.shape[1],
+    training_data_y.shape[1],
+  )
+  (
+    training_data_x, training_data_y,
+    test_data_x, test_data_y,
+  )=__conv_to_tensor((
+    training_data_x, training_data_y,
+    test_data_x, test_data_y,
+  ))
+  if _validation_data is not None:
+    _validation_data=__conv_to_tensor(_validation_data)
   def f(
     net_ind: NetIndividual,
     dir: Path,
@@ -205,9 +246,9 @@ def get_fit_func(
     count+=1
     model, batch_size, epochs=cr_net_from_ind(
       net_ind,
-      training_data_x.shape[1],
-      training_data_y.shape[1],
-      categorial
+      input_size,
+      output_size,
+      categorial,
     )
     with warnings.catch_warnings():
       warnings.filterwarnings(
