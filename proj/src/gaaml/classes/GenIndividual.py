@@ -5,12 +5,12 @@ from .Individual import Individual
 
 CPType: t.TypeAlias=int
 class GenIndividual(Individual["GenIndividual", CPType, bytearray]):
-  _GI=t.TypeVar('_GI', bound="GenIndividual")
+  _GI: t.TypeAlias="GenIndividual"
   @t.overload
   def __init__(self, num_gens: int, /) -> None: ...
   @t.overload
   def __init__(self: _GI, a: _GI, b: _GI, /, *, cross_point: CPType) -> None: ...
-  def __init__(self: _GI, a: int|_GI, b: _GI|None=None, /, *, cross_point: CPType|None=None) -> None:
+  def __init__(self: _GI, a: "int|_GI", b: "_GI|None"=None, /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return

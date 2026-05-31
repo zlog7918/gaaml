@@ -3,26 +3,26 @@ from . import _utils as util
 from .Individual import Individual
 from .ListIndividual import (
   CPType,
-  ListIndividual,
+  ListIndividual as _LI,
 )
 
-# CPType: t.TypeAlias=ListIndividual.CPType
-class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, ListIndividual]):
+class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, _LI]):
+  _MILI: t.TypeAlias="MaxIntsListIndividual"
   GenSchemaType: t.TypeAlias=tuple[tuple[int, int], util.BitSize_Min_Max]
   @t.overload
   def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
-  def __init__(self, a: "MaxIntsListIndividual", b: "MaxIntsListIndividual", /, *, cross_point: CPType) -> None: ...
-  def __init__(self, a: "int|MaxIntsListIndividual", b: "GenSchemaType|MaxIntsListIndividual", /, *, cross_point: CPType|None=None) -> None:
+  def __init__(self, a: _MILI, b: _MILI, /, *, cross_point: CPType) -> None: ...
+  def __init__(self, a: "int|_MILI", b: "GenSchemaType|_MILI", /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       min_max_len, (elem_size, _max, _min)=b
-      super().__init__(ListIndividual(a, (min_max_len, elem_size)))
+      super().__init__(_LI(a, (min_max_len, elem_size)))
       self.schema=_max, _min
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
         raise ValueError('Illegal argument options')
       a.__same_or_err(b)
-      super().__init__(ListIndividual(a.gen, b.gen, cross_point=cross_point))
+      super().__init__(_LI(a.gen, b.gen, cross_point=cross_point))
       self.schema=a.schema
     self._update_fenotype()
 
@@ -33,13 +33,12 @@ class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, ListIndi
   def _update_fenotype(self) -> None:
     self.fenotype: list[int]=self.get_fenotype(self.gen, *self.schema)
 
-  _MILI=t.TypeVar('_MILI', bound="MaxIntsListIndividual")
   def __same_or_err(self: _MILI, o: _MILI) -> None:
     if self.schema!=o.schema:
       raise ValueError('First and second solution do not have equal configuration')
 
   @staticmethod
-  def get_fenotype(gen: ListIndividual, min_v: int, max_v: int) -> list[int]:
+  def get_fenotype(gen: _LI, min_v: int, max_v: int) -> list[int]:
     gen_len=len(gen.gen)
     fenotype: list[int]=[0]*(gen_len//gen.item_size)
     for i, idx in enumerate(range(0, gen_len, gen.item_size)):
@@ -53,7 +52,7 @@ class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, ListIndi
   @classmethod
   def get_cp(cls: type[_MILI], a: _MILI, b: _MILI) -> CPType:
     a.__same_or_err(b)
-    return ListIndividual.get_cp(a.gen, b.gen)
+    return _LI.get_cp(a.gen, b.gen)
 
   @classmethod
   def crossover(cls: type[_MILI], a: _MILI, b: _MILI, cp: CPType) -> tuple[_MILI, _MILI]:

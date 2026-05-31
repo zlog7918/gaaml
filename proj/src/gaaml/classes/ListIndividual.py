@@ -5,6 +5,7 @@ from .Individual import Individual
 
 CPType: t.TypeAlias=tuple[int, int]
 class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
+  _LI: t.TypeAlias="ListIndividual"
   GenSchemaType: t.TypeAlias=tuple[tuple[int, int], int]
   item_size: int
   min_elem_len: int
@@ -12,8 +13,8 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   @t.overload
   def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
-  def __init__(self, a: "ListIndividual", b: "ListIndividual", /, *, cross_point: CPType) -> None: ...
-  def __init__(self, a: "int|ListIndividual", b: "GenSchemaType|ListIndividual", /, *, cross_point: CPType|None=None) -> None:
+  def __init__(self, a: _LI, b: _LI, /, *, cross_point: CPType) -> None: ...
+  def __init__(self, a: "int|_LI", b: "GenSchemaType|_LI", /, *, cross_point: CPType|None=None) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       (_min, _max), it_size=b
       if a<_min or _max<a:
@@ -50,7 +51,6 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
       # bit='0' if self.gen[i]=='1' else '1'
       # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 
-  _LI=t.TypeVar('_LI', bound="ListIndividual")
   def __same_or_err(self: _LI, o: _LI) -> None:
     if self.item_size!=o.item_size:
       raise ValueError('First and second solution do not have equal gen size')
