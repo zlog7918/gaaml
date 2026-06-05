@@ -6,7 +6,11 @@ from pathlib import Path
 
 class DirManager:
   __dir: tempfile.TemporaryDirectory[str]|Path
-  def __init__(self, directory: Path|str|None=None) -> None:
+  @t.overload
+  def __init__(self, directory: None=None) -> None: ...
+  @t.overload
+  def __init__(self, directory: Path|str, *, has_to_be_empty: bool=True) -> None: ...
+  def __init__(self, directory: Path|str|None=None, *, has_to_be_empty: bool=True) -> None:
     if directory is None:
       self.__dir=tempfile.TemporaryDirectory()
       self.__cleanup_ref=self.__cleanup
@@ -14,15 +18,15 @@ class DirManager:
       return
     if isinstance(directory, str):
       directory=Path(directory)
-    self.__dir=self.__validate_dir(directory)
+    self.__dir=self.__validate_dir(directory, has_to_be_empty)
 
   @staticmethod
-  def __validate_dir(path: Path) -> Path:
+  def __validate_dir(path: Path, has_to_be_empty: bool=True) -> Path:
     if not path.exists():
       path.mkdir(parents=True)
     if not path.is_dir():
       raise ValueError(f'Given path does not point to directory: {path}')
-    if next(path.iterdir(), None) is not None:
+    if has_to_be_empty and next(path.iterdir(), None) is not None:
       raise ValueError(f'Given directory is not empty: {path}')
     return path.resolve()
 

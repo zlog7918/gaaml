@@ -5,21 +5,33 @@ from pathlib import Path
 from gaaml.classes.DirManager import DirManager as DM
 
 mark__test_create=pytest.mark.parametrize(
-  ('path_to_args', 'exp_flag'),
+  ('path_to_args_kwargs', 'exp_flag'),
   [
-    ((lambda p: ()), True),
-    ((lambda p: (None,)), True),
-    ((lambda p: (str(p),)), False),
-    ((lambda p: (p,)), False),
+    (fp_2akw, flag) for fp_2akw, flag in (
+      (lambda p: ((), {}), True),
+      (lambda p: ((None,), {}), True),
+      *(f for kwargs in (
+        {},
+        {'has_to_be_empty': True},
+        {'has_to_be_empty': False},
+      ) for f in (
+        (lambda p: ((p,), kwargs), False),
+        (lambda p: ((str(p),), kwargs), False),
+      ))
+    )
   ]
 )
 @mark__test_create
-def test_create(tmp_path: Path, path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]], exp_flag: bool) -> None:
+def test_create(
+  tmp_path: Path,
+  path_to_args_kwargs: t.Callable[[Path], tuple[tuple[t.Any, ...], dict[str, bool]]],
+  exp_flag: bool,
+) -> None:
   # values
-  args=path_to_args(tmp_path)
+  args, kwargs=path_to_args_kwargs(tmp_path)
 
   # test
-  dm=DM(*args)
+  dm=DM(*args, **kwargs)
 
   # results
   # private access: dm.__dir
@@ -33,18 +45,25 @@ def test_create(tmp_path: Path, path_to_args: t.Callable[[Path], tuple[()]|tuple
   assert (dm.path==tmp_path.resolve()) ^ exp_flag
 
 mark__test_create_create_dir=pytest.mark.parametrize(
-  ('path_to_sub_path'),
+  ('path_to_sub_path', 'kwargs'),
   [
-    lambda p: str((p/'dir')),
-    lambda p: str((p/'dir'/'sub')),
-    lambda p: (p/'dir'),
-    lambda p: (p/'dir'/'sub'),
+    (fp_2sp, kwargs) for kwargs in (
+      {},
+      {'has_to_be_empty': True},
+      {'has_to_be_empty': False},
+    ) for fp_2sp in (
+      lambda p: p/'dir',
+      lambda p: str(p/'dir'),
+      lambda p: p/'dir'/'sub',
+      lambda p: str(p/'dir'/'sub'),
+    )
   ]
 )
 @mark__test_create_create_dir
 def test_create_create_dir(
   tmp_path: Path,
   path_to_sub_path: t.Callable[[Path], Path|str],
+  kwargs: dict[str, bool],
 ) -> None:
   # values
   path=path_to_sub_path(tmp_path)
@@ -52,7 +71,7 @@ def test_create_create_dir(
   path_exists=path_P.exists()
 
   # test
-  dm=DM(path)
+  dm=DM(path, **kwargs)
 
   # results
   # private access: dm.__dir
@@ -68,6 +87,36 @@ def test_create_create_dir(
   assert ret_path.is_dir()
   assert ret_path.is_absolute()
 
+mark__test_create_resume_non_empty_dir=pytest.mark.parametrize(
+  'path_to_dir_path',
+  [
+    lambda p: str(p),
+    lambda p: p,
+  ]
+)
+@mark__test_create_resume_non_empty_dir
+def test_create_resume_non_empty_dir(
+  tmp_path: Path,
+  path_to_dir_path: t.Callable[[Path], Path|str],
+) -> None:
+  # values
+  dir_path=path_to_dir_path(tmp_path)
+  dir_Path=Path(dir_path)
+  f=(dir_Path/'t.txt')
+  f.write_text('data')
+
+  # test
+  dm=DM(dir_path, has_to_be_empty=False)
+
+  # results
+  assert not dm.is_tmp
+  # private access: dm.__dir
+  _dir=dm._DirManager__dir # type: ignore
+  assert isinstance(_dir, Path)
+  assert dm.path==dir_Path.resolve()
+  assert f.exists()
+  assert f.resolve().is_relative_to(dm.path)
+
 mark__test_is_tmp=pytest.mark.parametrize(
   ('path_to_args', 'exp_flag'),
   [
@@ -78,7 +127,11 @@ mark__test_is_tmp=pytest.mark.parametrize(
   ]
 )
 @mark__test_is_tmp
-def test_is_tmp(tmp_path: Path, path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]], exp_flag: bool) -> None:
+def test_is_tmp(
+  tmp_path: Path,
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
+  exp_flag: bool
+) -> None:
   # values
   args=path_to_args(tmp_path)
   dm=DM(*args)
@@ -95,20 +148,21 @@ def test_is_tmp(tmp_path: Path, path_to_args: t.Callable[[Path], tuple[()]|tuple
 mark__test_path_setter=pytest.mark.parametrize(
   ('path_to_args', 'path_to_path_to_set'),
   [
-    (lambda p: (), lambda p: (p/'dir2')),
-    (lambda p: (), lambda p: str((p/'dir2'))),
-    (lambda p: (None,), lambda p: (p/'dir2')),
-    (lambda p: (None,), lambda p: str((p/'dir2'))),
-    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2')),
-    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'))),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'))),
+    (fp_2a, fp2p2s) for fp_2a in (
+      lambda p: (),
+      lambda p: (None,),
+      lambda p: (p/'dir1',),
+      lambda p: (str(p/'dir1'),),
+    ) for fp2p2s in (
+      lambda p: p/'dir2',
+      lambda p: str(p/'dir2'),
+    )
   ]
 )
 @mark__test_path_setter
 def test_path_setter(
   tmp_path: Path,
-  path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]],
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
   path_to_path_to_set: t.Callable[[Path], Path|str],
 ) -> None:
   # values
@@ -132,12 +186,17 @@ def test_path_setter(
 mark__test_temp_dir_is_deleted_on_reassignment=pytest.mark.parametrize(
   ('args', 'path_to_path_to_set'),
   [
-    ((), lambda p: (p)),
-    ((), lambda p: (p/'new_dir')),
-    ((), lambda p: (p/'new_dir'/'new_sub')),
-    ((None,), lambda p: (p)),
-    ((None,), lambda p: (p/'new_dir')),
-    ((None,), lambda p: (p/'new_dir'/'new_sub')),
+    (args, fp2p2s) for args in (
+      (),
+      (None,),
+    ) for _fp2p2s in (
+      lambda p: p,
+      lambda p: p/'new_dir',
+      lambda p: p/'new_dir'/'new_sub',
+    ) for fp2p2s in (
+      lambda p: _fp2p2s(p),
+      lambda p: str(_fp2p2s(p)),
+    )
   ]
 )
 @mark__test_temp_dir_is_deleted_on_reassignment
@@ -166,14 +225,16 @@ def test_temp_dir_is_deleted_on_reassignment(
 mark__test_not_tmp_dir_is_cleaned_on_reassignment=pytest.mark.parametrize(
   ('path_to_args', 'path_to_path_to_set'),
   [
-    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2')),
-    (lambda p: (str((p/'dir1')),), lambda p: (p/'dir2'/'sub')),
-    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'))),
-    (lambda p: (str((p/'dir1')),), lambda p: str((p/'dir2'/'sub'))),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir1'),), lambda p: (p/'dir2'/'sub')),
-    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'))),
-    (lambda p: ((p/'dir1'),), lambda p: str((p/'dir2'/'sub'))),
+    (fp_2a, fp2p2s) for fp_2a in (
+      lambda p: (p/'dir1',),
+      lambda p: (str(p/'dir1'),),
+    ) for _fp2p2s in (
+      lambda p: p/'dir2',
+      lambda p: p/'dir2'/'sub',
+    ) for fp2p2s in (
+      lambda p: _fp2p2s(p),
+      lambda p: str(_fp2p2s(p)),
+    )
   ]
 )
 @mark__test_not_tmp_dir_is_cleaned_on_reassignment
@@ -204,28 +265,21 @@ def test_not_tmp_dir_is_cleaned_on_reassignment(
 mark__test_dir_is_created_on_assignment=pytest.mark.parametrize(
   ('path_to_args', 'exp_is_tmp', 'path_to_path_to_set'),
   [
-    (lambda p: (), True, lambda p: (p/'new_dir')),
-    (lambda p: (), True, lambda p: str((p/'new_dir'))),
-    (lambda p: (), True, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: (), True, lambda p: str((p/'new_dir'/'new_sub'))),
-    (lambda p: (None,), True, lambda p: (p/'new_dir')),
-    (lambda p: (None,), True, lambda p: str((p/'new_dir'))),
-    (lambda p: (None,), True, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: (None,), True, lambda p: str((p/'new_dir'/'new_sub'))),
-    (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir')),
-    (lambda p: ((p/'dir'),), False, lambda p: str((p/'new_dir'))),
-    (lambda p: ((p/'dir'),), False, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: ((p/'dir'),), False, lambda p: str((p/'new_dir'/'new_sub'))),
-    (lambda p: (str((p/'dir')),), False, lambda p: (p/'new_dir')),
-    (lambda p: (str((p/'dir')),), False, lambda p: str((p/'new_dir'))),
-    (lambda p: (str((p/'dir')),), False, lambda p: (p/'new_dir'/'new_sub')),
-    (lambda p: (str((p/'dir')),), False, lambda p: str((p/'new_dir'/'new_sub'))),
+    (fp_2akw, flag, fp2p2s) for fp_2akw, flag in (
+      (lambda p: (), True),
+      (lambda p: (None,), True),
+      (lambda p: (p/'dir',), False),
+      (lambda p: (str(p/'dir'),), False),
+    ) for fp2p2s in (
+      lambda p: p/'new_dir',
+      lambda p: str(p/'new_dir'),
+    )
   ]
 )
 @mark__test_dir_is_created_on_assignment
 def test_dir_is_created_on_assignment(
   tmp_path: Path,
-  path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]],
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
   exp_is_tmp: bool,
   path_to_path_to_set: t.Callable[[Path], Path|str],
 ):
@@ -253,10 +307,10 @@ def test_dir_is_created_on_assignment(
 mark__test_path_setter_moves_contents=pytest.mark.parametrize(
   ('path_to_src', 'path_to_dst'),
   [
-    (lambda p: str((p/'src')), lambda p: str((p/'dst'))),
-    (lambda p: str((p/'src')), lambda p: (p/'dst')),
-    (lambda p: (p/'src'), lambda p: str((p/'dst'))),
-    (lambda p: (p/'src'), lambda p: (p/'dst')),
+    (lambda p: str(p/'src'), lambda p: str(p/'dst')),
+    (lambda p: str(p/'src'), lambda p: p/'dst'),
+    (lambda p: p/'src', lambda p: str(p/'dst')),
+    (lambda p: p/'src', lambda p: p/'dst'),
   ]
 )
 @mark__test_path_setter_moves_contents
@@ -270,8 +324,8 @@ def test_path_setter_moves_contents(
   dst=path_to_dst(tmp_path)
 
   dm=DM(src)
-  src_file=(Path(src)/'t.txt')
-  dst_file=(Path(dst)/'t.txt')
+  src_file=Path(src)/'t.txt'
+  dst_file=Path(dst)/'t.txt'
   src_file.write_text('hello')
   dst_file_exists=dst_file.exists()
 
@@ -310,8 +364,8 @@ def test_move_fallback_used(
 mark__test_path_setter_same_path=pytest.mark.parametrize(
   'path_to_dir_path',
   [
-    lambda p: str((p/'dir')),
-    lambda p: (p/'dir'),
+    lambda p: str(p/'dir'),
+    lambda p: p/'dir',
   ]
 )
 @mark__test_path_setter_same_path
@@ -339,8 +393,8 @@ def test_partial_move_rollback(
   dst=tmp_path/'dst'
   dm=DM(src)
 
-  f1=(src/'a.txt')
-  f2=(src/'b.txt')
+  f1=src/'a.txt'
+  f2=src/'b.txt'
   f1.write_text('a')
   f2.write_text('b')
 
@@ -370,8 +424,8 @@ def test_partial_move_rollback(
 mark__test_error_create_path_is_file=pytest.mark.parametrize(
   'path_to_file_path',
   [
-    lambda p: str((p/'t.txt')),
-    lambda p: (p/'t.txt'),
+    lambda p: str(p/'t.txt'),
+    lambda p: p/'t.txt',
   ]
 )
 @mark__test_error_create_path_is_file
@@ -391,17 +445,47 @@ def test_error_create_path_is_file(
   # results
   assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.resolve()}'
 
-mark__test_error_create_if_directory_not_empty=pytest.mark.parametrize(
-  'path_to_dir_path',
+mark__test_error_create_resume_path_is_file=pytest.mark.parametrize(
+  'path_to_file_path',
   [
-    lambda p: str(p),
-    lambda p: p,
+    lambda p: str(p/'t.txt'),
+    lambda p: p/'t.txt',
+  ]
+)
+@mark__test_error_create_resume_path_is_file
+def test_error_create_resume_path_is_file(
+  tmp_path: Path,
+  path_to_file_path: t.Callable[[Path], Path|str],
+) -> None:
+  # values
+  file_path=path_to_file_path(tmp_path)
+  file_Path=Path(file_path)
+  file_Path.write_text('data')
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=DM(file_path, has_to_be_empty=True)
+
+  # results
+  assert str(excinfo.value)==f'Given path does not point to directory: {file_Path.resolve()}'
+
+mark__test_error_create_if_directory_not_empty=pytest.mark.parametrize(
+  ('path_to_dir_path', 'kwargs'),
+  [
+    (fp_2dp, kwargs) for kwargs in (
+      {},
+      {'has_to_be_empty': True},
+    ) for fp_2dp in (
+      lambda p: p,
+      lambda p: str(p),
+    )
   ]
 )
 @mark__test_error_create_if_directory_not_empty
 def test_error_create_if_directory_not_empty(
   tmp_path: Path,
   path_to_dir_path: t.Callable[[Path], Path|str],
+  kwargs: dict[str, bool],
 ):
   # values
   dir_path=path_to_dir_path(tmp_path)
@@ -410,7 +494,7 @@ def test_error_create_if_directory_not_empty(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=DM(dir_path)
+    _=DM(dir_path, **kwargs)
 
   # results
   assert str(excinfo.value)==f'Given directory is not empty: {dir_Path.resolve()}'
@@ -418,20 +502,21 @@ def test_error_create_if_directory_not_empty(
 mark__test_error_path_setter_path_is_file=pytest.mark.parametrize(
   ('path_to_args', 'path_to_file_path'),
   [
-    (lambda p: (), lambda p: str((p/'t.txt'))),
-    (lambda p: (), lambda p: (p/'t.txt')),
-    (lambda p: (None,), lambda p: str((p/'t.txt'))),
-    (lambda p: (None,), lambda p: (p/'t.txt')),
-    (lambda p: (str((p/'dir')),), lambda p: str((p/'t.txt'))),
-    (lambda p: (str((p/'dir')),), lambda p: (p/'t.txt')),
-    (lambda p: ((p/'dir'),), lambda p: str((p/'t.txt'))),
-    (lambda p: ((p/'dir'),), lambda p: (p/'t.txt')),
+    (fp_2a, fp2p) for fp_2a in (
+      lambda p: (),
+      lambda p: (None,),
+      lambda p: (p/'dir',),
+      lambda p: (str(p/'dir'),),
+    ) for fp2p in (
+      lambda p: p/'t.txt',
+      lambda p: str(p/'t.txt'),
+    )
   ]
 )
 @mark__test_error_path_setter_path_is_file
 def test_error_path_setter_path_is_file(
   tmp_path: Path,
-  path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]],
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
   path_to_file_path: t.Callable[[Path], Path|str]
 ) -> None:
   # values
@@ -451,20 +536,21 @@ def test_error_path_setter_path_is_file(
 mark__test_error_path_setter_if_directory_not_empty=pytest.mark.parametrize(
   ('path_to_args', 'path_to_dir_path'),
   [
-    (lambda p: (), lambda p: str((p/'dir2'))),
-    (lambda p: (), lambda p: (p/'dir2')),
-    (lambda p: (None,), lambda p: str((p/'dir2'))),
-    (lambda p: (None,), lambda p: (p/'dir2')),
-    (lambda p: (str((p/'dir')),), lambda p: str((p/'dir2'))),
-    (lambda p: (str((p/'dir')),), lambda p: (p/'dir2')),
-    (lambda p: ((p/'dir'),), lambda p: str((p/'dir2'))),
-    (lambda p: ((p/'dir'),), lambda p: (p/'dir2')),
+    (fp_2a, fp2p2dp) for fp_2a in (
+      lambda p: (),
+      lambda p: (None,),
+      lambda p: (p/'dir',),
+      lambda p: (str(p/'dir'),),
+    ) for fp2p2dp in (
+      lambda p: p/'dir2',
+      lambda p: str(p/'dir2'),
+    )
   ]
 )
 @mark__test_error_path_setter_if_directory_not_empty
 def test_error_path_setter_if_directory_not_empty(
   tmp_path: Path,
-  path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]],
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
   path_to_dir_path: t.Callable[[Path], Path|str],
 ):
   # values
@@ -485,10 +571,10 @@ def test_error_path_setter_if_directory_not_empty(
 mark__test_error_path_setter_directory_is_inside_current_dir=pytest.mark.parametrize(
   ('path_to_path', 'path_to_subpath'),
   [
-    (lambda p: str((p/'dir')), lambda p: str((p/'dir'/'sub'))),
-    (lambda p: str((p/'dir')), lambda p: (p/'dir'/'sub')),
-    (lambda p: (p/'dir'), lambda p: str((p/'dir'/'sub'))),
-    (lambda p: (p/'dir'), lambda p: (p/'dir'/'sub')),
+    (lambda p: str(p/'dir'), lambda p: str(p/'dir'/'sub')),
+    (lambda p: str(p/'dir'), lambda p: p/'dir'/'sub'),
+    (lambda p: p/'dir', lambda p: str(p/'dir'/'sub')),
+    (lambda p: p/'dir', lambda p: p/'dir'/'sub'),
   ]
 )
 @mark__test_error_path_setter_directory_is_inside_current_dir
@@ -522,11 +608,15 @@ mark__test_error_change_is_tmp=pytest.mark.parametrize(
 @mark__test_error_change_is_tmp
 def test_error_change_is_tmp(
   tmp_path: Path,
-  path_to_args: t.Callable[[Path], tuple[()]|tuple[Path|str|None]]
+  path_to_args: t.Callable[[Path], tuple[t.Any, ...]],
 ) -> None:
   # values
   args=path_to_args(tmp_path)
   dm=DM(*args)
+  exp_err={
+    'can\'t set attribute \'is_tmp\'',
+    'property \'is_tmp\' of \'DirManager\' object has no setter'
+  }
 
   # test
   with pytest.raises(AttributeError) as excinfo1:
@@ -535,5 +625,5 @@ def test_error_change_is_tmp(
     dm.is_tmp=False # type: ignore
 
   # results
-  assert str(excinfo1.value) in {'can\'t set attribute \'is_tmp\'', 'property \'is_tmp\' of \'DirManager\' object has no setter'}
-  assert str(excinfo2.value) in {'can\'t set attribute \'is_tmp\'', 'property \'is_tmp\' of \'DirManager\' object has no setter'}
+  assert str(excinfo1.value) in exp_err
+  assert str(excinfo2.value) in exp_err
