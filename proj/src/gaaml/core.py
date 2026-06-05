@@ -2,7 +2,6 @@ import numpy as np
 import typing as t
 from pathlib import Path
 from tqdm.auto import tqdm
-from threading import RLock
 from . import utils as util
 from . import consts as const
 from .classes.Population import (
