@@ -13,11 +13,17 @@ class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, _LI]):
   def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
   def __init__(self, a: _MILI, b: _MILI, /, *, cross_point: CPType) -> None: ...
-  def __init__(self, a: "int|_MILI", b: "GenSchemaType|_MILI", /, *, cross_point: CPType|None=None) -> None:
+  def __init__(
+    self,
+    a: t.Union[int, _MILI],
+    b: t.Union[GenSchemaType, _MILI],
+    /, *,
+    cross_point: CPType|None=None,
+  ) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
-      min_max_len, (elem_size, _max, _min)=b
+      min_max_len, (elem_size, _min, _max)=b
       super().__init__(_LI(a, (min_max_len, elem_size)))
-      self.schema=_max, _min
+      self.schema=_min, _max
     else:
       if isinstance(a, int) or isinstance(b, tuple) or cross_point is None:
         raise ValueError('Illegal argument options')
@@ -61,5 +67,34 @@ class MaxIntsListIndividual(Individual["MaxIntsListIndividual", CPType, _LI]):
   def _save_format(self) -> dict[str, object]:
     return {
       'name': self.__class__.__name__,
-      'gen': self._gen._save_format()
+      'gen': self._gen._save_format(),
+      'schema': list(self.schema),
     }
+  @classmethod
+  def __from_gen(cls: type[_MILI], gen: _LI, schema: tuple[int, int]) -> _MILI:
+    i=cls.__new__(cls)
+    super(cls, i).__init__(gen)
+    i.schema=schema
+    i._update_fenotype()
+    return i
+  @classmethod
+  def _load_from_format(cls: type[_MILI], saved_model: dict[str, object]) -> _MILI:
+    if {k for k in saved_model.keys()}!={'name', 'gen', 'schema'}:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if saved_model['name']!=cls.__name__:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if not isinstance(saved_model['gen'], dict):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if not isinstance(saved_model['schema'], list):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if len(saved_model['schema'])!=2 or any(not isinstance(e, int) for e in saved_model['schema']):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    gen, schema=t.cast(tuple[dict[str, object], tuple[int, int]], (
+      saved_model['gen'],
+      tuple(saved_model['schema']),
+    ))
+    try:
+      li=_LI._load_from_format(gen)
+    except ValueError:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    return cls.__from_gen(li, schema)

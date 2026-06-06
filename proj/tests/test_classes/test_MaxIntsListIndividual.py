@@ -374,6 +374,7 @@ def test_save_format() -> None:
   assert saved=={
     'name': MILI.__name__,
     'gen': mili.gen._save_format(),
+    'schema': list(mili.schema),
   }
 
 def test_save_format_returns_serializable_data():
@@ -393,6 +394,52 @@ def test_save_format_returns_serializable_data():
 
   # test/results
   _=json.dumps(result)
+
+def test_load_from_format() -> None:
+  # values
+  input_len=5
+  item_size=3
+  min_elem_val=1
+  max_elem_val=6
+  min_list_size=1
+  max_list_size=50
+  li=_LI(input_len, ((min_list_size, max_list_size), item_size))
+  saved={
+    'name': MILI.__name__,
+    'gen': li._save_format(),
+    'schema': [min_elem_val, max_elem_val],
+  }
+
+  # test
+  loaded=MILI._load_from_format(saved)
+
+  # results
+  assert isinstance(loaded, MILI)
+  assert loaded.gen.gen==li.gen
+
+def test_load_from_format_roundtrip() -> None:
+  # values
+  input_len=5
+  item_size=3
+  min_elem_val=1
+  max_elem_val=6
+  min_list_size=1
+  max_list_size=50
+  schema=(
+    (min_list_size, max_list_size),
+    (item_size, min_elem_val, max_elem_val),
+  )
+  mili=MILI(input_len, schema)
+
+  # setup
+  saved=json.loads(json.dumps(mili._save_format()))
+
+  # test
+  loaded=MILI._load_from_format(saved)
+
+  # results
+  assert isinstance(loaded, MILI)
+  assert loaded._gen._gen==mili._gen._gen
 
 def test_error_list_size_too_small_on_create() -> None:
   # values
@@ -973,6 +1020,117 @@ def test_error_offset_on_crossover(cp: tuple[int, int]) -> None:
 
   # results
   assert str(excinfo.value)=='Cross points\' offsets are not equal'
+
+mark__test_error_load_from_format=pytest.mark.parametrize(
+  'saved_model',
+  [
+    # invalid keys
+    {},
+    {
+      'name': MILI.__name__,
+    },
+    {
+      'gen': {},
+    },
+    {
+      'name': MILI.__name__,
+      'gen': {},
+    },
+    {
+      'name': MILI.__name__,
+      'gen': {},
+      'extra': 123,
+    },
+
+    # wrong name
+    {
+      'name': 'OtherClass',
+      'gen': {},
+      'schema': [1, 6],
+    },
+    {
+      'name': '_MILI',
+      'gen': {},
+      'schema': [1, 6],
+    },
+    {
+      'name': 'MILI',
+      'gen': {},
+      'schema': [1, 6],
+    },
+
+    # gen wrong type
+    {
+      'name': MILI.__name__,
+      'gen': [],
+      'schema': [1, 6],
+    },
+
+    # schema wrong type
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': (1, 6),
+    },
+
+    # schema entry too short
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': [1],
+    },
+
+    # schema entry too long
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': [1, 6, 7],
+    },
+
+    # schema entry wrong types
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': [1, '6'],
+    },
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': ['1', 6],
+    },
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': [1.0, 6],
+    },
+    {
+      'name': MILI.__name__,
+      'gen': _LI(2, ((1, 4), 1))._save_format(),
+      'schema': [1, 6.0],
+    },
+
+    # invalid nested GenIndividual model
+    {
+      'name': MILI.__name__,
+      'gen': {
+        'invalid': True,
+      },
+      'schema': [1, 6],
+    },
+  ],
+)
+@mark__test_error_load_from_format
+def test_error_load_from_format(
+  saved_model: dict[str, object],
+) -> None:
+  # values ^
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MILI._load_from_format(saved_model)
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {MILI.__name__}'
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',
