@@ -70,7 +70,6 @@ mark__test_int_to_bin=pytest.mark.parametrize(
   [
     (22, 6, '0 1 0 1 1 0'),
     (22, 5, '1 0 1 1 0'),
-    (22, 0, ''),
     (22, 4, '0 1 1 0'), # 1 0 1 1 0
   ],
 )
@@ -145,3 +144,22 @@ def test_correct_gen_to_min_max(gen_str: str, max_v: int, min_v: int, exp_val_in
   expected=int(bytearray(exp_val_in_str.replace(' ', '').encode()), 2)+min_v
   assert isinstance(ret, int)
   assert ret==expected
+
+mark__test_error_int_to_bin=pytest.mark.parametrize(
+  ('val', 'length'),
+  [
+    (22, -6),
+    (22, -1),
+    (22, 0),
+  ],
+)
+@mark__test_error_int_to_bin
+def test_error_int_to_bin(val: int, length: int) -> None:
+  # values ^
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=util.int_to_bin(val, length)
+
+  # results
+  assert str(excinfo.value)=='length must be greater then 0'

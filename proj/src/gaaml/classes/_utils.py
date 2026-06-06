@@ -49,6 +49,8 @@ def randint(a: int, b: int) -> int:
   return rnd.randint(a, b) if a!=b else a
 
 def int_to_bin(value: int, length: int|None) -> bytearray:
+  if length is not None and length<1:
+    raise ValueError('length must be greater then 0')
   b=bin(value)[2:]
   b=bytearray(
     ord(el)
@@ -56,7 +58,7 @@ def int_to_bin(value: int, length: int|None) -> bytearray:
     (
       b
         if length is None else
-      reversed(tuple(reversed(b.zfill(length)))[:length])
+      b.zfill(length)[-length:]
     )
   )
   return b
