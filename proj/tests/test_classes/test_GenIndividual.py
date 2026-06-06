@@ -15,6 +15,38 @@ def test_create() -> None:
     assert isinstance(gi.gen, bytearray)
     assert len(gi.gen)==input_len
 
+def test_load_from_format() -> None:
+  # values
+  gen_str='10110'
+
+  # test
+  gi=GI._load_from_format({
+    'name': GI.__name__,
+    'gen': gen_str,
+  })
+
+  # results
+  assert isinstance(gi, GI)
+  assert gi.gen==bytearray(gen_str.encode())
+
+def test_load_from_format_roundtrip() -> None:
+  # values
+  input_len=5
+  gi1=GI(input_len)
+
+  # setup
+  gi1._gen=bytearray(b'10110')
+
+  # test
+  saved=gi1._save_format()
+  gi2=GI._load_from_format(saved)
+
+  # results
+  assert isinstance(gi2, GI)
+  assert gi2 is not gi1
+  assert gi2.gen==gi1.gen
+  assert gi2._gen==gi1._gen
+
 def test_mutate() -> None:
   # values
   input_len=5
@@ -197,8 +229,47 @@ def test_error_outside_range(
   # test
   with pytest.raises(ValueError) as excinfo:
     _=func(gi1, gi2, cp)
+
   # results
   assert str(excinfo.value)=='Cross point is outside of solution'
+
+mark__test_error_invalid_saved_model=pytest.mark.parametrize(
+  'saved_model',
+  [
+    # invalid keys
+    {'name': GI.__name__},
+    {'gen': '10110'},
+    {'name': GI.__name__, 'gen': '10110', 'extra': 1},
+
+    # invalid name
+    {'name': 'OtherClass', 'gen': '10110'},
+    {'name': '_GI', 'gen': '10110'},
+    {'name': 'GI', 'gen': '10110'},
+
+    # invalid gen type
+    {'name': GI.__name__, 'gen': 10110},
+    {'name': GI.__name__, 'gen': None},
+    {'name': GI.__name__, 'gen': b'10110'},
+
+    # invalid gen contents
+    {'name': GI.__name__, 'gen': ''},
+    {'name': GI.__name__, 'gen': '10112'},
+    {'name': GI.__name__, 'gen': '10a10'},
+    {'name': GI.__name__, 'gen': '10 10'},
+  ],
+)
+@mark__test_error_invalid_saved_model
+def test_error_invalid_saved_model(
+  saved_model: dict[str, t.Any],
+) -> None:
+  # values ^
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=GI._load_from_format(saved_model)
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {GI.__name__}'
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',
@@ -219,6 +290,7 @@ def test_error_illegal_argument_on_create(
   gi1=GI(input_len)
   gi2=GI(input_len)
   args, kwargs=func_args_kwargs(gi1, gi2)
+
   # test
   with pytest.raises(ValueError) as excinfo:
     _=GI(*args, **kwargs)

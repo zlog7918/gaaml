@@ -44,5 +44,23 @@ class GenIndividual(Individual["GenIndividual", CPType, bytearray]):
   def _save_format(self) -> dict[str, object]:
     return {
       'name': self.__class__.__name__,
-      'gen': self._gen.decode()
+      'gen': self._gen.decode(),
     }
+  @classmethod
+  def __from_gen(cls: type[_GI], gen: bytearray) -> _GI:
+    i=cls.__new__(cls)
+    super(cls, i).__init__(gen)
+    return i
+  @classmethod
+  def _load_from_format(cls: type[_GI], saved_model: dict[str, object]) -> _GI:
+    if {k for k in saved_model.keys()}!={'name', 'gen'}:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if saved_model['name']!=cls.__name__:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if not isinstance(saved_model['gen'], str):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if len(saved_model['gen'])==0:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if not set(saved_model['gen']).issubset({'0', '1'}):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    return cls.__from_gen(bytearray(saved_model['gen'].encode()))
