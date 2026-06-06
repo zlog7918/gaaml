@@ -307,6 +307,10 @@ def test_save_format() -> None:
   assert result=={
     'name': MII.__name__,
     'gen': mii._gen._save_format(),
+    'schema': [
+      ['x', 2, 1, 4],
+      ['y', 3, 0, 5],
+    ],
   }
 
 def test_save_format_returns_serializable_data():
@@ -320,6 +324,51 @@ def test_save_format_returns_serializable_data():
 
   # test/results
   _=json.dumps(result)
+
+def test_load_from_format() -> None:
+  # values
+  schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  input_len=sum(l for _, (l, _, _) in schema)
+  gi=_GI(input_len)
+  saved_model={
+    'name': MII.__name__,
+    'gen': gi._save_format(),
+    'schema': [
+      ['x', 2, 1, 4],
+      ['y', 3, 0, 5],
+    ],
+  }
+
+  # test
+  loaded=MII._load_from_format(saved_model)
+
+  # results
+  assert isinstance(loaded, MII)
+  assert loaded._gen._gen==gi._gen
+  # private access: loaded.__schema
+  loaded_schema=loaded._MaxIntsIndividual__schema # type: ignore
+  assert loaded_schema==schema
+
+def test_load_from_format_roundtrip() -> None:
+  # values
+  schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  mii=MII(schema)
+
+  # setup
+  saved=json.loads(json.dumps(mii._save_format()))
+
+  # test
+  loaded=MII._load_from_format(saved)
+
+  # results
+  assert isinstance(loaded, MII)
+  assert loaded._gen._gen==mii._gen._gen
 
 def test_error_name_collition_on_create() -> None:
   # values
@@ -465,6 +514,109 @@ def test_error_outside_range_on_crossover(cp: int) -> None:
 
   # results
   assert str(excinfo.value)=='Cross point is outside of solution'
+
+mark__test_error_load_invalid_model=pytest.mark.parametrize(
+  'saved',
+  [
+    # invalid keys
+    {},
+    {
+      'name': MII.__name__,
+    },
+    {
+      'gen': _GI(5)._save_format(),
+    },
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+    },
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [['x', 2, 1, 4]],
+      'extra': 123,
+    },
+
+    # wrong name
+    {
+      'name': 'OtherClass',
+      'gen': _GI(5)._save_format(),
+      'schema': [['x', 2, 1, 4]],
+    },
+
+    # gen wrong type
+    {
+      'name': MII.__name__,
+      'gen': [],
+      'schema': [['x', 2, 1, 4]],
+    },
+
+    # schema wrong type
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': {},
+    },
+
+    # schema entry too short
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [['x', 2, 1]],
+    },
+
+    # schema entry too long
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [['x', 2, 1, 4, 5]],
+    },
+
+    # schema entry wrong types
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [['x', '2', 1, 4]],
+    },
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [[1, 2, 1, 4]],
+    },
+
+    # schema entry not list
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': ['not-an-entry'],
+    },
+
+    # duplicate names
+    {
+      'name': MII.__name__,
+      'gen': _GI(5)._save_format(),
+      'schema': [
+        ['x', 2, 1, 4],
+        ['x', 3, 0, 5],
+      ],
+    },
+
+    # invalid nested GenIndividual model
+    {
+      'name': MII.__name__,
+      'gen': {'invalid': True},
+      'schema': [['x', 2, 1, 4]],
+    },
+  ]
+)
+@mark__test_error_load_invalid_model
+def test_error_load_from_format_invalid_model(saved: dict[str, object]) -> None:
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=MII._load_from_format(saved)
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {MII.__name__}'
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',

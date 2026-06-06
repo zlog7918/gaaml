@@ -7,14 +7,17 @@ CPType: t.TypeAlias=tuple[int, int]
 class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   _LI: t.TypeAlias="ListIndividual"
   GenSchemaType: t.TypeAlias=tuple[tuple[int, int], int]
-  item_size: int
-  min_elem_len: int
-  max_bit_len: int
   @t.overload
   def __init__(self, num_items: int, schema: GenSchemaType, /) -> None: ...
   @t.overload
   def __init__(self, a: _LI, b: _LI, /, *, cross_point: CPType) -> None: ...
-  def __init__(self, a: "int|_LI", b: "GenSchemaType|_LI", /, *, cross_point: CPType|None=None) -> None:
+  def __init__(
+    self,
+    a: t.Union[int, _LI],
+    b: t.Union[GenSchemaType, _LI],
+    /, *,
+    cross_point: CPType|None=None,
+  ) -> None:
     if isinstance(a, int) and isinstance(b, tuple):
       (_min, _max), it_size=b
       if a<_min or _max<a:
@@ -84,5 +87,40 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   def _save_format(self) -> dict[str, object]:
     return {
       'name': self.__class__.__name__,
-      'gen': self._gen.decode()
+      'gen': self._gen.decode(),
+      'item_size': self.item_size,
+      'max_bit_len': self.max_bit_len,
+      'min_elem_len': self.min_elem_len,
     }
+  @classmethod
+  def __from_gen(cls: type[_LI], gen: bytearray, item_size: int, max_bit_len: int, min_elem_len: int) -> _LI:
+    i=cls.__new__(cls)
+    super(cls, i).__init__(gen)
+    i.item_size=item_size
+    i.max_bit_len=max_bit_len
+    i.min_elem_len=min_elem_len
+    return i
+  @classmethod
+  def _load_from_format(cls: type[_LI], saved_model: dict[str, object]) -> _LI:
+    if {k for k in saved_model.keys()}!={'name', 'gen', 'item_size', 'max_bit_len', 'min_elem_len'}:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if saved_model['name']!=cls.__name__:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if any(not isinstance(saved_model[k], type) for k, type in (
+      ('gen', str),
+      ('item_size', int),
+      ('max_bit_len', int),
+      ('min_elem_len', int),
+    )):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    gen, item_size, max_bit_len, min_elem_len=t.cast(tuple[str, int, int, int], (
+      saved_model['gen'],
+      saved_model['item_size'],
+      saved_model['max_bit_len'],
+      saved_model['min_elem_len'],
+    ))
+    if len(gen)==0:
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    if not set(gen).issubset({'0', '1'}):
+      raise ValueError(f'Model saved is not {cls.__name__}')
+    return cls.__from_gen(bytearray(gen.encode()), item_size, max_bit_len, min_elem_len)

@@ -262,25 +262,9 @@ def test_save_format() -> None:
   assert result=={
     'name': LI.__name__,
     'gen': gen_str.replace(' ', ''),
-  }
-
-def test_save_format_empty_gen() -> None:
-  # values
-  input_len=0
-  item_size=1
-  min_list_size=0
-  max_list_size=10
-  schema=((min_list_size, max_list_size), item_size)
-  li=LI(input_len, schema)
-
-  # test
-  result=li._save_format()
-
-  # results
-  assert isinstance(result, dict)
-  assert result=={
-    'name': LI.__name__,
-    'gen': '',
+    'item_size': item_size,
+    'max_bit_len': item_size*max_list_size,
+    'min_elem_len': min_list_size,
   }
 
 def test_save_format_returns_serializable_data():
@@ -295,6 +279,48 @@ def test_save_format_returns_serializable_data():
 
   # test/results
   _=json.dumps(result)
+
+def test_load_from_format() -> None:
+  # values
+  saved_model={
+    'name': LI.__name__,
+    'gen': '011100101',
+    'item_size': 3,
+    'max_bit_len': 150,
+    'min_elem_len': 1,
+  }
+
+  # test
+  li=LI._load_from_format(saved_model)
+
+  # results
+  assert isinstance(li, LI)
+  assert li.gen==bytearray(saved_model['gen'].encode())
+  assert li.item_size==saved_model['item_size']
+  assert li.max_bit_len==saved_model['max_bit_len']
+  assert li.min_elem_len==saved_model['min_elem_len']
+
+def test_load_from_format_roundtrip() -> None:
+  # values
+  input_len=5
+  item_size=3
+  min_list_size=1
+  max_list_size=50
+  schema=((min_list_size, max_list_size), item_size)
+  li1=LI(input_len, schema)
+
+  # test
+  saved=li1._save_format()
+  li2=LI._load_from_format(saved)
+
+  # results
+  assert isinstance(li2, LI)
+  assert li2 is not li1
+  assert li2.gen==li1.gen
+  assert li2._gen==li1._gen
+  assert li2.item_size==li1.item_size
+  assert li2.max_bit_len==li1.max_bit_len
+  assert li2.min_elem_len==li1.min_elem_len
 
 def test_error_list_size_too_small_on_create() -> None:
   # values
@@ -693,6 +719,119 @@ def test_error_offset_on_crossover(cp: tuple[int, int]) -> None:
 
   # results
   assert str(excinfo.value)=='Cross points\' offsets are not equal'
+
+mark__test_error_load_from_format=pytest.mark.parametrize(
+  'saved_model',
+  [
+    # invalid keys
+    {},
+    {'name': LI.__name__},
+    {'gen': '010'},
+    {
+      'name': LI.__name__,
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': 1,
+      'min_elem_len': 1,
+      'extra': 1,
+    },
+
+
+    # invalid name
+    {
+      'name': 'OtherClass',
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': 1,
+      'min_elem_len': 1,
+    },
+    {
+      'name': '_LI',
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': 1,
+      'min_elem_len': 1,
+    },
+    {
+      'name': 'LI',
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': 1,
+      'min_elem_len': 1,
+    },
+
+    # invalid data type
+    {
+      'name': LI.__name__,
+      'gen': 123,
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': '010',
+      'item_size': '1',
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': '10',
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': '010',
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': '1',
+    },
+
+
+    # invalid gen contents
+    {
+      'name': LI.__name__,
+      'gen': '',
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': '01201',
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': 'abc',
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+    {
+      'name': LI.__name__,
+      'gen': '10a01',
+      'item_size': 1,
+      'max_bit_len': 10,
+      'min_elem_len': 1,
+    },
+  ],
+)
+@mark__test_error_load_from_format
+def test_error_load_from_format(
+  saved_model: dict[str, object],
+) -> None:
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=LI._load_from_format(saved_model)
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {LI.__name__}'
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',
