@@ -32,28 +32,160 @@ ale tylko ta po prawej jest wielowarstwowym perceptronem (MLP):
 W MLP można wyróżnić trzy rodzaje warstw: wejściowe, ukryte i wyjściowe.
 Ponieważ wejściowa warstwa musi być wielkości danych wejściowych,
 a warstwa wyjściowa - danych wyjściowych,
-to~zmienne są tylko warstwy ukryte i to ich połączenia można optymalizować.
+to~zmienne są tylko warstwy ukryte i to je można optymalizować.
 
 \subsubsection*{Architektura sieci neuronowej}
-Architektura sieci, w rozumieniu niniejszego dokumentu,
-to: liczba warstw ukrytych, liczba neuronów w każdej z warstw,
-i funkcja aktywacji każdej z warstw.
+Architektura sieci neuronowej określa jej strukturę,
+czyli sposób organizacji neuronów oraz ich połączeń.
+Jest ona jednym z najważniejszych czynników wpływających
+na zdolność modelu do aproksymacji funkcji,
+szybkość uczenia oraz możliwość uogólniania
+wiedzy na nowe dane.
 
 \noindent\\
-Nie zalicza się natomiast do niej liczby synapsów,
-ponieważ warstwy są między sobą w pełni połą\-czone.
-Nie zalicza się również do architektury wag synapsów
-- są określane w procesie ucze\-nia~się.
-Z~tego powodu nie są częścią architektury,
-a procesu oceniania jej przystosowania.
+W literaturze pojęcie architektury sieci neuronowej
+może być rozumiane szeroko i obejmować między innymi
+liczbę warstw, sposób połączenia neuronów,
+rodzaje warstw, funkcje aktywacji,
+obecność mechanizmów regularyzacji lub innych elementów
+charakterystycznych dla określonych typów sieci.
+Dokładny zakres tego pojęcia zależy od rozważanego
+typu sieci neuronowej.
 
-\subsection{Podejście genetyczne do rozwijania architektury}
-Algorytmem, który zostanie wykorzystany do optymalizacji
-architektury sieci neuronowej, jest algorytm genetyczny.
-Opiera się on na mechanizmie zaobserwowanym w przyrodzie,
-zwanym ewolucją, gdzie poprzez krzyżowanie i mutację
-następuje powstawanie nowych osobników,
-które całościowo jako populacja są coraz lepiej przystosowane.
+\newpage\noindent
+W niniejszej pracy rozważane są wyłącznie
+wielowarstwowe perceptrony (MLP), w których
+każda warstwa jest w pełni połączona z warstwą następną.
+Oznacza to, że sposób połączenia neuronów jest
+z góry ustalony i nie podlega optymalizacji.
+Z tego powodu liczba połączeń nie stanowi
+niezależnego parametru architektury,
+lecz wynika bezpośrednio z liczby neuronów
+znajdujących się w sąsiednich warstwach.
+Zatem przez architekturę
+sieci neuronowej rozumiane będą wyłącznie:
+\begin{itemize}
+  \setlength{\parskip}{2pt}
+  \setlength{\itemsep}{2pt}
+  \item liczba warstw ukrytych,
+  \item liczba neuronów w każdej warstwie ukrytej,
+  \item funkcja aktywacji zastosowana w każdej warstwie.
+\end{itemize}
+
+\noindent\\
+Do architektury nie będą natomiast zaliczane
+wartości wag i biasów neuronów,
+ponieważ są one wyznaczane podczas procesu uczenia.
+Nie będą do niej również zaliczane parametry procesu
+uczenia, takie jak współczynnik uczenia,
+liczba epok czy zastosowany optymalizator.
+Parametry te wpływają na przebieg procesu uczenia,
+lecz nie zmieniają struktury modelu.
+
+\subsection{Algorytmy genetyczne}
+Algorytmy genetyczne należą do grupy
+algorytmów ewolucyjnych,
+czyli metod optymalizacyjnych inspirowanych
+mechanizmami ewolucji biologicznej.
+Ich działanie opiera się na założeniu,
+że wielokrotne tworzenie nowych rozwiązań
+poprzez krzyżowanie i mutację
+oraz preferowanie lepiej przystosowanych osobników
+prowadzi do stopniowej poprawy jakości rozwiązań
+w kolejnych pokoleniach.
+
+\noindent\\
+Podstawowym elementem algorytmu genetycznego
+jest populacja osobników reprezentujących
+potencjalne rozwiązania rozważanego problemu.
+Każdy osobnik posiada genotyp,
+czyli zakodowaną reprezentację rozwiązania.
+Na podstawie genotypu można wyznaczyć fenotyp,
+będący rzeczywistą postacią rozwiązania
+ocenianą przez algorytm.
+
+\noindent\\
+Jakość poszczególnych osobników jest określana
+za pomocą funkcji przystosowania
+(ang. \textit{fitness function}).
+Funkcja ta przypisuje każdemu osobnikowi wartość
+liczbową odzwierciedlającą stopień spełnienia
+założonych kryteriów optymalizacji.
+Im wyższa wartość funkcji przystosowania,
+tym większe prawdopodobieństwo przekazania cech
+danego osobnika kolejnym pokoleniom.
+
+\noindent\\
+Typowy przebieg algorytmu genetycznego rozpoczyna się
+od wygenerowania początkowej populacji osobników.
+Następnie dla każdego osobnika obliczana
+jest wartość funkcji przystosowania.
+Na podstawie uzyskanych wyników wybierani są rodzice,
+którzy uczestniczą w procesie reprodukcji.
+W jego trakcie stosowane są operatory krzyżowania
+oraz mutacji prowadzące do powstania nowych osobników.
+Utworzone potomstwo zastępuje część
+lub całość poprzedniej populacji,
+po czym proces oceny i reprodukcji jest powtarzany
+aż do spełnienia warunku zakończenia algorytmu.
+
+\subsubsection*{Selekcja}
+Selekcja jest procesem wyboru osobników,
+które zostaną wykorzystane
+do utworzenia kolejnego pokolenia.
+Jej celem jest zwiększenie udziału
+dobrze przystosowanych osobników
+w populacji przy jednoczesnym
+zachowaniu różnorodności genetycznej.
+W praktyce stosowanych jest wiele metod selekcji,
+między innymi selekcja ruletkowa,
+turniejowa oraz rankingowa.
+
+\subsubsection*{Krzyżowanie}
+Krzyżowanie jest operacją polegającą
+na łączeniu informacji genetycznej pochodzącej
+od dwóch lub większej liczby rodziców.
+Celem tego procesu jest utworzenie nowych osobników
+posiadających cechy odziedziczone po rodzicach.
+Sposób przeprowadzenia krzyżowania zależy
+od przyjętej reprezentacji genotypu
+i może obejmować między innymi krzyżowanie
+jedno- lub wielopunktowe, równomierne oraz operatory
+przeznaczone dla struktur o zmiennej długości.
+
+\subsubsection*{Mutacja}
+Mutacja polega na losowej modyfikacji genotypu osobnika.
+Jej zadaniem jest wprowadzanie nowej
+informacji genetycznej do populacji
+oraz przeciwdziałanie przedwczesnej zbieżności algorytmu
+do lokalnych ekstremów funkcji celu.
+W zależności od sposobu reprezentacji genotypu mutacja
+może polegać na zmianie wartości pojedynczych genów,
+zamianie elementów miejscami
+lub dodawaniu i usuwaniu fragmentów kodu genetycznego.
+
+\subsubsection*{Elitaryzm}
+W wielu implementacjach algorytmów genetycznych
+stosowany jest mechanizm elitaryzmu.
+Polega on na bezpośrednim przenoszeniu najlepszych
+osobników z bieżącego pokolenia do kolejnego
+bez poddawania ich operacjom krzyżowania i mutacji.
+Pozwala to uniknąć utraty najlepszych znalezionych
+rozwiązań i często przyspiesza proces optymalizacji.
+
+\subsubsection*{Zastosowanie do optymalizacji}
+Algorytmy genetyczne znajdują zastosowanie w problemach,
+dla których wyznaczenie rozwiązania optymalnego
+metodami analitycznymi jest trudne lub niemożliwe.
+Szczególnie dobrze sprawdzają się w zadaniach
+charakteryzujących się dużą przestrzenią poszukiwań,
+obecnością wielu lokalnych ekstremów
+oraz nieciągłościami funkcji celu.
+Z tego powodu są wykorzystywane między innymi
+do optymalizacji parametrów modeli uczenia maszynowego,
+projektowania układów technicznych,
+planowania harmonogramów oraz
+rozwiązywania problemów kombinatorycznych.
 
 \subsection{Przegląd rozwiązań}
 % https://arxiv.org/abs/2003.06505
