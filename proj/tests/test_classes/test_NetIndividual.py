@@ -495,7 +495,7 @@ def test_update_fenotype() -> None:
     assert (mili_t.fenotype!=oryg_fenotype2)==feno_corr2
     assert mili_t.fenotype==exp_feno2
 
-def test_save_format():
+def test_save_format() -> None:
   # values
   layers_len=('len', (2, 1, 4))
   num_seed=('num_seed', (2, 0, 3))
@@ -506,6 +506,7 @@ def test_save_format():
   )
   n_schema=3, 2, 7
   t_schema=2, 0, 3
+
   ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
   gen_g, gen_l, gen_t=ni.gen
 
@@ -514,12 +515,15 @@ def test_save_format():
 
   # results
   assert ret=={
-      "name": NI.__name__,
-      "gen": {
-          "g": gen_g._save_format(),
-          "l": gen_l._save_format(),
-          "t": gen_t._save_format(),
-      },
+    'name': NI.__name__,
+    'gen': {
+      'g': gen_g._save_format(),
+      'l': gen_l._save_format(),
+      't': gen_t._save_format(),
+    },
+    'layers_len_name': ni.layers_len_name,
+    'num_seed_name': ni.num_seed_name,
+    'type_seed_name': ni.type_seed_name,
   }
 
 def test_save_format_returns_serializable_data():
@@ -538,6 +542,76 @@ def test_save_format_returns_serializable_data():
 
   # test/results
   _=json.dumps(result)
+
+def test_load_from_format() -> None:
+  # values
+  layers_len=('len', (2, 1, 4))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  l_schema=3, 2, 7
+  t_schema=2, 0, 3
+  layers_len_name, (_, len_min, len_max)=layers_len
+  num_seed_name, _=num_seed
+  type_seed_name, _=type_seed
+  g_gen=_MII((layers_len, num_seed, type_seed, *g_schema))
+  list_len=g_gen.fenotype[layers_len_name]
+  l_gen=_MILI(list_len, ((len_min, len_max+1), l_schema))
+  t_gen=_MILI(list_len+1, ((len_min+1, len_max+2), t_schema))
+
+  saved={
+    'name': NI.__name__,
+    'gen': {
+      'g': g_gen._save_format(),
+      'l': l_gen._save_format(),
+      't': t_gen._save_format(),
+    },
+    'layers_len_name': layers_len_name,
+    'num_seed_name': num_seed_name,
+    'type_seed_name': type_seed_name,
+  }
+
+  # test
+  loaded=NI._load_from_format(saved)
+
+  # results
+  assert isinstance(loaded, NI)
+  assert loaded.gen[0].gen.gen==g_gen.gen.gen
+  assert loaded.gen[1].gen.gen==l_gen.gen.gen
+  assert loaded.gen[2].gen.gen==t_gen.gen.gen
+
+  assert loaded.layers_len_name==layers_len_name
+  assert loaded.num_seed_name==num_seed_name
+  assert loaded.type_seed_name==type_seed_name
+
+def test_load_from_format_roundtrip() -> None:
+  # values
+  layers_len=('len', (2, 1, 4))
+  num_seed=('num_seed', (2, 0, 3))
+  type_seed=('type_seed', (2, 0, 3))
+  g_schema=(
+    ('x', (2, 1, 4)),
+    ('y', (3, 0, 5)),
+  )
+  n_schema=3, 2, 7
+  t_schema=2, 0, 3
+
+  ni=NI(layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema))
+
+  # setup
+  saved=json.loads(json.dumps(ni._save_format()))
+
+  # test
+  loaded=NI._load_from_format(saved)
+
+  # results
+  assert isinstance(loaded, NI)
+  assert loaded.gen[0].gen.gen==ni.gen[0].gen.gen
+  assert loaded.gen[1].gen.gen==ni.gen[1].gen.gen
+  assert loaded.gen[2].gen.gen==ni.gen[2].gen.gen
 
 def test_error_name_collition_on_create1() -> None:
   # values
@@ -1402,6 +1476,143 @@ def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int,
 
   # results
   assert str(excinfo.value)=='Solution too short'
+
+mark__test_error_load_from_format=pytest.mark.parametrize(
+  'saved_model',
+  [
+
+    # missing / invalid keys
+    {},
+    {'name': NI.__name__},
+    {'gen': {}},
+    {'gen': {}, 'name': NI.__name__},
+    {'gen': {}, 'name': NI.__name__, 'extra': 123},
+
+    # wrong name
+    {'name': 'OtherClass', 'gen': {}, 'layers_len_name': 'a', 'num_seed_name': 'b', 'type_seed_name': 'c'},
+    {'name': '_NI', 'gen': {}, 'layers_len_name': 'a', 'num_seed_name': 'b', 'type_seed_name': 'c'},
+
+    # missing required scalar fields
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      # missing layers_len_name
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      'layers_len_name': 'len',
+      # missing num_seed_name
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      # missing type_seed_name
+    },
+
+    # wrong types (scalar fields)
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      'layers_len_name': 123,
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      'layers_len_name': 'len',
+      'num_seed_name': 123,
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}, 't': {}},
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 123,
+    },
+
+    # gen wrong type
+    {
+      'name': NI.__name__,
+      'gen': [],
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': 'not-a-dict',
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+
+    # gen missing keys
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 'l': {}},  # missing t
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'g': {}, 't': {}},  # missing l
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+    {
+      'name': NI.__name__,
+      'gen': {'l': {}, 't': {}},  # missing g
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+
+    # nested load failures (invalid inner gens)
+    {
+      'name': NI.__name__,
+      'gen': {
+        'g': {'invalid': True},
+        'l': {'invalid': True},
+        't': {'invalid': True},
+      },
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+
+    # partially invalid nested gens
+    {
+      'name': NI.__name__,
+      'gen': {
+        'g': {'invalid': True},
+        'l': _MILI(2, ((1, 4), (3, 1, 6)))._save_format(),
+        't': _MILI(2, ((1, 4), (3, 1, 6)))._save_format(),
+      },
+      'layers_len_name': 'len',
+      'num_seed_name': 'num',
+      'type_seed_name': 'type',
+    },
+  ],
+)
+@mark__test_error_load_from_format
+def test_error_load_from_format(saved_model: dict[str, object]) -> None:
+  # values ^
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=NI._load_from_format(saved_model)
+
+  assert str(excinfo.value)==f'Model saved is not {NI.__name__}'
 
 mark__test_error_illegal_argument_on_create=pytest.mark.parametrize(
   'func_args_kwargs',
