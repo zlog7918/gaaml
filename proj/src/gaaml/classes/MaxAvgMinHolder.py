@@ -5,25 +5,15 @@ def _f2f(f: float) -> float: return f
 _T=t.TypeVar('_T')
 _CTV=t.TypeVar('_CTV', bound=t.Callable)
 class MaxAvgMinHolder(t.Generic[_T]):
-  __list: list[_T]
-  __list_v: list[float]
   @property
   def arr(self) -> list[_T]:
     return self.__list[:self.__curr_len]
   @property
   def arr_v(self) -> list[float]:
     return self.__list_v[:self.__curr_len]
-  __v2f: t.Callable[[_T], float]
   @property
   def v2f(self) -> t.Callable[[_T], float]:
     return self.__v2f
-  __curr_len: int=0
-  __max_i: int=-1
-  __min_i: int=-1
-  __max_v: float=float('-inf')
-  __min_v: float=float('inf')
-  __zero_counter: int=0
-  __sum: float=0
   def __init__(
     self,
     num: int=10,
@@ -31,13 +21,21 @@ class MaxAvgMinHolder(t.Generic[_T]):
   ) -> None:
     super().__init__()
     self.__v2f=staticmethod(to_val)
-    self.__list=[0]*num # type: ignore
-    self.__list_v=[0]*num
+    self.__list=t.cast(list[_T], [0]*num)
+    self.__list_v=t.cast(list[float], [0]*num)
+
+    self.__curr_len=0
+    self.__max_i=-1
+    self.__min_i=-1
+    self.__max_v=float('-inf')
+    self.__min_v=float('inf')
+    self.__zero_counter=0
+    self.__sum=.0
 
   def __is_filled_and_expand(self) -> None:
     if self.__curr_len>=len(self.__list):
-      self.__list.extend([.0]*len(self.__list)) # type: ignore
-      self.__list_v.extend([.0]*len(self.__list))
+      self.__list.extend(t.cast(list[_T], [0]*len(self.__list)))
+      self.__list_v.extend([0]*len(self.__list_v))
 
   def append(self, item: _T) -> None:
     self.__is_filled_and_expand()
