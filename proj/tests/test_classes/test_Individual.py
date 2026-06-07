@@ -206,6 +206,59 @@ def test_error_save_to_exists(
   with pytest.raises(FileExistsError):
     i.save_to(path)
 
+mark__test_error_load_from_not_dict=pytest.mark.parametrize(
+  ('ind_class', 'saved_data'),
+  [
+    (BI_Test, []),
+    (BI_Test, 'text'),
+    (BI_Test, 123),
+    (BI_Test, None),
+    (I_Test, []),
+    (I_Test, 'text'),
+    (I_Test, 123),
+    (I_Test, None),
+  ],
+)
+@mark__test_error_load_from_not_dict
+def test_error_load_from_not_dict(
+  tmp_path: Path,
+  ind_class: type[BI_Test|I_Test],
+  saved_data: object,
+) -> None:
+  # values
+  path=tmp_path/'test_model.json'
+
+  # setup
+  with open(path, 'w') as saved_model:
+    json.dump(saved_data, saved_model)
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    _=ind_class.load_from(path)
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {ind_class.__name__}'
+
+mark__test_load_err_raiser=pytest.mark.parametrize(
+  'ind_class',
+  [
+    BI_Test,
+    I_Test,
+  ],
+)
+@mark__test_load_err_raiser
+def test_load_err_raiser(
+  ind_class: type[BI_Test|I_Test],
+) -> None:
+  # values ^
+
+  # test
+  with pytest.raises(ValueError) as excinfo:
+    ind_class._load_err_raiser()
+
+  # results
+  assert str(excinfo.value)==f'Model saved is not {ind_class.__name__}'
+
 mark__test_error_change_gen=pytest.mark.parametrize(
   ('ind_class', 'gen', 'gen_to_set'),
   [

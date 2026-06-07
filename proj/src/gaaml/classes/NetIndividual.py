@@ -177,9 +177,9 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[_MII, _MILI, _MILI
       'num_seed_name',
       'type_seed_name',
     }:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     if saved_model['name']!=cls.__name__:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
 
     if any(not isinstance(saved_model[k], type) for k, type in (
       ('gen', dict),
@@ -187,9 +187,9 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[_MII, _MILI, _MILI
       ('num_seed_name', str),
       ('type_seed_name', str),
     )):
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     if set(t.cast(dict, saved_model['gen']).keys())!={'g', 'l', 't'}:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     (
       gen,
       layers_len_name,
@@ -209,7 +209,7 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[_MII, _MILI, _MILI
       l_gen=_MILI._load_from_format(gen['l'])
       t_gen=_MILI._load_from_format(gen['t'])
     except Exception:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     return cls.__from_gen(
       (g_gen, l_gen, t_gen),
       layers_len_name=layers_len_name,

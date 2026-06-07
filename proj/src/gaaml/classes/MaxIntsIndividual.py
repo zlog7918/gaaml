@@ -87,14 +87,14 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, _GI]):
   @classmethod
   def _load_from_format(cls: type[_MII], saved_model: dict[str, object]) -> _MII:
     if {k for k in saved_model.keys()}!={'name', 'gen', 'schema'}:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     if saved_model['name']!=cls.__name__:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     if any(not isinstance(saved_model[k], _type) for k, _type in (
       ('gen', dict),
       ('schema', list),
     )):
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     exp_entry_type=(str, int, int, int)
     if any(
       (
@@ -105,16 +105,16 @@ class MaxIntsIndividual(Individual["MaxIntsIndividual", CPType, _GI]):
         for entry in
       t.cast(list, saved_model['schema'])
     ):
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     gen, schema=t.cast(tuple[dict[str, object], MaxIntsIndividual.GenSchemaType], (
       saved_model['gen'],
       tuple((entry[0], tuple(entry[1:])) for entry in t.cast(list[list[object]], saved_model['schema']))
     ))
     names=[name for name, _ in schema]
     if len(set(names))!=len(names):
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     try:
       gi=_GI._load_from_format(gen)
     except ValueError:
-      raise ValueError(f'Model saved is not {cls.__name__}')
+      cls._load_err_raiser()
     return cls.__from_gen(gi, schema)

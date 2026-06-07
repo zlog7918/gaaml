@@ -36,9 +36,15 @@ class _BaseIndividual(t.Generic[_BI, _CPType, _T, _RT], metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def _load_from_format(cls: type[_BI], saved_model: dict[str, object]) -> _BI: ...
   @classmethod
+  def _load_err_raiser(cls: type[_BI]) -> t.Never:
+    raise ValueError(f'Model saved is not {cls.__name__}')
+  @classmethod
   def load_from(cls: type[_BI], path: Path) -> _BI:
     with open(path, 'r') as saved_model:
-      return cls._load_from_format(json.load(saved_model))
+      saved_data=json.load(saved_model)
+    if not isinstance(saved_data, dict):
+      cls._load_err_raiser()
+    return cls._load_from_format(saved_data)
 
 
 _I=t.TypeVar('_I', bound="Individual")
