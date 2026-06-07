@@ -9,11 +9,11 @@ from gaaml.classes.Individual import _BaseIndividual as _BI
 # from gaaml.classes.GenIndividual import GenIndividual as _GI
 
 class DummyInd(_BI["DummyInd", int, tuple[int, float], float]):
+  _DI: t.TypeAlias="DummyInd"
   def __init__(self, gen_int: int, gen_float: float) -> None:
     super().__init__((gen_int, gen_float), lambda gen: gen[1])
   def mutate(self) -> None: ...
 
-  _DI=t.TypeVar('_DI', bound="DummyInd")
   @classmethod
   def get_cp(cls: type[_DI], a: _DI, b: _DI) -> int:
     return 0
@@ -25,8 +25,16 @@ class DummyInd(_BI["DummyInd", int, tuple[int, float], float]):
   def _save_format(self) -> dict[str, object]:
     return {
       'name': self.__class__.__name__,
-      'gen': self._gen,
+      'gen': list(self._gen),
     }
+  @classmethod
+  def __from_gen(cls: type[_DI], gen: tuple[int, float]) -> _DI:
+    i=cls.__new__(cls)
+    super(cls, i).__init__(gen, lambda gen: gen[1])
+    return i
+  @classmethod
+  def _load_from_format(cls: type[_DI], saved_model: dict[str, object]) -> _DI:
+    return cls.__from_gen(tuple[int, float](t.cast(list, saved_model['gen'])))
 
 class DummyPop(_P[DummyInd]):
   gen_num: int=0
@@ -67,12 +75,12 @@ def bar_asserts(bar: tqdm, n: int, *, close: bool=True) -> None:
     bar.close()
 
 def get_priv_pop(
-  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  gens: G[DummyInd],
 ) -> DummyPop:
   pop=gens._Generations__pop # type: ignore
   return pop
 def num_generations_asserts(
-  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  gens: G[DummyInd],
   *,
   curr_generation: int,
 ) -> None:
@@ -81,7 +89,7 @@ def num_generations_asserts(
   assert gens.curr_generations==curr_generation
 
 def get_privates(
-  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  gens: G[DummyInd],
 ) -> tuple[
   list[float],
   list[float],
@@ -109,7 +117,7 @@ def get_privates(
   )
 
 def generations_asserts(
-  gens: G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  gens: G[DummyInd],
   *,
   curr_generation: int,
   expected_max_avg_min: tuple[
@@ -194,7 +202,7 @@ def create_gens(
   number_of_generations: int,
   pop_num: int,
 ) -> tuple[
-  G[[int, tqdm, t.Callable[[], DummyInd]], DummyInd],
+  G[DummyInd],
   tqdm,
   tqdm,
 ]:

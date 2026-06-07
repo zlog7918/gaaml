@@ -3,13 +3,8 @@ from tqdm.auto import tqdm
 from . import _utils as util
 from .Population import Population
 
-_P=t.ParamSpec('_P')
-class Generations(t.Generic[_P, util.IndividualType]):
-  __max_sol: util.IndividualType|None=None
-  __min_sol: util.IndividualType|None=None
-  __max_of_max=-1.
-  __min_of_min=float('inf')
-  __curr_generations=0
+class Generations(t.Generic[util.IndividualType]):
+  _P=t.ParamSpec('_P')
   def __init__(
     self,
     max_num_gen: int,
@@ -27,6 +22,12 @@ class Generations(t.Generic[_P, util.IndividualType]):
     self.__maxs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__avgs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__mins: list[float]=[.0]*(self.__max_num_gen+1)
+
+    self.__max_sol: util.IndividualType|None=None
+    self.__min_sol: util.IndividualType|None=None
+    self.__max_of_max=-1.
+    self.__min_of_min=float('inf')
+    self.__curr_generations=0
     self.__arrange_min_max()
 
   def go_through_generations(self, num_gen: int|None=None) -> None:
