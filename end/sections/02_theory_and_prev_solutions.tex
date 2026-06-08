@@ -1,38 +1,184 @@
 \section{Podstawy teoretyczne i przegląd rozwiązań}
 \subsection{Sieć neuronowa}
-Sieć neuronowa to model matematyczny inspirowany działaniem mózgu.
-Składa się z sztucznych neuronów (dalej nazywanych neuronami)
-oraz synapsów (w terminologi angielskiej występują one pod nazwą \textit{edges}).
+Sieci neuronowe stanowią grupę modeli obliczeniowych
+inspirowanych sposobem funkcjonowania
+biologicznego układu nerwowego.
+Ich głównym celem jest aproksymacja złożonych
+zależności pomiędzy danymi wejściowymi
+i wyjściowymi na podstawie przykładów
+dostarczonych podczas procesu uczenia.
+Dzięki temu może być wykorzystywana do
+rozwiązywania problemów klasyfikacji,
+regresji, rozpoznawania obrazów,
+przetwarzania języka naturalnego
+oraz wielu innych zagadnień związanych
+z uczeniem maszynowym.
 
 \noindent\\
-Obecnie sieci neuronowe są mocno rozwijanym działem informatyki.
-Z tego powodu powstało wiele typów sieci,
-które można uogólnić do kategorii jednokierunkowej sieci neuronowej
-(ang. \textit{feedforward neural networks})
-oraz rekurencyjnej sieci neuronowej (ang. \textit{recurrent neural networks}).
-W angielskiej literaturze można spotkać jeszcze następujące typy sieci:
-recursive neural network, feedback neural network.
-W niniejszym dokumencie sieci neuronowe odnoszą się
-do jednokierunkowej sieci neuronowej (FNN),
-a dokładniej do jej szczególnego przypadku nazwanego
-wielowarstwowym perceptronem (ang. \textit{multilayer perceptron}).
-Jego cechą charakterystyczną jest brak synapsów między warstwami,
-które nie są "obok siebie".
-Oznacza to, że obie poniższe sieci są jednokierunkowe,
-ale tylko ta po prawej jest wielowarstwowym perceptronem (MLP):
+Podstawowym elementem sieci
+neuronowej jest sztuczny neuron.
+Otrzymuje on zestaw wartości wejściowych,
+które są mnożone przez odpowiadające im wagi,
+a następnie sumowane.
+Do otrzymanej sumy dodawany
+jest wyraz wolny (ang. \textit{bias}),
+po czym wynik przekazywany jest do funkcji aktywacji.
+Funkcja ta wprowadza nieliniowość do modelu,
+dzięki czemu sieć neuronowa
+może odwzorowywać zależności,
+których nie da się opisać
+za pomocą prostych modeli liniowych.
 
-\noindent
+\noindent\\
+Działanie pojedynczego neuronu można
+opisać następującym wzorem:
+$$
+  y = f\left(\sum_{i=1}^{n} w_i x_i + b\right),
+$$
+gdzie:
+\begin{itemize}
+  \item $x_i$ - wartości wejściowe neuronu,
+  \item $w_i$ - wagi połączeń,
+  \item $b$ - wyraz wolny,
+  \item $f\left(\dots\right)$ - funkcja aktywacji,
+  \item $y$ - wartość wyjściowa neuronu.
+\end{itemize}
+
+\noindent\\
+Połączenia pomiędzy neuronami realizowane
+są za pomocą synapsów (ang. \textit{edges}).
+Każdy synaps posiada przypisaną wagę
+określającą siłę wpływu jednego neuronu na drugi.
+Proces uczenia sieci neuronowej polega
+na modyfikacji tych wag w taki sposób,
+aby minimalizować błąd popełniany
+podczas wykonywania określonego zadania.
+
+\noindent\\
+Obecnie sieci neuronowe są intensywnie
+rozwijanym działem informatyki.
+Z tego powodu powstało wiele typów architektur,
+z których najczęściej wykorzystane
+można podzielić na jednokierunkowe
+(ang. \textit{feedforward neural networks})
+oraz rekurencyjne
+(ang. \textit{recurrent neural networks}).
+Do pierwszej grupy należą między innymi:
+perceptrony wielowarstwowe
+(ang. \textit{multilayer perceptrons}, MLP),
+konwolucyjne sieci neuronowe
+(ang. \textit{convolutional neural networks}, CNN)
+oraz transformatory (ang. \textit{transformers}).
+Do drugiej grupy należą sieci RNN, LSTM i GRU,
+wykorzystywane przede wszystkim
+do przetwarzania danych sekwencyjnych.
+
+\noindent\\
+W jednokierunkowych sieciach neuronowych
+informacje przepływają wyłącznie
+od warstwy wejściowej do warstwy wyjściowej,
+bez występowania cykli oraz sprzężeń zwrotnych.
+Zatem wynik działania
+każdego neuronu zależy jedynie
+od neuronów znajdujących się
+w poprzednich warstwach.
+
+\noindent\\
+Perceptron wielowarstwowy stanowi
+szczególną klasę sieci jednokierunkowych,
+w której połączenia występują wyłącznie
+pomiędzy sąsiadującymi warstwami.
+W rezultacie każda warstwa może
+wykorzystywać informacje generowane
+jedynie przez warstwę bezpośrednio ją poprzedzającą.
+Eliminuje to możliwość występowania
+bezpośrednich połączeń pomiędzy warstwami
+oddalonymi od siebie o więcej niż jeden poziom.
+Oznacza to, że obie poniższe sieci są jednokierunkowe,
+jednak tylko ta po prawej spełnia
+definicję wielowarstwowego perceptronu:
 \begin{center}
   \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn.png}
   \hspace{2cm}
   \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn_mlp.png}
 \end{center}
 
+\noindent\\
+W architekturze MLP można wyróżnić
+trzy podstawowe rodzaje warstw:
+\begin{itemize}
+  \item \textbf{warstwę wejściową} -
+    odpowiedzialną za przyjęcie danych wejściowych,
+  \item \textbf{warstwy ukryte} -
+    odpowiedzialne za przetwarzanie informacji
+    i ekstrakcję cech,
+  \item \textbf{warstwę wyjściową} -
+    generującą końcowy wynik działania sieci.
+\end{itemize}
+
 \noindent
-W MLP można wyróżnić trzy rodzaje warstw: wejściowe, ukryte i wyjściowe.
-Ponieważ wejściowa warstwa musi być wielkości danych wejściowych,
-a warstwa wyjściowa - danych wyjściowych,
-to~zmienne są tylko warstwy ukryte i to je można optymalizować.
+Liczba neuronów w warstwie wejściowej
+jest bezpośrednio związana
+z liczbą cech opisujących dane wejściowe.
+Analogicznie liczba neuronów warstwy wyjściowej
+zależy od postaci oczekiwanego wyniku.
+Przykładowo w zadaniu klasyfikacji
+liczba neuronów wyjściowych
+często odpowiada liczbie klas,
+natomiast w zadaniach regresyjnych może
+wynosić jeden lub więcej neuronów,
+w zależności od liczby przewidywanych wartości.
+
+\noindent\\
+Największy wpływ na możliwości sieci neuronowej
+do modelowania złożonych zależności mają warstwy ukryte.
+W przeciwieństwie do warstw wejściowej i wyjściowej,
+których rozmiar jest w znacznym stopniu determinowany
+przez specyfikę rozważanego problemu,
+architektura warstw ukrytych może być kształtowana
+w szerokim zakresie. Z tego względu ich konfiguracja
+stanowi jeden z najważniejszych obszarów optymalizacji
+podczas projektowania sieci neuronowej.
+
+\noindent\\
+Do najważniejszych parametrów sieci
+z perspektywy procesu uczenia należą:
+\begin{itemize}
+  \item liczba warstw ukrytych,
+  \item liczba neuronów w poszczególnych warstwach,
+  \item topologia połączeń pomiędzy neuronami,
+  \item sposób inicjalizacji wag,
+  \item parametry procesu uczenia.
+\end{itemize}
+
+\noindent
+Dobór powyższych parametrów ma bezpośredni wpływ
+na zdolność sieci do generalizacji oraz osiągane wyniki.
+Zbyt mała sieć może nie być
+w stanie odwzorować zależności występujących w danych,
+co prowadzi do zjawiska niedouczenia
+(ang. \textit{underfitting}).
+Z kolei zbyt rozbudowana architektura
+może prowadzić do przeuczenia
+(ang. \textit{overfitting}),
+polegającego na nadmiernym dopasowaniu
+modelu do danych treningowych
+i pogorszeniu wyników
+dla danych wcześniej niewidzianych.
+
+\noindent\\
+Problem doboru odpowiedniej architektury
+jest jednym z najważniejszych zagadnień
+podczas projektowania sieci neuronowych.
+Liczba możliwych konfiguracji rośnie
+bardzo szybko wraz ze wzrostem liczby parametrów,
+co utrudnia ręczne znalezienie optymalnego rozwiązania.
+Z tego powodu coraz częściej wykorzystuje się
+metody automatycznej optymalizacji.
+Pozwalają one na przeszukiwanie
+przestrzeni możliwych architektur
+oraz wybór konfiguracji osiągających
+najlepsze wyniki dla rozważanego problemu.
 
 \subsubsection*{Architektura sieci neuronowej}
 Architektura sieci neuronowej określa jej strukturę,
@@ -65,8 +211,8 @@ znajdujących się w sąsiednich warstwach.
 Zatem przez architekturę
 sieci neuronowej rozumiane będą wyłącznie:
 \begin{itemize}
-  \setlength{\parskip}{2pt}
-  \setlength{\itemsep}{2pt}
+  % \setlength{\parskip}{2pt}
+  % \setlength{\itemsep}{2pt}
   \item liczba warstw ukrytych,
   \item liczba neuronów w każdej warstwie ukrytej,
   \item funkcja aktywacji zastosowana w każdej warstwie.
