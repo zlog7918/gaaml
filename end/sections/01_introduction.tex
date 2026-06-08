@@ -15,14 +15,14 @@ które mogą wpływać znacząco na końcowy wygląd sieci po uczeniu.
 
 \noindent\\
 Potrzeba ograniczenia ręcznego zmieniania parametrów i testowania,
-kieruje do automa\-tyzacji tego procesu.
+kieruje do automatyzacji tego procesu.
 Do tego zostanie wykorzystany algorytm genetyczny,
 ponieważ jest dobrze przystosowany
 do przeszukiwania dużych przestrzeni rozwiązań.
 
 \subsection*{Cel}
 Celem pracy jest opracowanie biblioteki w języku Python,
-która umożliwi automatyczne optyma\-lizowanie sieci neuronowej
+która umożliwi automatyczne optymalizowanie sieci neuronowej
 z pomocą algorytmu genetycznemu pod względem architektury sieci
 i jej parametrów uczenia na podstawie danych treningowych
 i walidacyjnych, i testowych.
@@ -39,20 +39,18 @@ i walidacyjnych, i testowych.
 \subsection*{Cele szczegółowe}
 Pierwszym kamieniem milowym jest opracowanie struktury
 kodu genetycznego umożliwiającego generowanie z nich,
-w spójny sposób, architektury sieci neuronowej oraz para\-metrów uczenia.
+w spójny sposób, architektury sieci neuronowej
+oraz parametrów uczenia.
 
 \noindent\\
-Kolejnym jest zawarcie w kodzie nauczania sieci neuronowych
-wraz z zatrzymaniem tego procesu na jej najbardziej optymalnym poziomien nauczania.
+Kolejnym jest zawarcie w kodzie nauczania
+sieci neuronowych, które będzie względnie niezależne
+od wybranego przez użytkownika platformy
+(tensorflow, pytorch).
 
 \noindent\\
-Ostatnim krokiem jest raportowanie wszystkich prób do pliku wraz
-z ich nauczonymi wagami.
-% Raportowanie wszystkich prób do pliku wraz
-% z ich nauczonymi wagami jest następnym krokiem.
-
-% \noindent\\
-% Ostatnim z kamieni milowych będzie 
+Ostatnim krokiem jest raportowanie wszystkich
+prób do pliku wraz z ich nauczonymi wagami.
 
 \subsection*{Zakres}
 Program powininen optymalizować architekturę sieci neuronowej wraz
@@ -67,9 +65,9 @@ wskaźnik uczenia się oraz liczbę epok.
 
 \noindent\\
 Optymalizacja powinna się odbywać dla konkretnych danych dostarczonych
-przez uży\-tkownika, za pomocą algorytmu genetycznego.
+przez użytkownika, za pomocą algorytmu genetycznego.
 Implementacja algorytmu genetycznego będzie obejmowała:
-osobni\-ków, selekcję, krzyżowanie i mutację.
+osobników, selekcję, krzyżowanie i mutację.
 
 \noindent\\
 Każdy osobnik będzie przechowywał jednoznaczny kod genetyczny, to znaczy,
@@ -95,7 +93,7 @@ i/lub mniejsza ilość połączeń między neuronami (czyli gdy przestaną być 
 \noindent\\
 Uczenie sieci neuronowej jest operacją zużywającą
 dużą ilość mocy obliczeniowej.
-Dodatkowo ponie\-waż proces uczenia sieci zależy
+Dodatkowo ponieważ proces uczenia sieci zależy
 od pierwotnie wylosowanych wag, to dla uzyskania większej pewności
 co do uzyskanego wyniku należy proces uczenia wykonać kilkakrotnie.
 Powoduje to, że działanie programu jest znacząco uzależnione
@@ -112,7 +110,6 @@ o jakości porównywalnej lub lepszej niż rozwiązania dobierane manualnie
 przy ograniczeniu nakładu pracy użytkownika.
 
 \subsection*{Struktura pracy}
-% \subsection*{Skrócone omówienia}
 Tu jeszcze nic nie ma,
 ponieważ będą na bieżąco dodawane krótkie opisy do danego
 rozdziału po jego skończeniu.
