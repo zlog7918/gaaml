@@ -1,16 +1,11 @@
 \section{Projekt rozwiązania i implementacja}
-
 \subsection{Kod genetyczny osobnika}
 W niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
 architekturę sieci i jej parametry uczenia.
 Kod genetyczny będzie składał się z trzech części:
 \begin{itemize}
-  \setlength{\itemsep}{0pt}
-  \setlength{\parskip}{0pt}
   \item Część binarna:
     \begin{itemize}
-      \setlength{\itemsep}{0pt}
-      \setlength{\parskip}{0pt}
       \item liczba warstw ukrytych: 5 bitów $\left[1, 32\right]$
       \item ziarno generatora liczby neuronów: 10 bitów $\left[0, 1023\right]$
       \item ziarno generatora typów aktywacji: 10 bitów $\left[0, 1023\right]$
@@ -27,8 +22,6 @@ Kod genetyczny będzie składał się z trzech części:
     minimalne i maksymalne długości list są zależne
     od minimalnych i maksymalnych wartości liczby warstw ukrytych:
     \begin{itemize}
-      \setlength{\itemsep}{0pt}
-      \setlength{\parskip}{0pt}
       \item lista ilości neuronów w warstwach ukrytych -\\
         \hspace*{1em}liczba elementów - taka sama:
           $\left[1, 128\right]$,\\
