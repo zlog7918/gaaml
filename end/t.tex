@@ -1,14 +1,18 @@
 \documentclass[a4paper, 12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-% \usepackage[polish,english]{babel}
 \usepackage[margin=1.5cm]{geometry}
 % \usepackage[margin=2.5cm]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{minted}
 \usepackage{natbib}
+\usepackage{microtype}
 
+\usepackage[polish,english]{babel}
+\selectlanguage{polish}
+\usepackage{enumitem}
+\setlist[itemize]{nosep}
 \usepackage{lipsum}
 \setlipsum{auto-lang=false}
 
@@ -60,10 +64,12 @@
 
   % EN
   \vspace{1cm}
+  \begin{otherlanguage}{english}
   \noindent
   This document shows reasoning in using genetic algorithm
   for neural network optimalization purposes, their practical usage
   and compartion to manualy chosen neural networks.
+  \end{otherlanguage}
 \end{abstract}
 \vfil
 \newpage
