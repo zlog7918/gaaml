@@ -6,29 +6,28 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{minted}
-\usepackage{natbib}
+\usepackage{graphicx}
 \usepackage[polish,english]{babel}
-\usepackage{microtype}
-% \pretolerance=20
 
 \usepackage{enumitem}
 \setlist[itemize]{nosep}
 \usepackage{lipsum}
 \setlipsum{auto-lang=false}
+\usepackage{microtype}
+% \pretolerance=20
+
+\usepackage{csquotes}
+\usepackage[
+  backend=biber,
+  style=ieee,
+  % giveninits=true,
+  autolang=other,
+  language=auto,
+]{biblatex}
+\addbibresource{references.bib}
+\newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
 
 \usepackage{fancyhdr}
-\usepackage{graphicx}
-\usepackage[
-  % colorlinks=true,
-  % allcolors=black,
-  allbordercolors={0 0 0},
-  pdfborderstyle={/S/U/W 1},
-]{hyperref}
-
-\newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
-\renewcommand{\bibsection}{\section*{Bibliografia}\addcontentsline{toc}{section}{Bibliografia}}
-\bibliographystyle{plain}
-
 \pagestyle{fancy}
 \setlength{\headheight}{14.5pt}
 % \setlength{\footheight}{14.5pt}
@@ -38,6 +37,13 @@
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{1pt}
 % \renewcommand{\footrulewidth}{0.1pt}
+
+\usepackage[
+  % colorlinks=true,
+  % allcolors=black,
+  allbordercolors={0 0 0},
+  pdfborderstyle={/S/U/W 1},
+]{hyperref}
 
 \title{Praca inżynierska "Optymalizacja sieci neuronowej za pomocą algorytmów ewolucyjnych"}
 \author{Szymon Wasążnik\\325522}
@@ -88,5 +94,9 @@
 
 \input{sections/07_summary.tex}
 
-\bibliography{references}
+% \nocite{*}
+\printbibliography[
+heading=bibintoc,
+title={Bibliografia}
+]
 \end{document}

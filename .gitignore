@@ -26,10 +26,12 @@ __pypackages__/
 *.aux
 *.log
 *.bbl
+*.bcf
 *.blg
 *.toc
 *.out
 *.pdf
+*.run.xml
 *.synctex.gz
 *.synctex(busy)
 _minted-*/
