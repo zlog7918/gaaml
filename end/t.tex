@@ -7,11 +7,10 @@
 \usepackage{amssymb}
 \usepackage{minted}
 \usepackage{natbib}
+\usepackage[polish,english]{babel}
 \usepackage{microtype}
 % \pretolerance=20
 
-\usepackage[polish,english]{babel}
-\selectlanguage{polish}
 \usepackage{enumitem}
 \setlist[itemize]{nosep}
 \usepackage{lipsum}
@@ -26,8 +25,6 @@
   pdfborderstyle={/S/U/W 1},
 ]{hyperref}
 
-\renewcommand{\abstractname}{Streszczenie}
-\renewcommand{\contentsname}{Spis treści}
 \newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
 \renewcommand{\bibsection}{\section*{Bibliografia}\addcontentsline{toc}{section}{Bibliografia}}
 \bibliographystyle{plain}
@@ -49,7 +46,7 @@
 \linespread{1.3}
 
 \begin{document}
-% \selectlanguage{polish}
+\selectlanguage{polish}
 \maketitle
 \setcounter{page}{-1}
 \thispagestyle{empty}
