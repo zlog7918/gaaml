@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ ! -f '/usr/bin/drawio' ]; then
+  printf '%s\n' 'err: no drawio program' >&1
+fi
+name="$1"
+if [ -f "$name" ]; then
+  rm -f "$name.pdf"
+  /usr/bin/drawio --crop -x -o "$name.pdf" "$name"
+fi
