@@ -12,7 +12,9 @@ rozwiązywania problemów klasyfikacji,
 regresji, rozpoznawania obrazów,
 przetwarzania języka naturalnego
 oraz wielu innych zagadnień związanych
-z uczeniem maszynowym.
+z uczeniem maszynowym%
+\sscite{Goodfellow-et-al-2016}%
+\sscite{haykin2009neural}.
 
 \noindent\\
 Podstawowym elementem sieci
@@ -27,11 +29,13 @@ Funkcja ta wprowadza nieliniowość do modelu,
 dzięki czemu sieć neuronowa
 może odwzorowywać zależności,
 których nie da się opisać
-za pomocą prostych modeli liniowych.
+za pomocą prostych modeli liniowych%
+\sscite{haykin2009neural}.
 
 \noindent\\
 Działanie pojedynczego neuronu można
-opisać następującym wzorem:
+opisać następującym wzorem%
+\sscite{haykin2009neural}:
 $$
   y = f\left(\sum_{i=1}^{n} w_i x_i + b\right),
 $$
@@ -52,7 +56,8 @@ określającą siłę wpływu jednego neuronu na drugi.
 Proces uczenia sieci neuronowej polega
 na modyfikacji tych wag w taki sposób,
 aby minimalizować błąd popełniany
-podczas wykonywania określonego zadania.
+podczas wykonywania określonego zadania%
+\sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
 Obecnie sieci neuronowe są intensywnie
@@ -71,7 +76,9 @@ konwolucyjne sieci neuronowe
 oraz transformatory (ang. \textit{transformers}).
 Do drugiej grupy należą sieci RNN, LSTM i GRU,
 wykorzystywane przede wszystkim
-do przetwarzania danych sekwencyjnych.
+do przetwarzania danych sekwencyjnych%
+\sscite{Goodfellow-et-al-2016}%
+\sscite{rutkowski2009ai}.
 
 \noindent\\
 W jednokierunkowych sieciach neuronowych
@@ -81,7 +88,8 @@ bez występowania cykli oraz sprzężeń zwrotnych.
 Zatem wynik działania
 każdego neuronu zależy jedynie
 od neuronów znajdujących się
-w poprzednich warstwach.
+w poprzednich warstwach%
+\sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
 Perceptron wielowarstwowy stanowi
@@ -96,7 +104,8 @@ bezpośrednich połączeń pomiędzy warstwami
 oddalonymi od siebie o więcej niż jeden poziom.
 Oznacza to, że obie poniższe sieci są jednokierunkowe,
 jednak tylko ta po prawej spełnia
-definicję wielowarstwowego perceptronu:
+definicję wielowarstwowego perceptronu%
+\sscite{haykin2009neural}:
 \begin{center}
   \immediate\write18{sh ./drawio_to_pdf sections/02_img/fnn/fnn.drawio}
   \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn/fnn.drawio.pdf}
@@ -107,7 +116,8 @@ definicję wielowarstwowego perceptronu:
 
 \noindent\\
 W architekturze MLP można wyróżnić
-trzy podstawowe rodzaje warstw:
+trzy podstawowe rodzaje warstw%
+\sscite{haykin2009neural}:
 \begin{itemize}
   \item \textbf{warstwę wejściową} -
     odpowiedzialną za przyjęcie danych wejściowych,
@@ -166,7 +176,8 @@ może prowadzić do przeuczenia
 polegającego na nadmiernym dopasowaniu
 modelu do danych treningowych
 i pogorszeniu wyników
-dla danych wcześniej niewidzianych.
+dla danych wcześniej niewidzianych%
+\sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
 Problem doboru odpowiedniej architektury
@@ -180,7 +191,9 @@ metody automatycznej optymalizacji.
 Pozwalają one na przeszukiwanie
 przestrzeni możliwych architektur
 oraz wybór konfiguracji osiągających
-najlepsze wyniki dla rozważanego problemu.
+najlepsze wyniki dla rozważanego problemu%
+\sscite{yao1999evolving}%
+\sscite{domashova2021optimal}.
 
 \subsubsection*{Architektura sieci neuronowej}
 Architektura sieci neuronowej określa jej strukturę,
@@ -188,7 +201,8 @@ czyli sposób organizacji neuronów oraz ich połączeń.
 Jest ona jednym z najważniejszych czynników wpływających
 na zdolność modelu do aproksymacji funkcji,
 szybkość uczenia oraz możliwość uogólniania
-wiedzy na nowe dane.
+wiedzy na nowe dane%
+\sscite{haykin2009neural}.
 
 \noindent\\
 W literaturze pojęcie architektury sieci neuronowej
@@ -198,7 +212,9 @@ rodzaje warstw, funkcje aktywacji,
 obecność mechanizmów regularyzacji lub innych elementów
 charakterystycznych dla określonych typów sieci.
 Dokładny zakres tego pojęcia zależy od rozważanego
-typu sieci neuronowej.
+typu sieci neuronowej%
+\sscite{Goodfellow-et-al-2016}%
+\sscite{yao1999evolving}.
 
 \noindent\\
 W niniejszej pracy rozważane są wyłącznie
@@ -240,7 +256,9 @@ Ich działanie opiera się na założeniu,
 poprzez krzyżowanie i mutację
 oraz preferowanie lepiej przystosowanych osobników
 prowadzi do stopniowej poprawy jakości rozwiązań
-w kolejnych pokoleniach.
+w kolejnych pokoleniach%
+\sscite{goldberg1989genetic}%
+\sscite{eiben2015evolutionary}.
 
 \noindent\\
 Podstawowym elementem algorytmu genetycznego
@@ -250,7 +268,8 @@ Każdy osobnik posiada genotyp,
 czyli zakodowaną reprezentację rozwiązania.
 Na podstawie genotypu można wyznaczyć fenotyp,
 będący rzeczywistą postacią rozwiązania
-ocenianą przez algorytm.
+ocenianą przez algorytm%
+\sscite{goldberg1989genetic}.
 
 \noindent\\
 Jakość poszczególnych osobników jest określana
@@ -261,7 +280,8 @@ liczbową odzwierciedlającą stopień spełnienia
 założonych kryteriów optymalizacji.
 Im wyższa wartość funkcji przystosowania,
 tym większe prawdopodobieństwo przekazania cech
-danego osobnika kolejnym pokoleniom.
+danego osobnika kolejnym pokoleniom%
+\sscite{goldberg1989genetic}.
 
 \noindent\\
 Typowy przebieg algorytmu genetycznego rozpoczyna się
@@ -275,7 +295,8 @@ oraz mutacji prowadzące do powstania nowych osobników.
 Utworzone potomstwo zastępuje część
 lub całość poprzedniej populacji,
 po czym proces oceny i reprodukcji jest powtarzany
-aż do spełnienia warunku zakończenia algorytmu.
+aż do spełnienia warunku zakończenia algorytmu%
+\sscite{eiben2015evolutionary}.
 
 \subsubsection*{Selekcja}
 Selekcja jest procesem wyboru osobników,
@@ -287,7 +308,8 @@ w populacji przy jednoczesnym
 zachowaniu różnorodności genetycznej.
 W praktyce stosowanych jest wiele metod selekcji,
 między innymi selekcja ruletkowa,
-turniejowa oraz rankingowa.
+turniejowa oraz rankingowa%
+\sscite{goldberg1989genetic}.
 
 \subsubsection*{Krzyżowanie}
 Krzyżowanie jest operacją polegającą
@@ -299,7 +321,10 @@ Sposób przeprowadzenia krzyżowania zależy
 od przyjętej reprezentacji genotypu
 i może obejmować między innymi krzyżowanie
 jedno- lub wielopunktowe, równomierne oraz operatory
-przeznaczone dla struktur o zmiennej długości.
+przeznaczone dla struktur o zmiennej długości%
+\sscite{goldberg1989genetic}%
+\sscite{stanley2002neat}%
+\sscite{synapsing_varlen_crossover}.
 
 \subsubsection*{Mutacja}
 Mutacja polega na losowej modyfikacji genotypu osobnika.
@@ -310,7 +335,8 @@ do lokalnych ekstremów funkcji celu.
 W zależności od sposobu reprezentacji genotypu mutacja
 może polegać na zmianie wartości pojedynczych genów,
 zamianie elementów miejscami
-lub dodawaniu i usuwaniu fragmentów kodu genetycznego.
+lub dodawaniu i usuwaniu fragmentów kodu genetycznego%
+\sscite{goldberg1989genetic}.
 
 \subsubsection*{Elitaryzm}
 W wielu implementacjach algorytmów genetycznych
@@ -319,7 +345,8 @@ Polega on na bezpośrednim przenoszeniu najlepszych
 osobników z bieżącego pokolenia do kolejnego
 bez poddawania ich operacjom krzyżowania i mutacji.
 Pozwala to uniknąć utraty najlepszych znalezionych
-rozwiązań i często przyspiesza proces optymalizacji.
+rozwiązań i często przyspiesza proces optymalizacji%
+\sscite{eiben2015evolutionary}.
 
 \subsubsection*{Zastosowanie do optymalizacji}
 Algorytmy genetyczne znajdują zastosowanie w problemach,
@@ -333,7 +360,8 @@ Z tego powodu są wykorzystywane między innymi
 do optymalizacji parametrów modeli uczenia maszynowego,
 projektowania układów technicznych,
 planowania harmonogramów oraz
-rozwiązywania problemów kombinatorycznych.
+rozwiązywania problemów kombinatorycznych%
+\sscite{eiben2015evolutionary}.
 
 \subsection{Przegląd rozwiązań}
 % https://arxiv.org/abs/2003.06505
