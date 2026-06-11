@@ -363,6 +363,138 @@ planowania harmonogramów oraz
 rozwiązywania problemów kombinatorycznych%
 \sscite{eiben2015evolutionary}.
 
+\subsection{Ewolucyjna optymalizacja sieci neuronowych}
+Dobór architektury sieci neuronowej stanowi
+jedno z najważniejszych zagadnień
+podczas projektowania modeli uczenia maszynowego.
+W praktyce proces ten często opiera się
+na wiedzy eksperckiej,
+wcześniejszych doświadczeniach
+oraz metodzie prób i błędów.
+Wraz ze wzrostem liczby parametrów architektury,
+takich jak liczba warstw ukrytych,
+liczba neuronów w poszczególnych warstwach
+czy rodzaje funkcji aktywacji,
+liczba możliwych konfiguracji rośnie bardzo szybko.
+Powoduje to, że ręczne przeszukiwanie
+przestrzeni rozwiązań staje się czasochłonne
+i nie gwarantuje znalezienia rozwiązania optymalnego%
+\sscite{Goodfellow-et-al-2016}%
+\sscite{yao1999evolving}.
+
+\noindent\\
+Jednym ze sposobów automatyzacji tego procesu
+jest wykorzystanie algorytmów ewolucyjnych,
+a w szczególności algorytmów genetycznych.
+Podejście to określane jest często mianem
+neuroewolucji (ang. \textit{neuroevolution})
+i polega na zastosowaniu mechanizmów
+inspirowanych ewolucją biologiczną
+do optymalizacji wybranych
+elementów sieci neuronowych.
+W zależności od przyjętego rozwiązania
+algorytm może optymalizować
+wyłącznie architekturę sieci,
+wyłącznie wartości wag
+lub oba te elementy jednocześnie%
+\sscite{yao1999evolving}%
+\sscite{stanley2019neuroevolution}.
+
+\noindent\\
+W przypadku optymalizacji architektury
+każda sieć neuronowa reprezentowana jest przez genotyp,
+czyli zakodowany opis jej struktury.
+Genotyp może zawierać informacje między innymi
+o liczbie warstw ukrytych,
+liczbie neuronów w poszczególnych warstwach,
+rodzajach funkcji aktywacji
+lub sposobie połączenia neuronów.
+Na podstawie takiej reprezentacji
+algorytm genetyczny tworzy
+kolejne pokolenia kandydatów
+na rozwiązanie problemu%
+\sscite{miller1989designing}%
+\sscite{Kitano1990DesigningNN}.
+
+\noindent\\
+Ocena jakości poszczególnych osobników
+realizowana jest za pomocą funkcji przystosowania.
+W kontekście sieci neuronowych
+najczęściej wykorzystuje się miary związane
+z jakością działania modelu,
+takie jak dokładność klasyfikacji,
+wartość funkcji straty
+lub inne wskaźniki zależne od rozwiązywanego problemu.
+Im lepszy wynik osiąga dana sieć,
+tym większe prawdopodobieństwo,
+że jej cechy zostaną przekazane kolejnym pokoleniom%
+\sscite{goldberg1989genetic}%
+\sscite{yao1999evolving}%
+\sscite{eiben2015evolutionary}.
+
+\noindent\\
+Istotną zaletą algorytmów genetycznych
+jest możliwość efektywnego przeszukiwania
+bardzo dużych przestrzeni rozwiązań
+bez konieczności posiadania informacji
+o własnościach optymalizowanej funkcji celu.
+Dzięki wykorzystaniu populacji rozwiązań
+oraz operatorów krzyżowania i mutacji
+algorytmy te są mniej podatne na zatrzymywanie się
+w lokalnych ekstremach niż wiele
+klasycznych metod optymalizacji.
+Z tego względu znajdują zastosowanie
+w problemach charakteryzujących się
+dużą liczbą parametrów
+oraz złożonym krajobrazem funkcji celu%
+\sscite{eiben2015evolutionary}%
+\sscite{michalewicz2003evolutionary}.
+
+\noindent\\
+Badania nad wykorzystaniem algorytmów genetycznych
+do projektowania sieci neuronowych prowadzone są
+od końca lat osiemdziesiątych XX wieku.
+Jedne z pierwszych prac dotyczących tego zagadnienia
+zostały przedstawione przez Millera, Todda i Hegde{\textquotesingle}a,
+którzy wykorzystali algorytmy genetyczne
+do automatycznego projektowania
+architektur sieci neuronowych%
+\sscite{miller1989designing}.
+W kolejnych latach rozwijano zarówno metody
+optymalizacji parametrów architektury,
+jak i podejścia umożliwiające ewolucję
+samej topologii połączeń pomiędzy neuronami.
+Przykładem takiego rozwiązania jest algorytm NEAT
+(\textit{NeuroEvolution of Augmenting Topologies}),
+w którym struktura sieci może być stopniowo rozwijana
+w trakcie procesu ewolucyjnego%
+\sscite{stanley2002neat}.
+W niniejszej pracy rozważany jest bardziej ograniczony
+wariant tego problemu, ponieważ analizowane są wyłącznie
+w pełni połączone wielowarstwowe perceptrony.
+Oznacza to, że sposób połączenia neuronów pomiędzy
+kolejnymi warstwami jest z góry ustalony i nie podlega
+optymalizacji. Zmianom podlega natomiast liczba warstw
+ukrytych, liczba neuronów w poszczególnych warstwach
+oraz zastosowane funkcje aktywacji.
+
+\noindent\\
+Współcześnie metody neuroewolucyjne są nadal rozwijane
+i wykorzystywane do automatycznego doboru architektury
+modeli uczenia maszynowego.
+Znajdują one zastosowanie szczególnie w sytuacjach,
+w których liczba możliwych
+konfiguracji jest bardzo duża,
+a ręczne projektowanie architektury
+staje się nieefektywne.
+Przykłady współczesnych badań pokazują,
+że algorytmy genetyczne mogą skutecznie wspomagać
+proces poszukiwania architektur
+osiągających wysoką jakość działania
+dla określonych problemów%
+\sscite{domashova2021optimal}%
+\sscite{stanley2019neuroevolution}.
+
 \subsection{Przegląd rozwiązań}
 % https://arxiv.org/abs/2003.06505
 % https://arxiv.org/pdf/2003.06505
