@@ -1,43 +1,33 @@
 \section{Podstawy teoretyczne i przegląd rozwiązań}
 \subsection{Sieć neuronowa}
-Sieci neuronowe stanowią grupę modeli obliczeniowych
-inspirowanych sposobem funkcjonowania
-biologicznego układu nerwowego.
-Ich głównym celem jest aproksymacja złożonych
-zależności pomiędzy danymi wejściowymi
-i wyjściowymi na podstawie przykładów
-dostarczonych podczas procesu uczenia.
-Dzięki temu może być wykorzystywana do
-rozwiązywania problemów klasyfikacji,
-regresji, rozpoznawania obrazów,
-przetwarzania języka naturalnego
-oraz wielu innych zagadnień związanych
-z uczeniem maszynowym%
-\sscite{Goodfellow-et-al-2016}%
-\sscite{haykin2009neural}.
+Sieci neuronowe należą do grupy
+matematycznych modeli obliczeniowych,
+powstałych pod inspiracją sposobu funkcjonowania
+procesów biologicznych w układzie nerwowym.
+Mają na celu znalezienie i wykorzystanie
+wysoko-poziomowych zależności
+między danymi wejściowymi a wyjściowymi,
+które zostały dostarczone podczas procesu uczenia,
+aby aproksymować odpowiedzi dla danych rzeczywistych.
+Dzięki temu przeznaczeniu znalazły się
+w różnych obszarach takich jak:
+klasyfikacja,
+regresja, rozpoznawanie obrazów czy
+przetwarzanie języka naturalnego%
+\sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
-Podstawowym elementem sieci
-neuronowej jest sztuczny neuron.
-Otrzymuje on zestaw wartości wejściowych,
-które są mnożone przez odpowiadające im wagi,
-a następnie sumowane.
-Do otrzymanej sumy dodawany
-jest wyraz wolny (ang. \textit{bias}),
-po czym wynik przekazywany jest do funkcji aktywacji.
-Funkcja ta wprowadza nieliniowość do modelu,
-dzięki czemu sieć neuronowa
-może odwzorowywać zależności,
-których nie da się opisać
-za pomocą prostych modeli liniowych%
-\sscite{haykin2009neural}.
-
-\noindent\\
-Działanie pojedynczego neuronu można
+Podstawą działania sieci neuronowych
+są sztuczne neurony.
+W najprostszej postaci sieci działanie
+pojedynczego neuronu można
 opisać następującym wzorem%
 \sscite{haykin2009neural}:
 $$
-  y = f\left(\sum_{i=1}^{n} w_i x_i + b\right),
+  y=f\left(
+    \sum_{i=1}^{n}{w_i x_i}
+    +b
+  \right),
 $$
 gdzie:
 \begin{itemize}
@@ -47,23 +37,39 @@ gdzie:
   \item $f\left(\dots\right)$ - funkcja aktywacji,
   \item $y$ - wartość wyjściowa neuronu.
 \end{itemize}
+Oznacza to, że otrzymuje on zestaw wartości wejściowych,
+które są mnożone przez odpowiadające im wagi,
+a następnie sumowane.
+Do otrzymanej sumy dodawany
+jest wyraz wolny (ang. \textit{bias}),
+po czym wynik przekazywany jest
+do funkcji aktywacji.
+Funkcja ta wprowadza nieliniowość do modelu,
+dzięki czemu sieć neuronowa
+może odwzorowywać zależności,
+których nie da się opisać
+za pomocą prostych modeli liniowych.
 
 \noindent\\
-Połączenia pomiędzy neuronami realizowane
-są za pomocą synapsów (ang. \textit{edges}).
-Każdy synaps posiada przypisaną wagę
+Odwzorowaniem biologicznych synaps pomiędzy
+neuronami są sztuczne synapsy
+zwane połączeniami (ang. \textit{edges}).
+Każde połączenie posiada przypisaną wagę
 określającą siłę wpływu jednego neuronu na drugi.
-Proces uczenia sieci neuronowej polega
-na modyfikacji tych wag w taki sposób,
-aby minimalizować błąd popełniany
-podczas wykonywania określonego zadania%
+Uczenie sieci neuronowej polega
+na modyfikowaniu wspomnianych wag
+na podstawie funkcji błędu,
+co jest kontrolowane przez
+współczynnik uczenia sieci,
+tak by zminimalizować błąd
+dla danych treningowych%
 \sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
 Obecnie sieci neuronowe są intensywnie
 rozwijanym działem informatyki.
-Z tego powodu powstało wiele typów architektur,
-z których najczęściej wykorzystane
+Z tego powodu powstało wiele ich typów,
+z których najczęściej stosowane
 można podzielić na jednokierunkowe
 (ang. \textit{feedforward neural networks})
 oraz rekurencyjne
@@ -81,27 +87,77 @@ do przetwarzania danych sekwencyjnych%
 \sscite{rutkowski2009ai}.
 
 \noindent\\
+Sieci składają się z trzech segmentów:
+wejściowego, przetwarzającego i wyjściowego.
+Odpowiadają one kolejno receptorom, mózgowi i efektorom%
+\sscite{haykin2009neural}.
 W jednokierunkowych sieciach neuronowych
 informacje przepływają wyłącznie
-od warstwy wejściowej do warstwy wyjściowej,
+od segmentu wejściowego do wyjściowego,
 bez występowania cykli oraz sprzężeń zwrotnych.
+
+\noindent\\
+W perceptronie wielowarstwowym
+segmenty sieci upraszczają się odpowiednio
+do trzech podstawowych rodzajów warstw:
+\begin{itemize}
+  \item \textbf{warstwę wejściową} -
+    odpowiedzialną za przyjęcie danych wejściowych,
+  \item \textbf{warstwy ukryte} -
+    odpowiedzialne za przetwarzanie informacji
+    i ekstrakcję cech,
+  \item \textbf{warstwę wyjściową} -
+    generującą końcowy wynik działania sieci.
+\end{itemize}
+Oraz są one ułożone szeregowo w następujący sposób:\\
+\begin{tikzpicture}[>=latex]
+  % nodes
+  \node (in) at (0,0) {we};
+  \node (h1) at (1,0) {u};
+  \node (dots) at (2,0) {$\cdots$};
+  \node (hN) at (3,0) {u};
+  \node (out) at (4,0) {wy};
+  \node (where) at ($(5,-8pt)!2pt!(6,-8pt)$) {, gdzie:};
+
+  % arrows
+  \draw[->] (in)--(h1);
+  \draw[->] (h1)--(dots);
+  \draw[->] (dots)--(hN);
+  \draw[->] (hN)--(out);
+
+  % brace
+  \coordinate (a) at (1,-5pt);
+  \coordinate (b) at (3,-5pt);
+  \draw[
+    decorate,
+    decoration={brace,mirror,amplitude=8pt},
+  ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
+\end{tikzpicture}
+\begin{itemize}
+  \item we - warstwa wejściowa,
+  \item u - warstwa ukryta,
+  \item wy - warstwa wyjściowa,
+  \item $n$ - liczba warstw ukrytych.
+  \item \raisebox{3pt}{\tikz{
+    \draw[->] (0,0)--(10pt,0)
+  }} -
+    kierunek przetwarzania danych.
+\end{itemize}
 Zatem wynik działania
 każdego neuronu zależy jedynie
-od neuronów znajdujących się
+od wartości neuronów znajdujących się
 w poprzednich warstwach%
 \sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
-Perceptron wielowarstwowy stanowi
-szczególną klasę sieci jednokierunkowych,
-w której połączenia występują wyłącznie
-pomiędzy sąsiadującymi warstwami.
-W rezultacie każda warstwa może
-wykorzystywać informacje generowane
-jedynie przez warstwę bezpośrednio ją poprzedzającą.
+W sieci MLP połączenia występują tylko
+pomiędzy sąsiadującymi warstwami, co powoduje,
+iż każda warstwa przetwarza dane wyłącznie
+dostarczone przez warstwę
+bezpośrednio ją poprzedzającą.
 Eliminuje to możliwość występowania
 bezpośrednich połączeń pomiędzy warstwami
-oddalonymi od siebie o więcej niż jeden poziom.
+niesąsiadującymi ze sobą.
 Oznacza to, że obie poniższe sieci są jednokierunkowe,
 jednak tylko ta po prawej spełnia
 definicję wielowarstwowego perceptronu%
@@ -113,48 +169,31 @@ definicję wielowarstwowego perceptronu%
   \immediate\write18{sh ./drawio_to_pdf sections/02_img/fnn/fnn_mlp.drawio}
   \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn/fnn_mlp.drawio.pdf}
 \end{center}
-
-\noindent\\
-W architekturze MLP można wyróżnić
-trzy podstawowe rodzaje warstw%
-\sscite{haykin2009neural}:
-\begin{itemize}
-  \item \textbf{warstwę wejściową} -
-    odpowiedzialną za przyjęcie danych wejściowych,
-  \item \textbf{warstwy ukryte} -
-    odpowiedzialne za przetwarzanie informacji
-    i ekstrakcję cech,
-  \item \textbf{warstwę wyjściową} -
-    generującą końcowy wynik działania sieci.
-\end{itemize}
-
-\noindent
 Liczba neuronów w warstwie wejściowej
-jest bezpośrednio związana
-z liczbą cech opisujących dane wejściowe.
-Analogicznie liczba neuronów warstwy wyjściowej
-zależy od postaci oczekiwanego wyniku.
-Przykładowo w zadaniu klasyfikacji
-liczba neuronów wyjściowych
-często odpowiada liczbie klas,
-natomiast w zadaniach regresyjnych może
-wynosić jeden lub więcej neuronów,
+odpowiada liczbie cech w danych wejściowych.
+W zadaniach klasyfikacji liczba neuronów wyjściowych
+często odpowiada liczbie klas
+lub jest o jeden większa,
+by oznaczyć dane nie pasujące do żadnej kategorii,
+natomiast w zadaniach regresyjnych
+liczba neuronów może zaczynać się od jednego,
 w zależności od liczby przewidywanych wartości.
 
 \noindent\\
-Największy wpływ na możliwości sieci neuronowej
-do modelowania złożonych zależności mają warstwy ukryte.
-W przeciwieństwie do warstw wejściowej i wyjściowej,
-których rozmiar jest w znacznym stopniu determinowany
-przez specyfikę rozważanego problemu,
-architektura warstw ukrytych może być kształtowana
-w szerokim zakresie. Z tego względu ich konfiguracja
-stanowi jeden z najważniejszych obszarów optymalizacji
-podczas projektowania sieci neuronowej.
+Powyżej omawiane warstwy są z reguły zdeterminowane
+przez dane i specyfikę problemu,
+więc do optymalizacji zostają warstwy ukryte
+które w największym stopniu można zmieniać.
+Z tego powodu to one mają największy wpływ
+na zdolności sieci.
+To one decydują czy sieć będzie zdolna
+do modelowania skomplikowanych zależności.
+Dlatego ich konfiguracja jest kluczowym
+obszarem optymalizacji.
 
 \noindent\\
-Do najważniejszych parametrów sieci
-z perspektywy procesu uczenia należą:
+Największy wpływ na proces uczenia MLP
+mają następujące parametry:
 \begin{itemize}
   \item liczba warstw ukrytych,
   \item liczba neuronów w poszczególnych warstwach,
@@ -163,74 +202,129 @@ z perspektywy procesu uczenia należą:
   \item parametry procesu uczenia.
 \end{itemize}
 
-\noindent
-Dobór powyższych parametrów ma bezpośredni wpływ
-na zdolność sieci do generalizacji oraz osiągane wyniki.
-Zbyt mała sieć może nie być
-w stanie odwzorować zależności występujących w danych,
-co prowadzi do zjawiska niedouczenia
-(ang. \textit{underfitting}).
-Z kolei zbyt rozbudowana architektura
-może prowadzić do przeuczenia
-(ang. \textit{overfitting}),
-polegającego na nadmiernym dopasowaniu
-modelu do danych treningowych
-i pogorszeniu wyników
-dla danych wcześniej niewidzianych%
-\sscite{Goodfellow-et-al-2016}.
-
 \noindent\\
-Problem doboru odpowiedniej architektury
-jest jednym z najważniejszych zagadnień
-podczas projektowania sieci neuronowych.
-Liczba możliwych konfiguracji rośnie
-bardzo szybko wraz ze wzrostem liczby parametrów,
-co utrudnia ręczne znalezienie optymalnego rozwiązania.
-Z tego powodu coraz częściej wykorzystuje się
-metody automatycznej optymalizacji.
-Pozwalają one na przeszukiwanie
-przestrzeni możliwych architektur
-oraz wybór konfiguracji osiągających
-najlepsze wyniki dla rozważanego problemu%
-\sscite{yao1999evolving}%
-\sscite{domashova2021optimal}.
+Ich dobór ma bezpośredni skutek
+w zdolnościach sieci do generalizacji
+oraz osiąganiu zadawalających wyników.
+Mniejsza sieć może nie być
+w stanie odwzorować zależności
+występujących w danych (ang. \textit{underfitting}).
+Z kolei zbyt rozbudowana architektura
+powoduje dłuższe uczenie i działanie modelu
+oraz może prowadzić do dopasowania się
+do zależności występujących tylko
+w danych treningowych (ang. \textit{overfitting}),
+co spowoduje nie adekwatne odpowiedzi
+dla danych uprzednio nieznanych%
+\sscite{Goodfellow-et-al-2016}:
+\begin{center}
+  \begin{tikzpicture}[>=latex]
+    \tikzset{
+      data_pic/.pic={
+        % Plot frame
+        \draw[line width=1.2pt] (0,0) rectangle (4,6.5);
+
+        % Data points
+        \filldraw[blue, draw=black, line width=0.8pt] (0.24,1.95) circle (0.12);
+        \filldraw[blue, draw=black, line width=0.8pt] (1.92,4.29) circle (0.12);
+        \filldraw[blue, draw=black, line width=0.8pt] (2.40,4.42) circle (0.12);
+
+        \filldraw[blue, draw=black, line width=0.8pt] (3.48,3.84) circle (0.12);
+        \filldraw[blue, draw=black, line width=0.8pt] (3.56,3.77) circle (0.12);
+        \filldraw[blue, draw=black, line width=0.8pt] (3.64,3.64) circle (0.12);
+
+        \coordinate (-oo) at (0, 0);
+        \coordinate (-top) at (2, 6.5);
+        \coordinate (-bottom) at (2, 0);
+        \coordinate (-left) at (0, 3.25);
+      }
+    }
+
+    % img
+    \pic (pic_u) at (0, 0) {data_pic};
+    \begin{scope}[shift={(pic_u-oo)}]
+      \draw[blue, line width=1.5pt]
+        (0,2.86) -- (4,4.29);
+    \end{scope}
+
+    \pic (pic_a) at (6, 0) {data_pic};
+    \begin{scope}[shift={(pic_a-oo)}]
+      \draw[blue, line width=1.5pt]
+        (0,1.5)
+        .. controls (1.5,4.9) and (2.8,5.1) ..
+        (4,3.2);
+    \end{scope}
+
+    \pic (pic_o) at (12, 0) {data_pic};
+    \begin{scope}[shift={(pic_o-oo)}]
+      \clip (0,0) rectangle (4,6.5);
+      \draw[
+        blue,
+        line width=1.5pt
+      ] plot[smooth] coordinates {
+        (0.23,6.5)
+        (0.24,2.0)
+        (0.25,0.0)
+        (0.26,-2.0)
+        (1.30,-0.1)
+        (1.30,-2.0)
+        (1.85,4.2)
+        (3.45,3.90)
+        (3.55,3.70)
+        (3.65,3.55)
+        (4.00,2.2)
+        (4.10,-2.0)
+      };
+    \end{scope}
+
+    % titles
+    \draw (pic_u-top) node[anchor=south] {Zbyt prosty model};
+    \draw (pic_a-top) node[anchor=south] {Odpowiedni model};
+    \draw (pic_o-top) node[anchor=south] {Zbyt złożony model};
+
+    % axis
+    \draw (pic_u-bottom) node[anchor=north] {$x$};
+    \draw (pic_a-bottom) node[anchor=north] {$x$};
+    \draw (pic_o-bottom) node[anchor=north] {$x$};
+    \draw (pic_u-left) node[anchor=east] {$y$};
+    \draw (pic_a-left) node[anchor=east] {$y$};
+    \draw (pic_o-left) node[anchor=east] {$y$};
+  \end{tikzpicture}
+\end{center}
 
 \subsubsection*{Architektura sieci neuronowej}
-Architektura sieci neuronowej określa jej strukturę,
-czyli sposób organizacji neuronów oraz ich połączeń.
-Jest ona jednym z najważniejszych czynników wpływających
-na zdolność modelu do aproksymacji funkcji,
-szybkość uczenia oraz możliwość uogólniania
-wiedzy na nowe dane%
+Architektura sieci neuronowej określa
+ułożenie i typy neuronów oraz ich połączeń.
+Jest ona jednym z najważniejszych czynników,
+które mają wpływ na zdolności modelu do:
+aproksymacji funkcji,
+szybkość uczenia i odpowiedzi
+oraz generalizacji wiedzy na nowe dane%
 \sscite{haykin2009neural}.
 
 \noindent\\
-W literaturze pojęcie architektury sieci neuronowej
-może być rozumiane szeroko i obejmować między innymi
-liczbę warstw, sposób połączenia neuronów,
-rodzaje warstw, funkcje aktywacji,
-obecność mechanizmów regularyzacji lub innych elementów
-charakterystycznych dla określonych typów sieci.
-Dokładny zakres tego pojęcia zależy od rozważanego
-typu sieci neuronowej%
-\sscite{Goodfellow-et-al-2016}%
+Pojęcie architektury sieci w literaturze
+obejmuje funkcje aktywacji, rozłożenie neuronów
+oraz połączenia między nimi%
 \sscite{yao1999evolving}.
 
 \noindent\\
+Przekładając powyższe na MLP architektura
+odnosi się do funkcji aktywacji, liczby warstw,
+neuronów w nich i połączeń.
 W niniejszej pracy rozważane są wyłącznie
-wielowarstwowe perceptrony (MLP), w których
-każda warstwa jest w pełni połączona z warstwą następną.
+wielowarstwowe perceptrony (MLP),
+w których każda warstwa jest
+w pełni połączona z warstwą następną.
 Oznacza to, że sposób połączenia neuronów jest
 z góry ustalony i nie podlega optymalizacji.
 Z tego powodu liczba połączeń nie stanowi
 niezależnego parametru architektury,
 lecz wynika bezpośrednio z liczby neuronów
 znajdujących się w sąsiednich warstwach.
-Zatem przez architekturę
-sieci neuronowej rozumiane będą wyłącznie:
+Zatem architektura sieci neuronowej
+rozumiana będzie wyłącznie jako:
 \begin{itemize}
-  % \setlength{\parskip}{2pt}
-  % \setlength{\itemsep}{2pt}
   \item liczba warstw ukrytych,
   \item liczba neuronów w każdej warstwie ukrytej,
   \item funkcja aktywacji zastosowana w każdej warstwie.
@@ -238,13 +332,25 @@ sieci neuronowej rozumiane będą wyłącznie:
 
 \noindent\\
 Do architektury nie będą natomiast zaliczane
-wartości wag i biasów neuronów,
+wartości wag i wyrazów wolnych neuronów,
 ponieważ są one wyznaczane podczas procesu uczenia.
 Nie będą do niej również zaliczane parametry procesu
 uczenia, takie jak współczynnik uczenia,
 liczba epok czy zastosowany optymalizator.
-Parametry te wpływają na przebieg procesu uczenia,
+Parametry te wpływają na przebieg uczenia,
 lecz nie zmieniają struktury modelu.
+
+\noindent\\
+Dobór odpowiedniej architektury
+jest jednym z najważniejszych zagadnień
+podczas tworzenia sieci.
+W przypadku wybierania takiej architektury 
+liczba parametrów jest znacząca.
+Z tego powodu można wykorzystać metody
+automatycznej optymalizacji, które są przeznaczone
+do przeszukiwania dużych przestrzeni rozwiązań%
+\sscite{yao1999evolving}%
+\sscite{domashova2021optimal}.
 
 \subsection{Algorytmy genetyczne}
 Algorytmy genetyczne należą do grupy
