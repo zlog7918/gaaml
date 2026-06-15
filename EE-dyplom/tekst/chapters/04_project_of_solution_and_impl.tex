@@ -1,5 +1,5 @@
-\section{Projekt rozwiązania i implementacja}
-\subsection{Kod genetyczny osobnika}
+\chapter{Projekt rozwiązania i implementacja}
+\section{Kod genetyczny osobnika}
 W niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
 architekturę sieci i jej parametry uczenia.
 Kod genetyczny będzie składał się z trzech części:
@@ -60,14 +60,14 @@ Następnie kod genetyczny zostanie uaktualniony o nowe elementy list.
 Jeżeli liczba warstw ukrytych jest mniejsza niż liczba elementów w listach,
 to nadmiarowe elementy zostaną zignorowane w fenotypie.
 
-\subsubsection{Selekcja}
+\subsection{Selekcja}
 Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowania.
 W przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
 to zostanie użyta selekcja losowa.
 
 % Krzyżowanie będzie odbywało się różnie dla części binarnej
 % i listowej kodu genetycznego.
-\subsubsection{Krzyżowanie - część binarna}
+\subsection{Krzyżowanie - część binarna}
 W przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
 gdzie losowo zostanie wybrany punkt podziału i
 części kodu genetycznego zostaną zamienione między dwoma rodzicami.
@@ -102,14 +102,14 @@ $\displaystyle
   \end{cases}
 $
 
-\subsubsection*{Elitaryzm}
+\subsection*{Elitaryzm}
 Zrezygnowano z elitaryzmu w celu zwiększenia
 różnorodności populacji i ograniczenia
 ryzyka przedwczesnej zbieżności.
 
-\subsubsection{Krzyżowanie - część listowa}
+\subsection{Krzyżowanie - część listowa}
 W przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
-gdzie losowo są wybrane punkty podziału w obu listach\,\sscite{synapsing_varlen_crossover}.
+% gdzie losowo są wybrane punkty podziału w obu listach\,\sscite{synapsing_varlen_crossover}.
 Natomiast jest on inny od opisanego w przypisie algorytmu,
 ponieważ o ile pierwszy punkt podziału jest wybierany z pełnego zakresu
 (biorąc pod uwagę wszystkie bity listy),
@@ -212,12 +212,12 @@ $\displaystyle
   \end{cases}
 $
 
-\subsubsection{Mutacja}
+\subsection{Mutacja}
 Mutacja będzie odbywała się przez odwracanie losowych bitów.
 Decyzja o mutacji będzie podejmowana dla każdego bitu
 z osobna z ustalonym prawdopodobieństwem mutacji.
 
-\subsubsection{Ocena przystosowania}
+\subsection{Ocena przystosowania}
 Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
 pięciu sieci o parametrach i z parametrami wynikającymi
 z fenotypu osobnika.

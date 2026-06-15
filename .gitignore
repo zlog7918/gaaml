@@ -23,14 +23,28 @@ pip-delete-this-directory.txt
 __pypackages__/
 
 # tex
+*.acn
+*.acr
+*.alg
+*.app
 *.aux
-*.log
 *.bbl
 *.bcf
 *.blg
 *.toc
+*.glg
+*.glo
+*.gls
+*.ist
+*.lof
+*.log
+*.lot
 *.out
 *.pdf
+*.slg
+*.slo
+*.sls
+*.swp
 *.run.xml
 *.synctex.gz
 *.synctex(busy)

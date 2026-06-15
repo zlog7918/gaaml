@@ -1,0 +1,72 @@
+% !TEX program = pdflatex
+% !TeX encoding = utf8
+% !TeX spellcheck = pl-PL
+\documentclass[thesis=inz,faculty=ee]{EE-dyplom}
+\input{header.tex}
+% thesis=[inz|mgr|bsc|msc]
+%  * inz - praca inżynierska
+%  * mgr - praca magisterska
+%  * bsc - bachelor thesis
+%  * msc - master thesis
+
+% Skróty nazw wydziałów zgodne z domenami internetowymi
+% Abbreviations of Faculties according to Internet subdomains
+% faculty=[
+%	arch,
+%	gik,
+%	ee,
+%	wip
+%	]
+
+\instytut{Instytut Badawczy Zjednoczonych Przedsiębiorstw Elektronowych}
+\kierunek{Informatyka Stosowana}
+\specjalnosc{Inżynieria Danych i Multimediów}
+\album{325522}
+\author{inż. Szymon Wasążnik}
+\promotor{dr inż. Jarosław Szostakowski}
+\date{2026}
+\longdate{2026-07-27}
+%\grantlicense{TRUE} % [TRUE|FALSE]
+
+\title{%
+  Optymalizacja sieci neuronowej
+  za pomocą algorytmów genetycznych%
+}
+\engtitle{%
+  Neural Networks optimization
+  using evolutionary algorithms%
+}
+
+\streszczeniepracy{
+  To jest streszczenie. To jest trochę za krótkie, jako że powinno zająć całą stronę.
+
+  \lipsum[1-4]
+}
+\thesisabstract{
+  This is abstract. This one is a little too short as it should occupy the whole page.
+
+  \lipsum[1-4]
+}
+
+\slowakluczowe{A, B, C}
+\thesiskeywords{X, Y, Z}
+
+
+\begin{document}
+  \frontpages
+
+  \input{tekst/main.tex}
+
+  % Bibliografia - musi być
+  % Bibliography - must exist
+  \bibliografia
+  
+  % % Wykaz symboli i skrótów - patrz opis w tekście przykładowym
+  % \acronymslist
+  % % Spis rysunków
+  % \listoffigures
+  % % Spis tabel
+  % \listoftables
+  % % Załączniki (plik appendices.tex)
+  % \easyappendices
+\end{document}

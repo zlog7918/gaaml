@@ -1,5 +1,5 @@
-\section{Podstawy teoretyczne i przegląd rozwiązań}
-\subsection{Sieć neuronowa}
+\chapter{Podstawy teoretyczne i przegląd rozwiązań}
+\section{Sieć neuronowa}
 Sieci neuronowe należą do grupy
 matematycznych modeli obliczeniowych,
 powstałych pod inspiracją sposobu funkcjonowania
@@ -128,10 +128,10 @@ Oraz są one ułożone szeregowo w następujący sposób:\\
   % brace
   \coordinate (a) at (1,-5pt);
   \coordinate (b) at (3,-5pt);
-  \draw[
-    decorate,
-    decoration={brace,mirror,amplitude=8pt},
-  ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
+  % \draw[
+  %   decorate,
+  %   decoration={brace,mirror,amplitude=8pt},
+  % ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
 \end{tikzpicture}
 \begin{itemize}
   \item we - warstwa wejściowa,
@@ -163,11 +163,11 @@ jednak tylko ta po prawej spełnia
 definicję wielowarstwowego perceptronu%
 \sscite{haykin2009neural}:
 \begin{center}
-  \immediate\write18{sh ./drawio_to_pdf sections/02_img/fnn/fnn.drawio}
-  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn/fnn.drawio.pdf}
+  \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio}
+  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
   \hspace{2cm}
-  \immediate\write18{sh ./drawio_to_pdf sections/02_img/fnn/fnn_mlp.drawio}
-  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{sections/02_img/fnn/fnn_mlp.drawio.pdf}
+  \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
+  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
 \end{center}
 Liczba neuronów w warstwie wejściowej
 odpowiada liczbie cech w danych wejściowych.
@@ -247,7 +247,7 @@ dla danych uprzednio nieznanych%
         (0,2.86) -- (4,4.29);
     \end{scope}
 
-    \pic (pic_a) at (6, 0) {data_pic};
+    \pic (pic_a) at (5.5, 0) {data_pic};
     \begin{scope}[shift={(pic_a-oo)}]
       \draw[blue, line width=1.5pt]
         (0,1.5)
@@ -255,7 +255,7 @@ dla danych uprzednio nieznanych%
         (4,3.2);
     \end{scope}
 
-    \pic (pic_o) at (12, 0) {data_pic};
+    \pic (pic_o) at (11, 0) {data_pic};
     \begin{scope}[shift={(pic_o-oo)}]
       \clip (0,0) rectangle (4,6.5);
       \draw[
@@ -292,7 +292,7 @@ dla danych uprzednio nieznanych%
   \end{tikzpicture}
 \end{center}
 
-\subsubsection*{Architektura sieci neuronowej}
+\subsection*{Architektura sieci neuronowej}
 Architektura sieci neuronowej określa
 ułożenie i typy neuronów oraz ich połączeń.
 Jest ona jednym z najważniejszych czynników,
@@ -352,9 +352,10 @@ do przeszukiwania dużych przestrzeni rozwiązań%
 \sscite{yao1999evolving}%
 \sscite{domashova2021optimal}.
 
-\subsection{Algorytmy genetyczne}
+\section{Algorytmy genetyczne}
 Algorytmy genetyczne należą do grupy
-algorytmów ewolucyjnych,
+algorytmów inspirowanych 
+
 czyli metod optymalizacyjnych inspirowanych
 mechanizmami ewolucji biologicznej.
 Ich działanie opiera się na założeniu,
@@ -404,7 +405,7 @@ po czym proces oceny i reprodukcji jest powtarzany
 aż do spełnienia warunku zakończenia algorytmu%
 \sscite{eiben2015evolutionary}.
 
-\subsubsection*{Selekcja}
+\subsection*{Selekcja}
 Selekcja jest procesem wyboru osobników,
 które zostaną wykorzystane
 do utworzenia kolejnego pokolenia.
@@ -417,7 +418,7 @@ między innymi selekcja ruletkowa,
 turniejowa oraz rankingowa%
 \sscite{goldberg1989genetic}.
 
-\subsubsection*{Krzyżowanie}
+\subsection*{Krzyżowanie}
 Krzyżowanie jest operacją polegającą
 na łączeniu informacji genetycznej pochodzącej
 od dwóch lub większej liczby rodziców.
@@ -432,7 +433,7 @@ przeznaczone dla struktur o zmiennej długości%
 \sscite{stanley2002neat}%
 \sscite{synapsing_varlen_crossover}.
 
-\subsubsection*{Mutacja}
+\subsection*{Mutacja}
 Mutacja polega na losowej modyfikacji genotypu osobnika.
 Jej zadaniem jest wprowadzanie nowej
 informacji genetycznej do populacji
@@ -444,7 +445,7 @@ zamianie elementów miejscami
 lub dodawaniu i usuwaniu fragmentów kodu genetycznego%
 \sscite{goldberg1989genetic}.
 
-\subsubsection*{Elitaryzm}
+\subsection*{Elitaryzm}
 W wielu implementacjach algorytmów genetycznych
 stosowany jest mechanizm elitaryzmu.
 Polega on na bezpośrednim przenoszeniu najlepszych
@@ -454,7 +455,7 @@ Pozwala to uniknąć utraty najlepszych znalezionych
 rozwiązań i często przyspiesza proces optymalizacji%
 \sscite{eiben2015evolutionary}.
 
-\subsubsection*{Zastosowanie do optymalizacji}
+\subsection*{Zastosowanie do optymalizacji}
 Algorytmy genetyczne znajdują zastosowanie w problemach,
 dla których wyznaczenie rozwiązania optymalnego
 metodami analitycznymi jest trudne lub niemożliwe.
@@ -469,7 +470,7 @@ planowania harmonogramów oraz
 rozwiązywania problemów kombinatorycznych%
 \sscite{eiben2015evolutionary}.
 
-\subsection{Ewolucyjna optymalizacja sieci neuronowych}
+\section{Ewolucyjna optymalizacja sieci neuronowych}
 Dobór architektury sieci neuronowej stanowi
 jedno z najważniejszych zagadnień
 podczas projektowania modeli uczenia maszynowego.
@@ -601,10 +602,12 @@ dla określonych problemów%
 \sscite{domashova2021optimal}%
 \sscite{stanley2019neuroevolution}.
 
-\subsection{Przegląd rozwiązań}
+\section{Przegląd rozwiązań}
 % https://arxiv.org/abs/2003.06505
 % https://arxiv.org/pdf/2003.06505
-\includegraphics[width=\textwidth,clip]{sections/02_img/AutoGluon.png}
+\includegraphics[width=\textwidth,clip]{img/02_img/AutoGluon.png}
+
 % https://dl.acm.org/doi/10.1145/3292500.3330648
 % https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
-\includegraphics[width=\textwidth,clip]{sections/02_img/AutoKeras.png}
+\noindent
+\includegraphics[width=\textwidth,clip]{img/02_img/AutoKeras.png}
