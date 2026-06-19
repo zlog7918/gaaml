@@ -278,7 +278,7 @@ automatycznej optymalizacji, które są przeznaczone
 do przeszukiwania dużych przestrzeni rozwiązań%
 \sscite{
   yao1999evolving,
-  domashova2021optimal
+  domashova2021optimal,
 }.
 
 \section{Algorytmy genetyczne}
@@ -293,106 +293,144 @@ do coraz większej optymalności w~populacji%
   eiben2015evolutionary,
 }.
 
-Podstawowym elementem algorytmu genetycznego
-jest populacja osobników reprezentujących
-potencjalne rozwiązania rozważanego problemu.
-Każdy osobnik posiada genotyp,
-czyli zakodowaną reprezentację rozwiązania.
-Na podstawie genotypu można wyznaczyć fenotyp,
-będący rzeczywistą postacią rozwiązania
-ocenianą przez algorytm%
+Algorytmy te zawierają więc
+w~sobie populację osobników,
+na których będą wykonywane operacje.
+Osobniki przedstawiają potencjalne
+rozwiązania, które określa się jako fenotyp.
+Każdy z~osobników posiada swój kod genetyczny
+(genotyp), którego części są przekazywane
+osobnikom potomnym podczas krzyżowania
+i~z niego odkodowywana jest postać fenotypu.
+Po odkodowaniu rozwiązania jest ono
+oceniane przez algorytm%
 \sscite{goldberg1989genetic}.
 
-Jakość poszczególnych osobników jest określana
+Ich jakość jest określana
 za pomocą funkcji przystosowania
 (ang. \textit{fitness function}).
-Funkcja ta przypisuje każdemu osobnikowi wartość
-liczbową odzwierciedlającą stopień spełnienia
-założonych kryteriów optymalizacji.
-Im wyższa wartość funkcji przystosowania,
-tym większe prawdopodobieństwo przekazania cech
-danego osobnika kolejnym pokoleniom%
+Funkcja ta zwraca dla fenotypu danego osobnika
+jego dostosowanie do środowiska.
+Gdzie środowisko jest kryteriami optymalizacji,
+które rozwiązania mają spełniać.
+Im większa wartość zostanie zwrócona,
+tym większe prawdopodobieństwo
+będzie miał dany osobnik
+dla przekazania cech
+do następnych pokoleń%
 \sscite{goldberg1989genetic}.
 
-Typowy przebieg algorytmu genetycznego rozpoczyna się
-od wygenerowania początkowej populacji osobników.
-Następnie dla każdego osobnika obliczana
-jest wartość funkcji przystosowania.
-Na podstawie uzyskanych wyników wybierani są rodzice,
-którzy uczestniczą w procesie reprodukcji.
-W jego trakcie stosowane są operatory krzyżowania
-oraz mutacji prowadzące do powstania nowych osobników.
-Utworzone potomstwo zastępuje część
-lub całość poprzedniej populacji,
-po czym proces oceny i~reprodukcji jest powtarzany
-aż do spełnienia warunku zakończenia algorytmu%
-\sscite{eiben2015evolutionary}.
+Klasyczny przebieg algorytmu genetycznego
+przedstawia \cref{fig:genetic_flow},
+którego elementy są omawiane w~poniższych podrozdziałach.
+\begin{figure}
+  \centering \scalebox{0.9}{%
+    \input{img/02_img/genetic_flow.tikz.tex}%
+  }
+  % \centering \input{img/02_img/genetic_flow.tikz.tex}
+  \caption{
+    Klasyczny przebieg algorytmu genetycznego
+    opisany w~\cite{eiben2015evolutionary}.
+    Na początku generowana jest początkowa populacja,
+    dla której osobników następnie
+    są wyliczane przystosowania.
+    Następnie występuje sprawdzenie
+    spełnienia warunków końcowych,
+    jeżeli zostały wypełnione
+    to algorytm kończy swoje działanie,
+    a~w przeciwnym wypadku są wykonywane:
+    selekcja, krzyżowanie, mutacja,
+    wyliczenie przystosowania nowych osobników,
+    wybranie następnej generacji,
+    potem następuje powrót
+    do sprawdzenia warunków końcowych.
+  }
+  \label{fig:genetic_flow}
+\end{figure}
 
 \tocless\subsection{Selekcja}
-Selekcja jest procesem wyboru osobników,
-które zostaną wykorzystane
-do utworzenia kolejnego pokolenia.
-Jej celem jest zwiększenie udziału
-dobrze przystosowanych osobników
-w populacji przy jednoczesnym
-zachowaniu różnorodności genetycznej.
-W praktyce stosowanych jest wiele metod selekcji,
-między innymi selekcja ruletkowa,
+Selekcja jest procesem odpowiadającym
+biologicznej selekcji naturalnej,
+polegającym na wyborze bardziej
+przystosowanych osobników,
+by z~nich mogło powstać
+następne pokolenie.
+Dobra selekcja faworyzuje
+lepiej przystosowane jednostki,
+jednocześnie zachowując
+różnorodność genetyczną.
+Chcąc osiągnąć ten balans
+powstało wiele metod selekcji,
+są to między innymi selekcja ruletkowa,
 turniejowa oraz rankingowa%
 \sscite{goldberg1989genetic}.
 
 \tocless\subsection{Krzyżowanie}
-Krzyżowanie jest operacją polegającą
-na łączeniu informacji genetycznej pochodzącej
-od dwóch lub większej liczby rodziców.
-Celem tego procesu jest utworzenie nowych osobników
-posiadających cechy odziedziczone po rodzicach.
-Sposób przeprowadzenia krzyżowania zależy
-od przyjętej reprezentacji genotypu
-i~może obejmować między innymi krzyżowanie
-jedno- lub wielopunktowe, równomierne oraz operatory
-przeznaczone dla struktur o~zmiennej długości%
+Krzyżowanie odwzorowuje biologiczne mieszanie
+genów rodziców przy rozmnażaniu płciowym,
+w~którym dziecko dostaje część genów
+od jednego rodzica, a~część - od drugiego.
+Dzięki temu procesowi tworzone są nowe osobniki
+posiadające cechy odziedziczone po rodzicach.
+Sposób krzyżowania zależy od reprezentacji genotypu
+i~są to między innymi:
+krzyżowanie jedno- lub wielopunktowe,
+równomierne oraz operatory przeznaczone
+dla struktur o~zmiennej długości%
 \sscite{
   goldberg1989genetic,
   stanley2002neat,
-  synapsing_varlen_crossover,
+  hutt2007varlengthcrossover,
 }.
 
 \tocless\subsection{Mutacja}
-Mutacja polega na losowej modyfikacji genotypu osobnika.
-Jej zadaniem jest wprowadzanie nowej
-informacji genetycznej do populacji
-oraz przeciwdziałanie przedwczesnej zbieżności algorytmu
-do lokalnych ekstremów funkcji celu.
-W zależności od sposobu reprezentacji genotypu mutacja
-może polegać na zmianie wartości pojedynczych genów,
-zamianie elementów miejscami
-lub dodawaniu i~usuwaniu fragmentów kodu genetycznego%
+Kolejnym elementarnym działaniem
+w~algorytmach genetycznych jest mutacja.
+Polega ona na losowej modyfikacji genotypu.
+Podobnie jak w~przypadku krzyżowania
+sposób wykonania tej czynności zależy
+od reprezentacji genotypu,
+może to być między innymi:
+zmiana wartości pojedyńczego genu,
+zmiana miejsc elementów w~genotypie
+lub dodanie albo usuwanie
+fragmentów kodu.
+Celem tych działań jest
+wprowadzanie do populacji
+nowej informacji genetycznej
+oraz zapobieganie przedwczesnemu zbieganiu
+do lokalnych ekstremów optymalizacji%
 \sscite{goldberg1989genetic}.
 
 \tocless\subsection{Elitaryzm}
 W~wielu implementacjach algorytmów genetycznych
-stosowany jest mechanizm elitaryzmu.
-Polega on na bezpośrednim przenoszeniu najlepszych
-osobników z~bieżącego pokolenia do kolejnego
-bez poddawania ich operacjom krzyżowania i~mutacji.
-Pozwala to uniknąć utraty najlepszych znalezionych
-rozwiązań i~często przyspiesza proces optymalizacji%
+stosowany jest elitaryzm.
+W~przypadku jego zastosowania przenosi się
+najbardziej przystosowanych osobników
+do kolejnego pokolenia bez zmian
+w~ich genotypie.
+Takie rozwiązanie pozwala
+uniknąć utraty najlepszych
+ze znalezionych rozwiązań%
 \sscite{eiben2015evolutionary}.
 
 \tocless\subsection{Zastosowanie do optymalizacji}
-Algorytmy genetyczne znajdują zastosowanie w~problemach,
-dla których wyznaczenie rozwiązania optymalnego
-metodami analitycznymi jest trudne lub niemożliwe.
-Szczególnie dobrze sprawdzają się w~zadaniach
-charakteryzujących się dużą przestrzenią poszukiwań,
-obecnością wielu lokalnych ekstremów
-oraz nieciągłościami funkcji celu.
-Z~tego powodu są wykorzystywane między innymi
-do optymalizacji parametrów modeli uczenia maszynowego,
-projektowania układów technicznych,
-planowania harmonogramów oraz
-rozwiązywania problemów kombinatorycznych%
+Algorytmy genetyczne wykorzystuje się
+w~poszukiwaniach optymalnego rozwiązania,
+które byłyby trudne do rozwiązania
+metodami analitycznymi.
+Dobrze się sprawdzają w~przeszukiwaniu
+dużych przestrzeni poszukiwań,
+w~których występuje wiele lokalnych ekstremów
+oraz nieciągłości funkcji celu.
+Dzięki tym zdolnością są wykorzystywane
+między innymi do:
+projektowania konstrukcji,
+planowania i~harmonogramowania zadań,
+problemów logistycznych czy kombinatorycznych,
+doboru cech i~strojenia
+hiperparametrów w~uczeniu maszynowym,
+oraz optymalizacji parametrów modeli i~systemów%
 \sscite{eiben2015evolutionary}.
 
 \section{Ewolucyjna optymalizacja sieci neuronowych}
@@ -418,117 +456,111 @@ znalezienia optymalnego rozwiązania%
   yao1999evolving,
 }.
 
-Jednym ze sposobów automatyzacji tego procesu
-jest wykorzystanie algorytmów ewolucyjnych,
-a~w~szczególności algorytmów genetycznych.
-Podejście to określane jest często mianem
-neuroewolucji (ang. \textit{neuroevolution})
-i~polega na zastosowaniu mechanizmów
-inspirowanych ewolucją biologiczną
-do optymalizacji wybranych
-elementów sieci neuronowych.
-W~zależności od przyjętego rozwiązania
-algorytm może optymalizować
-wyłącznie architekturę sieci,
-wyłącznie wartości wag
-lub oba te elementy jednocześnie%
+W~celu automatyzacji tego procesu
+można wykorzystać algorytmy ewolucyjne,
+takie jak algorytmy genetyczne.
+W~literaturze podejście to
+widnieje pod nazwą neuroewolucji
+(ang. \textit{neuroevolution}),
+które w~ogólnym rozumieniu może odnosić się
+do optymalizacji dowolnej części sieci,
+ponieważ algorytm może
+przeszukiwać przestrzeń rozwiązań
+wyłącznie dla wartości wag,
+architektury sieci
+lub obu tych elementów jednocześnie%
 \sscite{
   yao1999evolving,
   stanley2019neuroevolution,
 }.
 
-W~przypadku optymalizacji architektury
-każda sieć neuronowa reprezentowana jest przez genotyp,
-czyli zakodowany opis jej struktury.
-Genotyp może zawierać informacje między innymi
-o~liczbie warstw ukrytych,
-liczbie neuronów w poszczególnych warstwach,
-rodzajach funkcji aktywacji
-lub sposobie połączenia neuronów.
-Na podstawie takiej reprezentacji
-algorytm genetyczny tworzy
-kolejne pokolenia kandydatów
-na rozwiązanie problemu%
-\sscite{
-  miller1989designing,
-  Kitano1990DesigningNN,
-}.
+W~przypadku optymalizowania architektury sieci,
+osobniki zawierają w~genotypie
+zakodowany opis tej stuktury.
+Więc w~zależności od typu budowanego modelu
+oraz założeń danej problematyki zapisane
+będą informacje umożliwiające skonstruowanie go.
+Przykładowo w~\cite[481]{miller1989designing}
+zostaje przedstawiony opis zawierający
+połączenia między neuronami
+ze stałą liczbą neuronów.
+Natomiast w~\cite[268]{domashova2021optimal}
+w~genotypie zawarta jest informacja
+o~liczbie warstw, typach funkcji aktywacji
+i~liczbie neuronów w~nich.
 
-Ocena jakości poszczególnych osobników
-realizowana jest za pomocą funkcji przystosowania.
-W~kontekście sieci neuronowych
-najczęściej wykorzystuje się miary związane
-z~jakością działania modelu,
-takie jak dokładność klasyfikacji,
-wartość funkcji straty
-lub inne wskaźniki zależne od rozwiązywanego problemu.
-Im lepszy wynik osiąga dana sieć,
-tym większe prawdopodobieństwo,
-że jej cechy zostaną przekazane kolejnym pokoleniom%
+Ocena jakości osobników w~kontekście
+sieci neuronowych powoduje,
+że funkcja przystosowania jest związana
+z~miarami jakości działania modelu.
+Mogą być nimi w zależności od typu problematyki:
+dokładność klasyfikacji, wartość funkcji straty
+lub inne tego rodzaju wskaźniki%
 \sscite{
   goldberg1989genetic,
   yao1999evolving,
   eiben2015evolutionary,
 }.
 
-Istotną zaletą algorytmów genetycznych
-jest możliwość efektywnego przeszukiwania
-bardzo dużych przestrzeni rozwiązań
-bez konieczności posiadania informacji
-o własnościach optymalizowanej funkcji celu.
-Dzięki wykorzystaniu populacji rozwiązań
-oraz operatorów krzyżowania i~mutacji
-algorytmy te są mniej podatne na zatrzymywanie się
-w~lokalnych ekstremach niż wiele
-klasycznych metod optymalizacji.
-Z~tego względu znajdują zastosowanie
-w~problemach charakteryzujących się
-dużą liczbą parametrów
-oraz złożonym krajobrazem funkcji celu%
-\sscite{
-  eiben2015evolutionary,
-  michalewicz2003evolutionary,
-}.
+% Istotną zaletą algorytmów genetycznych
+% jest możliwość efektywnego przeszukiwania
+% bardzo dużych przestrzeni rozwiązań
+% bez konieczności posiadania informacji
+% o~własnościach optymalizowanej funkcji celu.
+% Dzięki wykorzystaniu populacji rozwiązań
+% oraz operatorów krzyżowania i~mutacji
+% algorytmy te są mniej podatne na zatrzymywanie się
+% w~lokalnych ekstremach niż wiele
+% klasycznych metod optymalizacji.
+% Z~tego względu znajdują zastosowanie
+% w~problemach charakteryzujących się
+% dużą liczbą parametrów
+% oraz złożonym krajobrazem funkcji celu%
+% \sscite{
+%   eiben2015evolutionary,
+%   michalewicz2003evolutionary,
+% }.
 
 Badania nad wykorzystaniem algorytmów genetycznych
 do projektowania sieci neuronowych prowadzone są
 od końca lat osiemdziesiątych XX wieku.
 Jedne z~pierwszych prac dotyczących tego zagadnienia
 zostały przedstawione w~\cite{miller1989designing},
-%  przez Millera, Todda i~Hegde{\textquotesingle}a,
+% przez Millera, Todda i~Hegde{\textquotesingle}a,
 gdzie autorzy wykorzystali algorytmy genetyczne
 do automatycznego projektowania
-architektur sieci neuronowych.
+połączeń między ustaloną liczbą neuronów.
 W~kolejnych latach rozwijano zarówno metody
 optymalizacji parametrów architektury,
 jak i~podejścia umożliwiające ewolucję
-samej topologii połączeń pomiędzy neuronami.
+całej struktury neuronowej.
 Przykładem takiego rozwiązania jest algorytm NEAT
 (\textit{NeuroEvolution of Augmenting Topologies}),
-w~którym struktura sieci może być stopniowo rozwijana
+w~którym architektura sieci
+może być stopniowo rozwijana
 w~trakcie procesu ewolucyjnego%
 \sscite{stanley2002neat}.
-W~niniejszej pracy rozważany jest bardziej ograniczony
-wariant tego problemu, ponieważ analizowane są wyłącznie
+W~niniejszej pracy rozważany jest
+bardziej ograniczony wariant tego problemu,
+ponieważ analizowane są wyłącznie
 w~pełni połączone wielowarstwowe perceptrony.
-Oznacza to, że sposób połączenia neuronów pomiędzy
-kolejnymi warstwami jest z~góry ustalony i~nie podlega
-optymalizacji. Zmianom podlega natomiast liczba warstw
-ukrytych, liczba neuronów w~poszczególnych warstwach
+Oznacza to, że sposób połączenia neuronów
+pomiędzy kolejnymi warstwami jest z~góry
+ustalony i~nie podlega optymalizacji.
+Zmianom podlega natomiast liczba warstw ukrytych,
+liczba neuronów w~poszczególnych warstwach
 oraz zastosowane funkcje aktywacji.
 
-Współcześnie metody neuroewolucyjne są nadal rozwijane
-i~wykorzystywane do automatycznego doboru architektury
-modeli uczenia maszynowego.
-Znajdują one zastosowanie szczególnie w~sytuacjach,
-w~których liczba możliwych
-konfiguracji jest bardzo duża,
-a~ręczne projektowanie architektury
-staje się nieefektywne.
+Metody neuroewolucji są wciąż
+rozwijane i~wykorzystywane.
+Znajdują zastosowanie, zwłaszcza
+gdy przy danej problematyce
+występuje duża liczba możliwych konfiguracji.
 Przykłady współczesnych badań pokazują,
-że algorytmy genetyczne mogą skutecznie wspomagać
-proces poszukiwania architektur
-osiągających wysoką jakość działania
+iż algorytmy genetyczne mogą
+wspomagać proces poszukiwania
+architektury osiągające
+zadawalającą jakość działania
 dla określonych problemów%
 \sscite{
   domashova2021optimal,
