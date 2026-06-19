@@ -29,6 +29,7 @@ __pypackages__/
 *.app
 *.aux
 *.bbl
+*.bbl-SAVE-ERROR
 *.bcf
 *.blg
 *.toc
