@@ -1,16 +1,16 @@
-\chapter{Podstawy teoretyczne i przegląd rozwiązań}
+\chapter{Podstawy teoretyczne i~przegląd rozwiązań}
 \section{Sieć neuronowa}
 Sieci neuronowe należą do grupy
 matematycznych modeli obliczeniowych,
 powstałych pod inspiracją sposobu funkcjonowania
-procesów biologicznych w układzie nerwowym.
-Mają na celu znalezienie i wykorzystanie
+procesów biologicznych w~układzie nerwowym.
+Mają na celu znalezienie i~wykorzystanie
 wysoko-poziomowych zależności
-między danymi wejściowymi a wyjściowymi,
+między danymi wejściowymi a~wyjściowymi,
 które zostały dostarczone podczas procesu uczenia,
 aby aproksymować odpowiedzi dla danych rzeczywistych.
 Dzięki temu przeznaczeniu znalazły się
-w różnych obszarach takich jak:
+w~różnych obszarach takich jak:
 klasyfikacja,
 regresja, rozpoznawanie obrazów czy
 przetwarzanie języka naturalnego%
@@ -19,7 +19,7 @@ przetwarzanie języka naturalnego%
 \noindent\\
 Podstawą działania sieci neuronowych
 są sztuczne neurony.
-W najprostszej postaci sieci działanie
+W~najprostszej postaci sieci działanie
 pojedynczego neuronu można
 opisać następującym wzorem%
 \sscite{haykin2009neural}:
@@ -39,7 +39,7 @@ gdzie:
 \end{itemize}
 Oznacza to, że otrzymuje on zestaw wartości wejściowych,
 które są mnożone przez odpowiadające im wagi,
-a następnie sumowane.
+a~następnie sumowane.
 Do otrzymanej sumy dodawany
 jest wyraz wolny (ang. \textit{bias}),
 po czym wynik przekazywany jest
@@ -68,8 +68,8 @@ dla danych treningowych%
 \noindent\\
 Obecnie sieci neuronowe są intensywnie
 rozwijanym działem informatyki.
-Z tego powodu powstało wiele ich typów,
-z których najczęściej stosowane
+Z~tego powodu powstało wiele ich typów,
+z~których najczęściej stosowane
 można podzielić na jednokierunkowe
 (ang. \textit{feedforward neural networks})
 oraz rekurencyjne
@@ -80,24 +80,24 @@ perceptrony wielowarstwowe
 konwolucyjne sieci neuronowe
 (ang. \textit{convolutional neural networks}, CNN)
 oraz transformatory (ang. \textit{transformers}).
-Do drugiej grupy należą sieci RNN, LSTM i GRU,
+Do drugiej grupy należą sieci RNN, LSTM i~GRU,
 wykorzystywane przede wszystkim
 do przetwarzania danych sekwencyjnych%
 \sscite{Goodfellow-et-al-2016}%
 \sscite{rutkowski2009ai}.
 
 \noindent\\
-Sieci składają się z trzech segmentów:
-wejściowego, przetwarzającego i wyjściowego.
-Odpowiadają one kolejno receptorom, mózgowi i efektorom%
+Sieci składają się z~trzech segmentów:
+wejściowego, przetwarzającego i~wyjściowego.
+Odpowiadają one kolejno receptorom, mózgowi i~efektorom%
 \sscite{haykin2009neural}.
-W jednokierunkowych sieciach neuronowych
+W~jednokierunkowych sieciach neuronowych
 informacje przepływają wyłącznie
 od segmentu wejściowego do wyjściowego,
 bez występowania cykli oraz sprzężeń zwrotnych.
 
 \noindent\\
-W perceptronie wielowarstwowym
+W~perceptronie wielowarstwowym
 segmenty sieci upraszczają się odpowiednio
 do trzech podstawowych rodzajów warstw:
 \begin{itemize}
@@ -105,12 +105,12 @@ do trzech podstawowych rodzajów warstw:
     odpowiedzialną za przyjęcie danych wejściowych,
   \item \textbf{warstwy ukryte} -
     odpowiedzialne za przetwarzanie informacji
-    i ekstrakcję cech,
+    i~ekstrakcję cech,
   \item \textbf{warstwę wyjściową} -
     generującą końcowy wynik działania sieci.
 \end{itemize}
-Oraz są one ułożone szeregowo w następujący sposób:\\
-\begin{tikzpicture}[>=latex]
+Oraz są one ułożone szeregowo w~następujący sposób:\\
+\begin{tikzpicture}[>=Latex]
   % nodes
   \node (in) at (0,0) {we};
   \node (h1) at (1,0) {u};
@@ -138,19 +138,18 @@ Oraz są one ułożone szeregowo w następujący sposób:\\
   \item u - warstwa ukryta,
   \item wy - warstwa wyjściowa,
   \item $n$ - liczba warstw ukrytych.
-  \item \raisebox{3pt}{\tikz{
+  \item \raisebox{3pt}{\tikz[>=Latex]{
     \draw[->] (0,0)--(10pt,0)
-  }} -
-    kierunek przetwarzania danych.
+  }} - kierunek przetwarzania danych.
 \end{itemize}
 Zatem wynik działania
 każdego neuronu zależy jedynie
 od wartości neuronów znajdujących się
-w poprzednich warstwach%
+w~poprzednich warstwach%
 \sscite{Goodfellow-et-al-2016}.
 
 \noindent\\
-W sieci MLP połączenia występują tylko
+W~sieci MLP połączenia występują tylko
 pomiędzy sąsiadującymi warstwami, co powoduje,
 iż każda warstwa przetwarza dane wyłącznie
 dostarczone przez warstwę
@@ -169,22 +168,22 @@ definicję wielowarstwowego perceptronu%
   \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
   \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
 \end{center}
-Liczba neuronów w warstwie wejściowej
-odpowiada liczbie cech w danych wejściowych.
-W zadaniach klasyfikacji liczba neuronów wyjściowych
+Liczba neuronów w~warstwie wejściowej
+odpowiada liczbie cech w~danych wejściowych.
+W~zadaniach klasyfikacji liczba neuronów wyjściowych
 często odpowiada liczbie klas
-lub jest o jeden większa,
+lub jest o~jeden większa,
 by oznaczyć dane nie pasujące do żadnej kategorii,
-natomiast w zadaniach regresyjnych
+natomiast w~zadaniach regresyjnych
 liczba neuronów może zaczynać się od jednego,
-w zależności od liczby przewidywanych wartości.
+w~zależności od liczby przewidywanych wartości.
 
 \noindent\\
-Powyżej omawiane warstwy są z reguły zdeterminowane
-przez dane i specyfikę problemu,
+Powyżej omawiane warstwy są z~reguły zdeterminowane
+przez dane i~specyfikę problemu,
 więc do optymalizacji zostają warstwy ukryte
-które w największym stopniu można zmieniać.
-Z tego powodu to one mają największy wpływ
+które w~największym stopniu można zmieniać.
+Z~tego powodu to one mają największy wpływ
 na zdolności sieci.
 To one decydują czy sieć będzie zdolna
 do modelowania skomplikowanych zależności.
@@ -196,7 +195,7 @@ Największy wpływ na proces uczenia MLP
 mają następujące parametry:
 \begin{itemize}
   \item liczba warstw ukrytych,
-  \item liczba neuronów w poszczególnych warstwach,
+  \item liczba neuronów w~poszczególnych warstwach,
   \item topologia połączeń pomiędzy neuronami,
   \item sposób inicjalizacji wag,
   \item parametry procesu uczenia.
@@ -204,19 +203,19 @@ mają następujące parametry:
 
 \noindent\\
 Ich dobór ma bezpośredni skutek
-w zdolnościach sieci do generalizacji
+w~zdolnościach sieci do generalizacji
 oraz osiąganiu zadawalających wyników.
 Mniejsza sieć może nie być
-w stanie odwzorować zależności
-występujących w danych (ang. \textit{underfitting}).
-Z kolei zbyt rozbudowana architektura
-powoduje dłuższe uczenie i działanie modelu
+w~stanie odwzorować zależności
+występujących w~danych (ang. \textit{underfitting}).
+Z~kolei zbyt rozbudowana architektura
+powoduje dłuższe uczenie i~działanie modelu
 oraz może prowadzić do dopasowania się
 do zależności występujących tylko
-w danych treningowych (ang. \textit{overfitting}),
+w~danych treningowych (ang. \textit{overfitting}),
 co spowoduje nie adekwatne odpowiedzi
-dla danych uprzednio nieznanych%
-\sscite{Goodfellow-et-al-2016}:
+dla danych uprzednio nieznanych.
+% Widać to na \cref{fig:fitting_under_over},
 \begin{center}
   \begin{tikzpicture}[>=latex]
     \tikzset{
@@ -294,16 +293,16 @@ dla danych uprzednio nieznanych%
 
 \subsection*{Architektura sieci neuronowej}
 Architektura sieci neuronowej określa
-ułożenie i typy neuronów oraz ich połączeń.
-Jest ona jednym z najważniejszych czynników,
+ułożenie i~typy neuronów oraz ich połączeń.
+Jest ona jednym z~najważniejszych czynników,
 które mają wpływ na zdolności modelu do:
 aproksymacji funkcji,
-szybkość uczenia i odpowiedzi
+szybkość uczenia i~odpowiedzi
 oraz generalizacji wiedzy na nowe dane%
 \sscite{haykin2009neural}.
 
 \noindent\\
-Pojęcie architektury sieci w literaturze
+Pojęcie architektury sieci w~literaturze
 obejmuje funkcje aktywacji, rozłożenie neuronów
 oraz połączenia między nimi%
 \sscite{yao1999evolving}.
@@ -311,28 +310,28 @@ oraz połączenia między nimi%
 \noindent\\
 Przekładając powyższe na MLP architektura
 odnosi się do funkcji aktywacji, liczby warstw,
-neuronów w nich i połączeń.
-W niniejszej pracy rozważane są wyłącznie
+neuronów w~nich i~połączeń.
+W~niniejszej pracy rozważane są wyłącznie
 wielowarstwowe perceptrony (MLP),
-w których każda warstwa jest
-w pełni połączona z warstwą następną.
+w~których każda warstwa jest
+w~pełni połączona z~warstwą następną.
 Oznacza to, że sposób połączenia neuronów jest
-z góry ustalony i nie podlega optymalizacji.
-Z tego powodu liczba połączeń nie stanowi
+z~góry ustalony i~nie podlega optymalizacji.
+Z~tego powodu liczba połączeń nie stanowi
 niezależnego parametru architektury,
-lecz wynika bezpośrednio z liczby neuronów
-znajdujących się w sąsiednich warstwach.
+lecz wynika bezpośrednio z~liczby neuronów
+znajdujących się w~sąsiednich warstwach.
 Zatem architektura sieci neuronowej
 rozumiana będzie wyłącznie jako:
 \begin{itemize}
   \item liczba warstw ukrytych,
-  \item liczba neuronów w każdej warstwie ukrytej,
-  \item funkcja aktywacji zastosowana w każdej warstwie.
+  \item liczba neuronów w~każdej warstwie ukrytej,
+  \item funkcja aktywacji zastosowana w~każdej warstwie.
 \end{itemize}
 
 \noindent\\
 Do architektury nie będą natomiast zaliczane
-wartości wag i wyrazów wolnych neuronów,
+wartości wag i~wyrazów wolnych neuronów,
 ponieważ są one wyznaczane podczas procesu uczenia.
 Nie będą do niej również zaliczane parametry procesu
 uczenia, takie jak współczynnik uczenia,
@@ -342,11 +341,11 @@ lecz nie zmieniają struktury modelu.
 
 \noindent\\
 Dobór odpowiedniej architektury
-jest jednym z najważniejszych zagadnień
+jest jednym z~najważniejszych zagadnień
 podczas tworzenia sieci.
-W przypadku wybierania takiej architektury 
+W~przypadku wybierania takiej architektury 
 liczba parametrów jest znacząca.
-Z tego powodu można wykorzystać metody
+Z~tego powodu można wykorzystać metody
 automatycznej optymalizacji, które są przeznaczone
 do przeszukiwania dużych przestrzeni rozwiązań%
 \sscite{yao1999evolving}%
@@ -360,7 +359,7 @@ czyli metod optymalizacyjnych inspirowanych
 mechanizmami ewolucji biologicznej.
 Ich działanie opiera się na założeniu,
 że wielokrotne tworzenie nowych rozwiązań
-poprzez krzyżowanie i mutację
+poprzez krzyżowanie i~mutację
 oraz preferowanie lepiej przystosowanych osobników
 prowadzi do stopniowej poprawy jakości rozwiązań
 w kolejnych pokoleniach%
@@ -401,7 +400,7 @@ W jego trakcie stosowane są operatory krzyżowania
 oraz mutacji prowadzące do powstania nowych osobników.
 Utworzone potomstwo zastępuje część
 lub całość poprzedniej populacji,
-po czym proces oceny i reprodukcji jest powtarzany
+po czym proces oceny i~reprodukcji jest powtarzany
 aż do spełnienia warunku zakończenia algorytmu%
 \sscite{eiben2015evolutionary}.
 
@@ -426,9 +425,9 @@ Celem tego procesu jest utworzenie nowych osobników
 posiadających cechy odziedziczone po rodzicach.
 Sposób przeprowadzenia krzyżowania zależy
 od przyjętej reprezentacji genotypu
-i może obejmować między innymi krzyżowanie
+i~może obejmować między innymi krzyżowanie
 jedno- lub wielopunktowe, równomierne oraz operatory
-przeznaczone dla struktur o zmiennej długości%
+przeznaczone dla struktur o~zmiennej długości%
 \sscite{goldberg1989genetic}%
 \sscite{stanley2002neat}%
 \sscite{synapsing_varlen_crossover}.
@@ -442,28 +441,28 @@ do lokalnych ekstremów funkcji celu.
 W zależności od sposobu reprezentacji genotypu mutacja
 może polegać na zmianie wartości pojedynczych genów,
 zamianie elementów miejscami
-lub dodawaniu i usuwaniu fragmentów kodu genetycznego%
+lub dodawaniu i~usuwaniu fragmentów kodu genetycznego%
 \sscite{goldberg1989genetic}.
 
 \subsection*{Elitaryzm}
-W wielu implementacjach algorytmów genetycznych
+W~wielu implementacjach algorytmów genetycznych
 stosowany jest mechanizm elitaryzmu.
 Polega on na bezpośrednim przenoszeniu najlepszych
-osobników z bieżącego pokolenia do kolejnego
-bez poddawania ich operacjom krzyżowania i mutacji.
+osobników z~bieżącego pokolenia do kolejnego
+bez poddawania ich operacjom krzyżowania i~mutacji.
 Pozwala to uniknąć utraty najlepszych znalezionych
-rozwiązań i często przyspiesza proces optymalizacji%
+rozwiązań i~często przyspiesza proces optymalizacji%
 \sscite{eiben2015evolutionary}.
 
 \subsection*{Zastosowanie do optymalizacji}
-Algorytmy genetyczne znajdują zastosowanie w problemach,
+Algorytmy genetyczne znajdują zastosowanie w~problemach,
 dla których wyznaczenie rozwiązania optymalnego
 metodami analitycznymi jest trudne lub niemożliwe.
-Szczególnie dobrze sprawdzają się w zadaniach
+Szczególnie dobrze sprawdzają się w~zadaniach
 charakteryzujących się dużą przestrzenią poszukiwań,
 obecnością wielu lokalnych ekstremów
 oraz nieciągłościami funkcji celu.
-Z tego powodu są wykorzystywane między innymi
+Z~tego powodu są wykorzystywane między innymi
 do optymalizacji parametrów modeli uczenia maszynowego,
 projektowania układów technicznych,
 planowania harmonogramów oraz
@@ -471,35 +470,37 @@ rozwiązywania problemów kombinatorycznych%
 \sscite{eiben2015evolutionary}.
 
 \section{Ewolucyjna optymalizacja sieci neuronowych}
-Dobór architektury sieci neuronowej stanowi
-jedno z najważniejszych zagadnień
-podczas projektowania modeli uczenia maszynowego.
-W praktyce proces ten często opiera się
+Jak już zostało przytoczone
+w~\cref{subsec:nn_architecture_theory}
+architektura sieci jest jednym z~najważniejszych
+elementów wpływającym na efektywność uczenia,
+jak i~na jej późniejsze zdolności do realizacji zadań.
+W~praktyce proces ten często opiera się
 na wiedzy eksperckiej,
 wcześniejszych doświadczeniach
-oraz metodzie prób i błędów.
-Wraz ze wzrostem liczby parametrów architektury,
-takich jak liczba warstw ukrytych,
-liczba neuronów w poszczególnych warstwach
-czy rodzaje funkcji aktywacji,
+oraz metodzie prób i~błędów.
+A~wraz ze wzrostem liczby parametrów architektury,
+takich jak liczba neuronów
+czy rodzaje funkcji aktywacji
+w~poszczególnych warstwach,
 liczba możliwych konfiguracji rośnie bardzo szybko.
-Powoduje to, że ręczne przeszukiwanie
-przestrzeni rozwiązań staje się czasochłonne
-i nie gwarantuje znalezienia rozwiązania optymalnego%
+Powoduje to, że ręczne przeszukiwanie przestrzeni
+rozwiązań staje się czasochłonne, a~nie gwarantuje
+znalezienia optymalnego rozwiązania%
 \sscite{Goodfellow-et-al-2016}%
 \sscite{yao1999evolving}.
 
 \noindent\\
 Jednym ze sposobów automatyzacji tego procesu
 jest wykorzystanie algorytmów ewolucyjnych,
-a w szczególności algorytmów genetycznych.
+a~w~szczególności algorytmów genetycznych.
 Podejście to określane jest często mianem
 neuroewolucji (ang. \textit{neuroevolution})
-i polega na zastosowaniu mechanizmów
+i~polega na zastosowaniu mechanizmów
 inspirowanych ewolucją biologiczną
 do optymalizacji wybranych
 elementów sieci neuronowych.
-W zależności od przyjętego rozwiązania
+W~zależności od przyjętego rozwiązania
 algorytm może optymalizować
 wyłącznie architekturę sieci,
 wyłącznie wartości wag
@@ -508,11 +509,11 @@ lub oba te elementy jednocześnie%
 \sscite{stanley2019neuroevolution}.
 
 \noindent\\
-W przypadku optymalizacji architektury
+W~przypadku optymalizacji architektury
 każda sieć neuronowa reprezentowana jest przez genotyp,
 czyli zakodowany opis jej struktury.
 Genotyp może zawierać informacje między innymi
-o liczbie warstw ukrytych,
+o~liczbie warstw ukrytych,
 liczbie neuronów w poszczególnych warstwach,
 rodzajach funkcji aktywacji
 lub sposobie połączenia neuronów.
@@ -526,9 +527,9 @@ na rozwiązanie problemu%
 \noindent\\
 Ocena jakości poszczególnych osobników
 realizowana jest za pomocą funkcji przystosowania.
-W kontekście sieci neuronowych
+W~kontekście sieci neuronowych
 najczęściej wykorzystuje się miary związane
-z jakością działania modelu,
+z~jakością działania modelu,
 takie jak dokładność klasyfikacji,
 wartość funkcji straty
 lub inne wskaźniki zależne od rozwiązywanego problemu.
@@ -546,12 +547,12 @@ bardzo dużych przestrzeni rozwiązań
 bez konieczności posiadania informacji
 o własnościach optymalizowanej funkcji celu.
 Dzięki wykorzystaniu populacji rozwiązań
-oraz operatorów krzyżowania i mutacji
+oraz operatorów krzyżowania i~mutacji
 algorytmy te są mniej podatne na zatrzymywanie się
-w lokalnych ekstremach niż wiele
+w~lokalnych ekstremach niż wiele
 klasycznych metod optymalizacji.
-Z tego względu znajdują zastosowanie
-w problemach charakteryzujących się
+Z~tego względu znajdują zastosowanie
+w~problemach charakteryzujących się
 dużą liczbą parametrów
 oraz złożonym krajobrazem funkcji celu%
 \sscite{eiben2015evolutionary}%
@@ -561,38 +562,38 @@ oraz złożonym krajobrazem funkcji celu%
 Badania nad wykorzystaniem algorytmów genetycznych
 do projektowania sieci neuronowych prowadzone są
 od końca lat osiemdziesiątych XX wieku.
-Jedne z pierwszych prac dotyczących tego zagadnienia
-zostały przedstawione przez Millera, Todda i Hegde{\textquotesingle}a,
-którzy wykorzystali algorytmy genetyczne
+Jedne z~pierwszych prac dotyczących tego zagadnienia
+zostały przedstawione w~\cite{miller1989designing},
+%  przez Millera, Todda i~Hegde{\textquotesingle}a,
+gdzie autorzy wykorzystali algorytmy genetyczne
 do automatycznego projektowania
-architektur sieci neuronowych%
-\sscite{miller1989designing}.
-W kolejnych latach rozwijano zarówno metody
+architektur sieci neuronowych.
+W~kolejnych latach rozwijano zarówno metody
 optymalizacji parametrów architektury,
-jak i podejścia umożliwiające ewolucję
+jak i~podejścia umożliwiające ewolucję
 samej topologii połączeń pomiędzy neuronami.
 Przykładem takiego rozwiązania jest algorytm NEAT
 (\textit{NeuroEvolution of Augmenting Topologies}),
-w którym struktura sieci może być stopniowo rozwijana
-w trakcie procesu ewolucyjnego%
+w~którym struktura sieci może być stopniowo rozwijana
+w~trakcie procesu ewolucyjnego%
 \sscite{stanley2002neat}.
-W niniejszej pracy rozważany jest bardziej ograniczony
+W~niniejszej pracy rozważany jest bardziej ograniczony
 wariant tego problemu, ponieważ analizowane są wyłącznie
-w pełni połączone wielowarstwowe perceptrony.
+w~pełni połączone wielowarstwowe perceptrony.
 Oznacza to, że sposób połączenia neuronów pomiędzy
-kolejnymi warstwami jest z góry ustalony i nie podlega
+kolejnymi warstwami jest z~góry ustalony i~nie podlega
 optymalizacji. Zmianom podlega natomiast liczba warstw
-ukrytych, liczba neuronów w poszczególnych warstwach
+ukrytych, liczba neuronów w~poszczególnych warstwach
 oraz zastosowane funkcje aktywacji.
 
 \noindent\\
 Współcześnie metody neuroewolucyjne są nadal rozwijane
-i wykorzystywane do automatycznego doboru architektury
+i~wykorzystywane do automatycznego doboru architektury
 modeli uczenia maszynowego.
-Znajdują one zastosowanie szczególnie w sytuacjach,
-w których liczba możliwych
+Znajdują one zastosowanie szczególnie w~sytuacjach,
+w~których liczba możliwych
 konfiguracji jest bardzo duża,
-a ręczne projektowanie architektury
+a~ręczne projektowanie architektury
 staje się nieefektywne.
 Przykłady współczesnych badań pokazują,
 że algorytmy genetyczne mogą skutecznie wspomagać
