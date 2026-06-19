@@ -143,6 +143,8 @@
   \RequirePackage[utf8]{inputenc}
   \DeclareUnicodeCharacter{00B0}{$^{\circ}$}
   \DeclareUnicodeCharacter{00D7}{x}
+  % should'n 00D7 be this?
+  % \DeclareUnicodeCharacter{00D7}{$\times$}
 \fi
 
 % -------------------------------------------------------------------
