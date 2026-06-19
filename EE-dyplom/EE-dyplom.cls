@@ -686,10 +686,12 @@
   \end{center}
   \@streszczeniepracy
 
-  \vskip 2em
-  \noindent\textbf{Słowa kluczowe: }
-  \@slowakluczowe
-  \cleardoublepage
+  {\setlength{\parskip}{0pt}
+    \vskip 2em
+    \noindent\textbf{Słowa kluczowe: }
+    \@slowakluczowe
+    \cleardoublepage
+  }
 }
 
 % Abstract angielski
@@ -703,10 +705,12 @@
   \end{center}
   \@thesisabstract
 
-  \vskip 2em
-  \noindent\textbf{Keywords: }
-  \@thesiskeywords
-  \cleardoublepage
+  {\setlength{\parskip}{0pt}
+    \vskip 2em
+    \noindent\textbf{Keywords: }
+    \@thesiskeywords
+    \cleardoublepage
+  }
 }
 
 % Spięcie stron streszczeń we właściwej
