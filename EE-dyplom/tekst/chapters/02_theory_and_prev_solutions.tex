@@ -16,7 +16,6 @@ regresja, rozpoznawanie obrazów czy
 przetwarzanie języka naturalnego%
 \sscite{Goodfellow-et-al-2016}.
 
-\noindent\\
 Podstawą działania sieci neuronowych
 są sztuczne neurony.
 W~najprostszej postaci sieci działanie
@@ -50,7 +49,6 @@ może odwzorowywać zależności,
 których nie da się opisać
 za pomocą prostych modeli liniowych.
 
-\noindent\\
 Odwzorowaniem biologicznych synaps pomiędzy
 neuronami są sztuczne synapsy
 zwane połączeniami (ang. \textit{edges}).
@@ -65,7 +63,6 @@ tak by zminimalizować błąd
 dla danych treningowych%
 \sscite{Goodfellow-et-al-2016}.
 
-\noindent\\
 Obecnie sieci neuronowe są intensywnie
 rozwijanym działem informatyki.
 Z~tego powodu powstało wiele ich typów,
@@ -86,7 +83,6 @@ do przetwarzania danych sekwencyjnych%
 \sscite{Goodfellow-et-al-2016}%
 \sscite{rutkowski2009ai}.
 
-\noindent\\
 Sieci składają się z~trzech segmentów:
 wejściowego, przetwarzającego i~wyjściowego.
 Odpowiadają one kolejno receptorom, mózgowi i~efektorom%
@@ -96,7 +92,6 @@ informacje przepływają wyłącznie
 od segmentu wejściowego do wyjściowego,
 bez występowania cykli oraz sprzężeń zwrotnych.
 
-\noindent\\
 W~perceptronie wielowarstwowym
 segmenty sieci upraszczają się odpowiednio
 do trzech podstawowych rodzajów warstw:
@@ -148,7 +143,6 @@ od wartości neuronów znajdujących się
 w~poprzednich warstwach%
 \sscite{Goodfellow-et-al-2016}.
 
-\noindent\\
 W~sieci MLP połączenia występują tylko
 pomiędzy sąsiadującymi warstwami, co powoduje,
 iż każda warstwa przetwarza dane wyłącznie
@@ -178,7 +172,6 @@ natomiast w~zadaniach regresyjnych
 liczba neuronów może zaczynać się od jednego,
 w~zależności od liczby przewidywanych wartości.
 
-\noindent\\
 Powyżej omawiane warstwy są z~reguły zdeterminowane
 przez dane i~specyfikę problemu,
 więc do optymalizacji zostają warstwy ukryte
@@ -190,7 +183,6 @@ do modelowania skomplikowanych zależności.
 Dlatego ich konfiguracja jest kluczowym
 obszarem optymalizacji.
 
-\noindent\\
 Największy wpływ na proces uczenia MLP
 mają następujące parametry:
 \begin{itemize}
@@ -201,7 +193,6 @@ mają następujące parametry:
   \item parametry procesu uczenia.
 \end{itemize}
 
-\noindent\\
 Ich dobór ma bezpośredni skutek
 w~zdolnościach sieci do generalizacji
 oraz osiąganiu zadawalających wyników.
@@ -301,13 +292,11 @@ szybkość uczenia i~odpowiedzi
 oraz generalizacji wiedzy na nowe dane%
 \sscite{haykin2009neural}.
 
-\noindent\\
 Pojęcie architektury sieci w~literaturze
 obejmuje funkcje aktywacji, rozłożenie neuronów
 oraz połączenia między nimi%
 \sscite{yao1999evolving}.
 
-\noindent\\
 Przekładając powyższe na MLP architektura
 odnosi się do funkcji aktywacji, liczby warstw,
 neuronów w~nich i~połączeń.
@@ -329,7 +318,6 @@ rozumiana będzie wyłącznie jako:
   \item funkcja aktywacji zastosowana w~każdej warstwie.
 \end{itemize}
 
-\noindent\\
 Do architektury nie będą natomiast zaliczane
 wartości wag i~wyrazów wolnych neuronów,
 ponieważ są one wyznaczane podczas procesu uczenia.
@@ -339,7 +327,6 @@ liczba epok czy zastosowany optymalizator.
 Parametry te wpływają na przebieg uczenia,
 lecz nie zmieniają struktury modelu.
 
-\noindent\\
 Dobór odpowiedniej architektury
 jest jednym z~najważniejszych zagadnień
 podczas tworzenia sieci.
@@ -363,10 +350,11 @@ poprzez krzyżowanie i~mutację
 oraz preferowanie lepiej przystosowanych osobników
 prowadzi do stopniowej poprawy jakości rozwiązań
 w kolejnych pokoleniach%
-\sscite{goldberg1989genetic}%
-\sscite{eiben2015evolutionary}.
+\sscite{
+  goldberg1989genetic,
+  eiben2015evolutionary,
+}.
 
-\noindent\\
 Podstawowym elementem algorytmu genetycznego
 jest populacja osobników reprezentujących
 potencjalne rozwiązania rozważanego problemu.
@@ -377,7 +365,6 @@ będący rzeczywistą postacią rozwiązania
 ocenianą przez algorytm%
 \sscite{goldberg1989genetic}.
 
-\noindent\\
 Jakość poszczególnych osobników jest określana
 za pomocą funkcji przystosowania
 (ang. \textit{fitness function}).
@@ -389,7 +376,6 @@ tym większe prawdopodobieństwo przekazania cech
 danego osobnika kolejnym pokoleniom%
 \sscite{goldberg1989genetic}.
 
-\noindent\\
 Typowy przebieg algorytmu genetycznego rozpoczyna się
 od wygenerowania początkowej populacji osobników.
 Następnie dla każdego osobnika obliczana
@@ -428,9 +414,11 @@ od przyjętej reprezentacji genotypu
 i~może obejmować między innymi krzyżowanie
 jedno- lub wielopunktowe, równomierne oraz operatory
 przeznaczone dla struktur o~zmiennej długości%
-\sscite{goldberg1989genetic}%
-\sscite{stanley2002neat}%
-\sscite{synapsing_varlen_crossover}.
+\sscite{
+  goldberg1989genetic,
+  stanley2002neat,
+  synapsing_varlen_crossover,
+}.
 
 \subsection*{Mutacja}
 Mutacja polega na losowej modyfikacji genotypu osobnika.
@@ -487,10 +475,11 @@ liczba możliwych konfiguracji rośnie bardzo szybko.
 Powoduje to, że ręczne przeszukiwanie przestrzeni
 rozwiązań staje się czasochłonne, a~nie gwarantuje
 znalezienia optymalnego rozwiązania%
-\sscite{Goodfellow-et-al-2016}%
-\sscite{yao1999evolving}.
+\sscite{
+  Goodfellow-et-al-2016,
+  yao1999evolving,
+}.
 
-\noindent\\
 Jednym ze sposobów automatyzacji tego procesu
 jest wykorzystanie algorytmów ewolucyjnych,
 a~w~szczególności algorytmów genetycznych.
@@ -505,10 +494,11 @@ algorytm może optymalizować
 wyłącznie architekturę sieci,
 wyłącznie wartości wag
 lub oba te elementy jednocześnie%
-\sscite{yao1999evolving}%
-\sscite{stanley2019neuroevolution}.
+\sscite{
+  yao1999evolving,
+  stanley2019neuroevolution,
+}.
 
-\noindent\\
 W~przypadku optymalizacji architektury
 każda sieć neuronowa reprezentowana jest przez genotyp,
 czyli zakodowany opis jej struktury.
@@ -521,10 +511,11 @@ Na podstawie takiej reprezentacji
 algorytm genetyczny tworzy
 kolejne pokolenia kandydatów
 na rozwiązanie problemu%
-\sscite{miller1989designing}%
-\sscite{Kitano1990DesigningNN}.
+\sscite{
+  miller1989designing,
+  Kitano1990DesigningNN,
+}.
 
-\noindent\\
 Ocena jakości poszczególnych osobników
 realizowana jest za pomocą funkcji przystosowania.
 W~kontekście sieci neuronowych
@@ -536,11 +527,12 @@ lub inne wskaźniki zależne od rozwiązywanego problemu.
 Im lepszy wynik osiąga dana sieć,
 tym większe prawdopodobieństwo,
 że jej cechy zostaną przekazane kolejnym pokoleniom%
-\sscite{goldberg1989genetic}%
-\sscite{yao1999evolving}%
-\sscite{eiben2015evolutionary}.
+\sscite{
+  goldberg1989genetic,
+  yao1999evolving,
+  eiben2015evolutionary,
+}.
 
-\noindent\\
 Istotną zaletą algorytmów genetycznych
 jest możliwość efektywnego przeszukiwania
 bardzo dużych przestrzeni rozwiązań
@@ -555,10 +547,11 @@ Z~tego względu znajdują zastosowanie
 w~problemach charakteryzujących się
 dużą liczbą parametrów
 oraz złożonym krajobrazem funkcji celu%
-\sscite{eiben2015evolutionary}%
-\sscite{michalewicz2003evolutionary}.
+\sscite{
+  eiben2015evolutionary,
+  michalewicz2003evolutionary,
+}.
 
-\noindent\\
 Badania nad wykorzystaniem algorytmów genetycznych
 do projektowania sieci neuronowych prowadzone są
 od końca lat osiemdziesiątych XX wieku.
@@ -586,7 +579,6 @@ optymalizacji. Zmianom podlega natomiast liczba warstw
 ukrytych, liczba neuronów w~poszczególnych warstwach
 oraz zastosowane funkcje aktywacji.
 
-\noindent\\
 Współcześnie metody neuroewolucyjne są nadal rozwijane
 i~wykorzystywane do automatycznego doboru architektury
 modeli uczenia maszynowego.
@@ -600,8 +592,10 @@ Przykłady współczesnych badań pokazują,
 proces poszukiwania architektur
 osiągających wysoką jakość działania
 dla określonych problemów%
-\sscite{domashova2021optimal}%
-\sscite{stanley2019neuroevolution}.
+\sscite{
+  domashova2021optimal,
+  stanley2019neuroevolution,
+}.
 
 \section{Przegląd rozwiązań}
 % https://arxiv.org/abs/2003.06505
