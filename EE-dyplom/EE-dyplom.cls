@@ -31,17 +31,17 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{EE-dyplom}[2026/03/03 Praca dyplomowa na Politechnice Warszawskiej]
 
-\LoadClass[a4paper,11pt,twoside,openright]{book}
+% \LoadClass[a4paper,11pt,twoside,openright]{book}
 % Alternatywnie: 12 pt
-%\LoadClass[a4paper,12pt,twoside,openright]{book}
+\LoadClass[a4paper,12pt,twoside,openright]{book}
 
 % -------------------------------------------------------------------
 % Możliwość kompilacji przez pdflatex i xelatex
 % -------------------------------------------------------------------
 \RequirePackage{iftex}
 \ifPDFTeX
-    \let\strcmp\pdfstrcmp
-    \let\XeLaTeX\LaTeX
+  \let\strcmp\pdfstrcmp
+  \let\XeLaTeX\LaTeX
 \fi
 
 % -------------------------------------------------------------------
@@ -55,16 +55,16 @@
 
 
 \ifnum\strcmp{\pwthesis}{inz} = 0
-    \newcommand{\locallang}{PL}
+  \newcommand{\locallang}{PL}
 \fi
 \ifnum\strcmp{\pwthesis}{mgr} = 0
-    \newcommand{\locallang}{PL}
+  \newcommand{\locallang}{PL}
 \fi
 \ifnum\strcmp{\pwthesis}{bsc} = 0
-    \newcommand{\locallang}{EN}
+  \newcommand{\locallang}{EN}
 \fi
 \ifnum\strcmp{\pwthesis}{msc} = 0
-    \newcommand{\locallang}{EN}
+  \newcommand{\locallang}{EN}
 \fi
 
 % -------------------------------------------------------------------
@@ -76,9 +76,9 @@
 % \makeglossaries
 % \loadglsentries{tekst/glossary}
 \ifnum\strcmp{\locallang}{PL} = 0 
-    \newcommand{\acronymstitle}{Wykaz skrótów i symboli}
+  \newcommand{\acronymstitle}{Wykaz skrótów i~symboli}
 \else
-    \newcommand{\acronymstitle}{List of Abbreviations and Symbols}
+  \newcommand{\acronymstitle}{List of Abbreviations and Symbols}
 \fi
 
 % -------------------------------------------------------------------
@@ -98,13 +98,13 @@
 \RequirePackage{esint}
 %\RequirePackage[version=4]{mhchem}
 \ifXeTeX
-    \RequirePackage{mathspec} % wczytuje również fontspec
-	\usepackage[default,oldstyle]{sourcesanspro}
+  \RequirePackage{mathspec} % wczytuje również fontspec
+  \usepackage[default,oldstyle]{sourcesanspro}
 \else
 %    \RequirePackage{lmodern}
-    \usepackage[default]{sourcesanspro}
-    \renewcommand*\familydefault{\sfdefault}
-    \RequirePackage[T1]{fontenc}
+  \usepackage[default]{sourcesanspro}
+  \renewcommand*\familydefault{\sfdefault}
+  \RequirePackage[T1]{fontenc}
 \fi
 \renewcommand{\familydefault}{\sfdefault}
 
@@ -112,7 +112,7 @@
 % Podstawowa konfiguracja XeLaTeX
 % -------------------------------------------------------------------
 \ifXeTeX
-    \RequirePackage{xltxtra}
+  \RequirePackage{xltxtra}
 \fi
 
 % -------------------------------------------------------------------
@@ -120,29 +120,29 @@
 % Musi być wczytana na początku
 % -------------------------------------------------------------------
 \ifXeTeX
-    \RequirePackage{polyglossia}
-    \ifnum\strcmp{\locallang}{PL} = 0 
-        \setdefaultlanguage{polish}
-    \else
-        \setdefaultlanguage{english}
-    \fi
-    \setotherlanguage{polish}
-    \setotherlanguage{english}
-    %\setotherlanguage{latin}
-    %\selectlanguage{english}
-    %\selectlanguage{polish}
+  \RequirePackage{polyglossia}
+  \ifnum\strcmp{\locallang}{PL} = 0 
+    \setdefaultlanguage{polish}
+  \else
+    \setdefaultlanguage{english}
+  \fi
+  \setotherlanguage{polish}
+  \setotherlanguage{english}
+  %\setotherlanguage{latin}
+  %\selectlanguage{english}
+  %\selectlanguage{polish}
 \else
-    \RequirePackage[MeX]{polski}
-    \ifnum\strcmp{\locallang}{PL} = 0 
-        \RequirePackage[english,polish]{babel}
-        \selectlanguage{polish}
-    \else
-        \RequirePackage[polish,english]{babel}
-        \selectlanguage{english}
-    \fi
-    \RequirePackage[utf8]{inputenc}
-    \DeclareUnicodeCharacter{00B0}{$^{\circ}$}
-    \DeclareUnicodeCharacter{00D7}{x}
+  \RequirePackage[MeX]{polski}
+  \ifnum\strcmp{\locallang}{PL} = 0 
+    \RequirePackage[english,polish]{babel}
+    \selectlanguage{polish}
+  \else
+    \RequirePackage[polish,english]{babel}
+    \selectlanguage{english}
+  \fi
+  \RequirePackage[utf8]{inputenc}
+  \DeclareUnicodeCharacter{00B0}{$^{\circ}$}
+  \DeclareUnicodeCharacter{00D7}{x}
 \fi
 
 % -------------------------------------------------------------------
@@ -152,13 +152,14 @@
 %   margines zewnętrzny 20 mm,
 %   marginesy górny i dolny 20 mm
 % -------------------------------------------------------------------
-\RequirePackage[a4paper,
-    includehead,
-    includefoot,
-    inner=30mm,
-    outer=20mm,
-    vmargin=25mm]
-{geometry}
+\RequirePackage[
+  a4paper,
+  includehead,
+  includefoot,
+  inner=30mm,
+  outer=20mm,
+  vmargin=25mm
+]{geometry}
 % Do debugowania wymiarów
 %\RequirePackage{showframe}
 
@@ -197,20 +198,20 @@
 \RequirePackage{fancyhdr}
 \fancyhf{}
 \fancypagestyle{plain}{ %
-    \fancyhf{}
-    \renewcommand{\headrulewidth}{0pt}
-    \renewcommand{\footrulewidth}{0pt}
-    \fancyfoot[RO,LE]{\thepage}
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+  \fancyfoot[RO,LE]{\thepage}
 }
 \fancypagestyle{headings}{
-    \fancyhf{}
-    \renewcommand{\headrulewidth}{1pt}
-    \fancyheadoffset{0cm}
-    \fancyhead[LE]{\textit{\nouppercase{\leftmark}}}
-    \fancyhead[RO]{\textit{\nouppercase{\rightmark}}}
-    \fancyfoot[RO,LE]{\thepage}
-    \renewcommand{\footrulewidth}{0pt}
-    \setlength{\headheight}{16pt}
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{1pt}
+  \fancyheadoffset{0cm}
+  \fancyhead[LE]{\textit{\nouppercase{\leftmark}}}
+  \fancyhead[RO]{\textit{\nouppercase{\rightmark}}}
+  \fancyfoot[RO,LE]{\thepage}
+  \renewcommand{\footrulewidth}{0pt}
+  \setlength{\headheight}{16pt}
 }
 \pagestyle{headings}
 
@@ -240,21 +241,21 @@
 % ALBO styl harwardzki
 % -------------------------------------------------------------------
 \RequirePackage[backend=biber,
-        style=ieee,     % styl numeryczny IEEE prawie jak PN
-%        sorting=nyt,    % sortowanie spisu po nazwiskach
-        sorting=none,    % ze względu na popularne żądanie
-        citestyle=numeric-comp % kompaktowe odnośniki numeryczne typu [21-23]
-    ]{biblatex}
+    style=ieee,     % styl numeryczny IEEE prawie jak PN
+    % sorting=nyt,    % sortowanie spisu po nazwiskach
+    sorting=none,    % ze względu na popularne żądanie
+    citestyle=numeric-comp % kompaktowe odnośniki numeryczne typu [21-23]
+  ]{biblatex}
 \addbibresource{EE-dyplom.bib}
 \DeclareNameAlias{default}{family-given} % nazwisko na początku
 \newcommand{\bibliografia}{
-    \cleardoublepage
-    \phantomsection
-    \addcontentsline{toc}{chapter}{\refname}
-    {
-        \sloppy
-        \printbibliography
-    }
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\refname}
+  {
+    \sloppy
+    \printbibliography
+  }
 }
 % -------------------------------------------------------------------
 % Alternatywa - styl harwardzki:
@@ -276,10 +277,10 @@
 % ALBO kolejna w rozdziałach
 % -------------------------------------------------------------------
 % Rozwiązanie 1: ciągła w pracy
-\RequirePackage{chngcntr}
-\counterwithout{figure}{chapter}
-\counterwithout{table}{chapter}
-\counterwithout{equation}{chapter}
+% \RequirePackage{chngcntr}
+% \counterwithout{figure}{chapter}
+% \counterwithout{table}{chapter}
+% \counterwithout{equation}{chapter}
 % Rozwiązanie 2: kolejna w rozdziałach
 % To standard - wystarczy zakomentować powyższe
 
@@ -292,9 +293,14 @@
 %            font=footnotesize, justification=RaggedRight]
 %        {caption}
 % Alternatywnie: 10 pt gdy główny to 11 pt i 11 pt gdy główny to 12 pt
-\RequirePackage[format=hang, labelfont=bf, labelsep=period,
-            font=small, justification=raggedright,singlelinecheck=true]
-        {caption}
+\RequirePackage[
+  format=hang,
+  labelfont=bf,
+  labelsep=period,
+  font=small,
+  justification=raggedright,
+  singlelinecheck=true
+]{caption}
 \RequirePackage{subcaption}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,7 +336,7 @@
 % Ścieżki do grafik
 % -------------------------------------------------------------------
 \RequirePackage{graphicx}
-\graphicspath{{gfx/}{rysunki/}}
+\graphicspath{{gfx/}}
 
 % -------------------------------------------------------------------
 % Formatowanie tabel
@@ -397,25 +403,25 @@
 % -------------------------------------------------------------------
 \RequirePackage{hyperref}
 \hypersetup{ % Na bazie https://en.wikibooks.org/wiki/LaTeX/Hyperlinks
-	%    bookmarks=true,         % show bookmarks bar? FIXME
-	unicode=true,           % non-Latin characters in Acrobat’s bookmarks
-	pdftoolbar=true,        % show Acrobat’s toolbar?
-	pdfmenubar=true,        % show Acrobat’s menu?
-	pdffitwindow=false,     % window fit to page when opened
-	pdfstartview={FitH},    % fits the width of the page to the window
-	%    pdfsubject={}, % subject of the document
-	%    pdfkeywords={}, % list of keywords
-	linktoc=all,            % defines which part of an entry in the table 
-	%of contents is made into a link (none,section,page,all)
-	pdfnewwindow=true,      % links in new PDF window
-	colorlinks=true,        % false: boxed links; true: colored links
-	linkcolor=granatowy,   % color of internal links (change box color with linkbordercolor)
-	citecolor=ciemnoczerwony,   % color of links to bibliography
-	filecolor=granatowy,   % color of file links
-	urlcolor=granatowy,    % color of external links
-	linkbordercolor={1 0 0},     % color of frame around internal links (if colorlinks=false)
-	citebordercolor={0 1 0},     % color of frame around citations
-	urlbordercolor={0 1 1},     % color of frame around URL links 
+  % bookmarks=true,       % show bookmarks bar? FIXME
+  unicode=true,           % non-Latin characters in Acrobat’s bookmarks
+  pdftoolbar=true,        % show Acrobat’s toolbar?
+  pdfmenubar=true,        % show Acrobat’s menu?
+  pdffitwindow=false,     % window fit to page when opened
+  pdfstartview={FitH},    % fits the width of the page to the window
+  % pdfsubject={}, % subject of the document
+  % pdfkeywords={}, % list of keywords
+  linktoc=all,            % defines which part of an entry in the table 
+  % of contents is made into a link (none,section,page,all)
+  pdfnewwindow=true,      % links in new PDF window
+  colorlinks=true,        % false: boxed links; true: colored links
+  linkcolor=granatowy,   % color of internal links (change box color with linkbordercolor)
+  citecolor=ciemnoczerwony,   % color of links to bibliography
+  filecolor=granatowy,   % color of file links
+  urlcolor=granatowy,    % color of external links
+  linkbordercolor={1 0 0},     % color of frame around internal links (if colorlinks=false)
+  citebordercolor={0 1 0},     % color of frame around citations
+  urlbordercolor={0 1 1},     % color of frame around URL links 
 }
 
 % -------------------------------------------------------------------
@@ -423,65 +429,65 @@
 % -------------------------------------------------------------------
 \RequirePackage{listings}
 \lstdefinestyle{basiclststyle}{
-	backgroundcolor=\color{mietowy!10!white},
-    numberstyle=\tiny\color{black},
-    commentstyle=\color{mietowy!50!black},
-    keywordstyle=\bfseries\color{ciemnoczerwony},
-    identifierstyle=\color{niebieski},
-    stringstyle=\color{fioletowy},
-    basicstyle=\ttfamily\small,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
-    keepspaces=true,
-    numbers=left,
-    firstnumber=1, % 2
-    stepnumber=1,  % 5
-    numbersep=5pt,
-    xleftmargin=4ex,frame=single,framexleftmargin=0ex,
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-    tabsize=2,
-    frame=lrbt,
-    frameround=ffff,
-    inputpath=src,
-    aboveskip=1.46557em,
-    belowskip=1em,
-	escapeinside={\%*}{*)},
-	inputencoding = utf8,
-    extendedchars = true,
-    literate      =
-      {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
-      {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
-      {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
-      {À}{{\`A}}1  {È}{{\`E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
-      {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
-      {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
-      {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
-      {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
-      {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
-      {ẞ}{{\SS}}1  {ç}{{\c{c}}}1 {Ç}{{\c{C}}}1 {ø}{{\o}}1  {Ø}{{\O}}1
-      {å}{{\aa}}1  {Å}{{\AA}}1  {ã}{{\~a}}1  {õ}{{\~o}}1 {Ã}{{\~A}}1
-      {Õ}{{\~O}}1  {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1
-      {„}{\quotedblbase}1 {“}{\textquotedblleft}1 {–}{$-$}1
-      {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
-      {£}{{\pounds}}1  {©}{{\copyright}}1  {®}{{\textregistered}}1
-      {«}{{\guillemotleft}}1  {»}{{\guillemotright}}1  {Ð}{{\DH}}1  {ð}{{\dh}}1
-      {Ý}{{\'Y}}1    {ý}{{\'y}}1    {Þ}{{\TH}}1    {þ}{{\th}}1    {Ă}{{\u{A}}}1
-      {ă}{{\u{a}}}1  {Ą}{{\k{A}}}1  {ą}{{\k{a}}}1  {Ć}{{\'C}}1    {ć}{{\'c}}1
-      {Č}{{\v{C}}}1  {č}{{\v{c}}}1  {Ď}{{\v{D}}}1  {ď}{{\v{d}}}1  {Đ}{{\DJ}}1
-      {đ}{{\dj}}1    {Ė}{{\.{E}}}1  {ė}{{\.{e}}}1  {Ę}{{\k{E}}}1  {ę}{{\k{e}}}1
-      {Ě}{{\v{E}}}1  {ě}{{\v{e}}}1  {Ğ}{{\u{G}}}1  {ğ}{{\u{g}}}1  {Ĩ}{{\~I}}1
-      {ĩ}{{\~\i}}1   {Į}{{\k{I}}}1  {į}{{\k{i}}}1  {İ}{{\.{I}}}1  {ı}{{\i}}1
-      {Ĺ}{{\'L}}1    {ĺ}{{\'l}}1    {Ľ}{{\v{L}}}1  {ľ}{{\v{l}}}1  {Ł}{{\L{}}}1
-      {ł}{{\l{}}}1   {Ń}{{\'N}}1    {ń}{{\'n}}1    {Ň}{{\v{N}}}1  {ň}{{\v{n}}}1
-      {Ő}{{\H{O}}}1  {ő}{{\H{o}}}1  {Ŕ}{{\'{R}}}1  {ŕ}{{\'{r}}}1  {Ř}{{\v{R}}}1
-      {ř}{{\v{r}}}1  {Ś}{{\'S}}1    {ś}{{\'s}}1    {Ş}{{\c{S}}}1  {ş}{{\c{s}}}1
-      {Š}{{\v{S}}}1  {š}{{\v{s}}}1  {Ť}{{\v{T}}}1  {ť}{{\v{t}}}1  {Ũ}{{\~U}}1
-      {ũ}{{\~u}}1    {Ū}{{\={U}}}1  {ū}{{\={u}}}1  {Ů}{{\r{U}}}1  {ů}{{\r{u}}}1
-      {Ű}{{\H{U}}}1  {ű}{{\H{u}}}1  {Ų}{{\k{U}}}1  {ų}{{\k{u}}}1  {Ź}{{\'Z}}1
-      {ź}{{\'z}}1    {Ż}{{\.Z}}1    {ż}{{\.z}}1    {Ž}{{\v{Z}}}1  {ž}{{\v{z}}}1
+  backgroundcolor=\color{mietowy!10!white},
+  numberstyle=\tiny\color{black},
+  commentstyle=\color{mietowy!50!black},
+  keywordstyle=\bfseries\color{ciemnoczerwony},
+  identifierstyle=\color{niebieski},
+  stringstyle=\color{fioletowy},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  firstnumber=1, % 2
+  stepnumber=1,  % 5
+  numbersep=5pt,
+  xleftmargin=4ex,frame=single,framexleftmargin=0ex,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=lrbt,
+  frameround=ffff,
+  inputpath=src,
+  aboveskip=1.46557em,
+  belowskip=1em,
+  escapeinside={\%*}{*)},
+  inputencoding = utf8,
+  extendedchars = true,
+  literate      =
+    {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
+    {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
+    {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
+    {À}{{\`A}}1  {È}{{\`E}}1  {Ì}{{\`I}}1 {Ò}{{\`O}}1  {Ù}{{\`U}}1
+    {ä}{{\"a}}1  {ë}{{\"e}}1  {ï}{{\"i}}1 {ö}{{\"o}}1  {ü}{{\"u}}1
+    {Ä}{{\"A}}1  {Ë}{{\"E}}1  {Ï}{{\"I}}1 {Ö}{{\"O}}1  {Ü}{{\"U}}1
+    {â}{{\^a}}1  {ê}{{\^e}}1  {î}{{\^i}}1 {ô}{{\^o}}1  {û}{{\^u}}1
+    {Â}{{\^A}}1  {Ê}{{\^E}}1  {Î}{{\^I}}1 {Ô}{{\^O}}1  {Û}{{\^U}}1
+    {œ}{{\oe}}1  {Œ}{{\OE}}1  {æ}{{\ae}}1 {Æ}{{\AE}}1  {ß}{{\ss}}1
+    {ẞ}{{\SS}}1  {ç}{{\c{c}}}1 {Ç}{{\c{C}}}1 {ø}{{\o}}1  {Ø}{{\O}}1
+    {å}{{\aa}}1  {Å}{{\AA}}1  {ã}{{\~a}}1  {õ}{{\~o}}1 {Ã}{{\~A}}1
+    {Õ}{{\~O}}1  {ñ}{{\~n}}1  {Ñ}{{\~N}}1  {¿}{{?`}}1  {¡}{{!`}}1
+    {„}{\quotedblbase}1 {“}{\textquotedblleft}1 {–}{$-$}1
+    {°}{{\textdegree}}1 {º}{{\textordmasculine}}1 {ª}{{\textordfeminine}}1
+    {£}{{\pounds}}1  {©}{{\copyright}}1  {®}{{\textregistered}}1
+    {«}{{\guillemotleft}}1  {»}{{\guillemotright}}1  {Ð}{{\DH}}1  {ð}{{\dh}}1
+    {Ý}{{\'Y}}1    {ý}{{\'y}}1    {Þ}{{\TH}}1    {þ}{{\th}}1    {Ă}{{\u{A}}}1
+    {ă}{{\u{a}}}1  {Ą}{{\k{A}}}1  {ą}{{\k{a}}}1  {Ć}{{\'C}}1    {ć}{{\'c}}1
+    {Č}{{\v{C}}}1  {č}{{\v{c}}}1  {Ď}{{\v{D}}}1  {ď}{{\v{d}}}1  {Đ}{{\DJ}}1
+    {đ}{{\dj}}1    {Ė}{{\.{E}}}1  {ė}{{\.{e}}}1  {Ę}{{\k{E}}}1  {ę}{{\k{e}}}1
+    {Ě}{{\v{E}}}1  {ě}{{\v{e}}}1  {Ğ}{{\u{G}}}1  {ğ}{{\u{g}}}1  {Ĩ}{{\~I}}1
+    {ĩ}{{\~\i}}1   {Į}{{\k{I}}}1  {į}{{\k{i}}}1  {İ}{{\.{I}}}1  {ı}{{\i}}1
+    {Ĺ}{{\'L}}1    {ĺ}{{\'l}}1    {Ľ}{{\v{L}}}1  {ľ}{{\v{l}}}1  {Ł}{{\L{}}}1
+    {ł}{{\l{}}}1   {Ń}{{\'N}}1    {ń}{{\'n}}1    {Ň}{{\v{N}}}1  {ň}{{\v{n}}}1
+    {Ő}{{\H{O}}}1  {ő}{{\H{o}}}1  {Ŕ}{{\'{R}}}1  {ŕ}{{\'{r}}}1  {Ř}{{\v{R}}}1
+    {ř}{{\v{r}}}1  {Ś}{{\'S}}1    {ś}{{\'s}}1    {Ş}{{\c{S}}}1  {ş}{{\c{s}}}1
+    {Š}{{\v{S}}}1  {š}{{\v{s}}}1  {Ť}{{\v{T}}}1  {ť}{{\v{t}}}1  {Ũ}{{\~U}}1
+    {ũ}{{\~u}}1    {Ū}{{\={U}}}1  {ū}{{\={u}}}1  {Ů}{{\r{U}}}1  {ů}{{\r{u}}}1
+    {Ű}{{\H{U}}}1  {ű}{{\H{u}}}1  {Ų}{{\k{U}}}1  {ų}{{\k{u}}}1  {Ź}{{\'Z}}1
+    {ź}{{\'z}}1    {Ż}{{\.Z}}1    {ż}{{\.z}}1    {Ž}{{\v{Z}}}1  {ž}{{\v{z}}}1
 }
 \lstset{style=basiclststyle}
 
@@ -500,11 +506,11 @@
 \RequirePackage{etoolbox}
 %\RequirePackage[titletoc]{appendix}
 \ifnum\strcmp{\locallang}{PL} = 0 
-    \newcommand{\appendiceslisttitle}{Spis załączników}
-    \newcommand{\appendixprefix}{Załącznik}
+  \newcommand{\appendiceslisttitle}{Spis załączników}
+  \newcommand{\appendixprefix}{Załącznik}
 \else
-    \newcommand{\appendiceslisttitle}{List of Appendices}
-    \newcommand{\appendixprefix}{Appendix}
+  \newcommand{\appendiceslisttitle}{List of Appendices}
+  \newcommand{\appendixprefix}{Appendix}
 \fi
 \renewcommand{\appendixname}{\appendixprefix}
 \let\appendixname\appendixprefix
@@ -563,156 +569,156 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\instytut}[1]{
-    \newcommand{\@instytut}{#1}
+  \newcommand{\@instytut}{#1}
 }
 \newcommand{\kierunek}[1]{
-    \newcommand{\@kierunek}{#1}
+  \newcommand{\@kierunek}{#1}
 }
 \newcommand{\specjalnosc}[1]{
-    \newcommand{\@specjalnosc}{#1}
+  \newcommand{\@specjalnosc}{#1}
 }
 \newcommand{\album}[1]{
-    \newcommand{\@album}{#1}
+  \newcommand{\@album}{#1}
 }
 \newcommand{\promotor}[1]{
-    \newcommand{\@promotor}{#1}
+  \newcommand{\@promotor}{#1}
 }
 \newcommand{\engtitle}[1]{
-    \newcommand{\@engtitle}{#1}
+  \newcommand{\@engtitle}{#1}
 }
 \newcommand{\longdate}[1]{
-    \newcommand{\@longdate}{#1}
+  \newcommand{\@longdate}{#1}
 }
 
 \ifnum\strcmp{\pwthesis}{inz} = 0
-    \newcommand{\frontpageheader}{inzhead.png}
+  \newcommand{\frontpageheader}{inzhead.png}
 \fi
 \ifnum\strcmp{\pwthesis}{mgr} = 0
-    \newcommand{\frontpageheader}{mgrhead.png}
+  \newcommand{\frontpageheader}{mgrhead.png}
 \fi
 \ifnum\strcmp{\pwthesis}{bsc} = 0
-    \newcommand{\frontpageheader}{bschead.png}
+  \newcommand{\frontpageheader}{bschead.png}
 \fi
 \ifnum\strcmp{\pwthesis}{msc} = 0
-    \newcommand{\frontpageheader}{mschead.png}
+  \newcommand{\frontpageheader}{mschead.png}
 \fi
 
 \ifnum\strcmp{\locallang}{PL} = 0
-    \newcommand{\kieruneklocal}{na~kierunku }
-    \newcommand{\specjalnosclocal}{w~specjalności }
-    \newcommand{\titlelocal}{\@title }
-    \newcommand{\albumlocal}{numer~albumu }
-    \newcommand{\promotorlocal}{promotor}
-    \newcommand{\citylocal}{WARSZAWA }
+  \newcommand{\kieruneklocal}{na~kierunku }
+  \newcommand{\specjalnosclocal}{w~specjalności }
+  \newcommand{\titlelocal}{\@title }
+  \newcommand{\albumlocal}{numer~albumu }
+  \newcommand{\promotorlocal}{promotor}
+  \newcommand{\citylocal}{WARSZAWA }
 \fi
 \ifnum\strcmp{\locallang}{EN} = 0
-    \newcommand{\kieruneklocal}{in~the~field~of~study }
-    \newcommand{\specjalnosclocal}{and~specialisation }
-    \newcommand{\titlelocal}{\@engtitle }
-    \newcommand{\albumlocal}{student record book number }
-    \newcommand{\promotorlocal}{supervisor }
-    \newcommand{\citylocal}{WARSZAWA }
+  \newcommand{\kieruneklocal}{in~the~field~of~study }
+  \newcommand{\specjalnosclocal}{and~specialisation }
+  \newcommand{\titlelocal}{\@engtitle }
+  \newcommand{\albumlocal}{student record book number }
+  \newcommand{\promotorlocal}{supervisor }
+  \newcommand{\citylocal}{WARSZAWA }
 \fi
 
 \newcommand{\pwheader}{Head}
 \ifnum\strcmp{\locallang}{PL} = 0
-    \g@addto@macro\pwheader\pwfaculty
-    \g@addto@macro\pwheader{PL.png}
+  \g@addto@macro\pwheader\pwfaculty
+  \g@addto@macro\pwheader{PL.png}
 \fi
 
 \ifnum\strcmp{\locallang}{EN} = 0
-    \g@addto@macro\pwheader\pwfaculty
-    \g@addto@macro\pwheader{EN.png}
+  \g@addto@macro\pwheader\pwfaculty
+  \g@addto@macro\pwheader{EN.png}
 \fi
 
 \let\oldmaketitle\maketitle
 \renewcommand{\maketitle}{
-    \linespread{1.15}
+  \linespread{1.15}
 
-    \thispagestyle{empty}
-    \begin{center}
-    \includegraphics[width=\textwidth]{\pwheader}
-        \vskip 3em
-        \@instytut
-        \vskip 3em
-        \includegraphics[width=\linewidth]{\frontpageheader}
-        \vskip 1em
-        \kieruneklocal \@kierunek
-        \vskip .5em
-        \specjalnosclocal \@specjalnosc
-        \vskip 3em
-        \large \titlelocal
-        \vskip 3em
-        \LARGE \@author \\
-        \normalsize
-        \albumlocal \@album
-        \vskip 2em
-        \promotorlocal\\\@promotor
-        \vfill
-        \citylocal \@date
-    \end{center}
+  \thispagestyle{empty}
+  \begin{center}
+  \includegraphics[width=\textwidth]{\pwheader}
+    \vskip 3em
+    \@instytut
+    \vskip 3em
+    \includegraphics[width=\linewidth]{\frontpageheader}
+    \vskip 1em
+    \kieruneklocal \@kierunek
+    \vskip .5em
+    \specjalnosclocal \@specjalnosc
+    \vskip 3em
+    \large \titlelocal
+    \vskip 3em
+    \LARGE \@author \\
+    \normalsize
+    \albumlocal \@album
+    \vskip 2em
+    \promotorlocal\\\@promotor
+    \vfill
+    \citylocal \@date
+  \end{center}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % streszczenie, abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\streszczeniepracy}[1]{
-    \newcommand{\@streszczeniepracy}{#1}
+  \newcommand{\@streszczeniepracy}{#1}
 }
 \newcommand{\slowakluczowe}[1]{
-    \newcommand{\@slowakluczowe}{#1}
+  \newcommand{\@slowakluczowe}{#1}
 }
 \newcommand{\thesisabstract}[1]{
-    \newcommand{\@thesisabstract}{#1}
+  \newcommand{\@thesisabstract}{#1}
 }
 \newcommand{\thesiskeywords}[1]{
-    \newcommand{\@thesiskeywords}{#1}
+  \newcommand{\@thesiskeywords}{#1}
 }
 
 % Streszczenie polskie
 \newcommand{\stronastreszczenia}{
-    \cleardoublepage
-    \thispagestyle{empty}
-    \begin{center}
-        \textbf{\large\@title}
-        
-        \textbf{Streszczenie}
-    \end{center}
-    \@streszczeniepracy
-    
-    \vskip 2em
-    \noindent\textbf{Słowa kluczowe: }
-    \@slowakluczowe
-    \cleardoublepage
+  \cleardoublepage
+  \thispagestyle{empty}
+  \begin{center}
+    \textbf{\large\@title}
+
+    \textbf{Streszczenie}
+  \end{center}
+  \@streszczeniepracy
+
+  \vskip 2em
+  \noindent\textbf{Słowa kluczowe: }
+  \@slowakluczowe
+  \cleardoublepage
 }
 
 % Abstract angielski
 \newcommand{\abstractpage}{
-    \cleardoublepage
-    \thispagestyle{empty}
-    \begin{center}
-        \textbf{\large\@engtitle}
-        
-        \textbf{Abstract}
-    \end{center}
-    \@thesisabstract
-    
-    \vskip 2em
-    \noindent\textbf{Keywords: }
-    \@thesiskeywords
-    \cleardoublepage
+  \cleardoublepage
+  \thispagestyle{empty}
+  \begin{center}
+    \textbf{\large\@engtitle}
+
+    \textbf{Abstract}
+  \end{center}
+  \@thesisabstract
+
+  \vskip 2em
+  \noindent\textbf{Keywords: }
+  \@thesiskeywords
+  \cleardoublepage
 }
 
 % Spięcie stron streszczeń we właściwej
 % kolejności w jedno polecenie.
 \newcommand{\abstractpages}{
-    \ifnum\strcmp{\locallang}{PL} = 0
-        \stronastreszczenia
-        \abstractpage
-    \else
-        \abstractpage
-        \stronastreszczenia
-    \fi
+  \ifnum\strcmp{\locallang}{PL} = 0
+    \stronastreszczenia
+    \abstractpage
+  \else
+    \abstractpage
+    \stronastreszczenia
+  \fi
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -721,10 +727,10 @@
 \AtBeginDocument{\addtocontents{toc}{\protect\thispagestyle{empty}}} 
 %\AtBeginDocument{\counterwithout{lstlisting}{chapter}}
 \newcommand{\frontpages}{
-    \counterwithout{lstlisting}{chapter} % hack niestety
-    \pagestyle{empty}
-    \maketitle
-    \abstractpages
+  \counterwithout{lstlisting}{chapter} % hack niestety
+  \pagestyle{empty}
+  \maketitle
+  \abstractpages
 % Zgodnie z Zarządzeniem JM Rektora 3/2022, oświadczenia o autorstwie i
 % opcjonalne oświadczenie o udzieleniu licencji składane są w systemie USOS
 % APD.
@@ -732,9 +738,9 @@
 % oświadczenia o autorstwie i udzielenia licencji BG PW.
 %    \authorship
 %    \licensedthesis
-    \tableofcontents
-    \cleardoublepage
-    \pagestyle{headings}
+  \tableofcontents
+  \cleardoublepage
+  \pagestyle{headings}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -742,13 +748,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\acronymslist}{
 %    \cleardoublepage
-    \chapter*{\acronymstitle}
-    \pagestyle{plain}
-    \addcontentsline{toc}{chapter}{\acronymstitle}
-    \printglossary[type=\acronymtype,title={}]
-    \printglossary[type=symbols,title={}]
-    % Alternatywna lista symboli - do użycia tylko w Overleaf
-    %\input{tekst/symbols}
+  \chapter*{\acronymstitle}
+  \pagestyle{plain}
+  \addcontentsline{toc}{chapter}{\acronymstitle}
+  \printglossary[type=\acronymtype,title={}]
+  \printglossary[type=symbols,title={}]
+  % Alternatywna lista symboli - do użycia tylko w Overleaf
+  %\input{tekst/symbols}
 }   %
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -756,20 +762,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcounter{easyappendix}[chapter]
 \newenvironment{easyappendix}[1]{
-    \cleardoublepage
-    \refstepcounter{easyappendix}
-    \addcontentsline{app}{chapter}{\hspace{1em}\theeasyappendix\hspace{1em} #1\dotfill}
-    \par\bigskip
-    \Huge{\textbf{\appendixname~\theeasyappendix}}
-    \par\medskip
-    \Huge{\textbf{#1}}
-    \par\bigskip
-    \normalsize
+  \cleardoublepage
+  \refstepcounter{easyappendix}
+  \addcontentsline{app}{chapter}{\hspace{1em}\theeasyappendix\hspace{1em} #1\dotfill}
+  \par\bigskip
+  \Huge{\textbf{\appendixname~\theeasyappendix}}
+  \par\medskip
+  \Huge{\textbf{#1}}
+  \par\bigskip
+  \normalsize
 }{}
 \newcommand\easyappendices{
-    \let\appendixname\appendixprefix
-    \chapter*{\appendiceslisttitle}
-    \addcontentsline{toc}{chapter}{\appendiceslisttitle}
-    \@starttoc{app}
-    \input{tekst/appendices}
+  \let\appendixname\appendixprefix
+  \chapter*{\appendiceslisttitle}
+  \addcontentsline{toc}{chapter}{\appendiceslisttitle}
+  \@starttoc{app}
+  \input{tekst/appendices}
 }
