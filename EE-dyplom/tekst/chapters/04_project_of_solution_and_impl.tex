@@ -1,8 +1,8 @@
-\chapter{Projekt rozwiązania i implementacja}
+\chapter{Projekt rozwiązania i~implementacja}
 \section{Kod genetyczny osobnika}
-W niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
-architekturę sieci i jej parametry uczenia.
-Kod genetyczny będzie składał się z trzech części:
+W~niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
+architekturę sieci i~jej parametry uczenia.
+Kod genetyczny będzie składał się z~trzech części:
 \begin{itemize}
   \item Część binarna:
     \begin{itemize}
@@ -19,22 +19,22 @@ Kod genetyczny będzie składał się z trzech części:
   \item Część list - generowane po części binarnej;
     długości list są nie mniejsze niż liczba warstw ukrytych,
     przy czym długości wygenerowanych są równe tej liczbie;
-    minimalne i maksymalne długości list są zależne
-    od minimalnych i maksymalnych wartości liczby warstw ukrytych:
+    minimalne i~maksymalne długości list są zależne
+    od minimalnych i~maksymalnych wartości liczby warstw ukrytych:
     \begin{itemize}
-      \item lista ilości neuronów w warstwach ukrytych -\\
+      \item lista ilości neuronów w~warstwach ukrytych -\\
         \hspace*{1em}liczba elementów - taka sama:
           $\left[1, 128\right]$,\\
-        \hspace*{1em}zawiera liczby z zakresu:
+        \hspace*{1em}zawiera liczby z~zakresu:
           $\left[2, 724\right]$,\\
         % ze wzgędu na możliwe ograniczenia pamięci dla sieci: .5GB
         % .5÷128÷8×1024×1024×1024=524288 -> √524288 ~ 724
-        \hspace*{1em}każdy element składa się z 10 bitów.
-      \item lista typów aktywacji w warstwach ukrytych -\\
-        \hspace*{1em}liczba elementów - o 1 większa
+        \hspace*{1em}każdy element składa się z~10 bitów.
+      \item lista typów aktywacji w~warstwach ukrytych -\\
+        \hspace*{1em}liczba elementów - o~1 większa
           (uwzględnia warstwę wyjściową):
           $\left[2, 129\right]$,\\
-        \hspace*{1em}zawiera liczby z zakresu:
+        \hspace*{1em}zawiera liczby z~zakresu:
           $\left[0, 3\right]$
           (%
             0 \textrightarrow relu,
@@ -42,50 +42,50 @@ Kod genetyczny będzie składał się z trzech części:
             2 \textrightarrow sigmoid,
             3 \textrightarrow leaky relu%
           ),\\
-        \hspace*{1em}każdy element składa się z 2 bitów.
+        \hspace*{1em}każdy element składa się z~2 bitów.
     \end{itemize}
 \end{itemize}
 Ważnym mechanizmem podczas czytania kodu genetycznego
-w celu utworzenia fenotypu są ziarna generatora.
+w~celu utworzenia fenotypu są ziarna generatora.
 
 \noindent\\
-Jeżeli liczba warstw ukrytych z części binarnej,
-wynosiłoby więcej niż liczba elementów w listach,
+Jeżeli liczba warstw ukrytych z~części binarnej,
+wynosiłoby więcej niż liczba elementów w~listach,
 to~należy uzupełnić listy ilości neuronów
-i typów aktywacji do danej liczby elementów do czego zostanie
-użyty generator z odpowiednim ziarnem.
-Następnie kod genetyczny zostanie uaktualniony o nowe elementy list.
+i~typów aktywacji do danej liczby elementów do czego zostanie
+użyty generator z~odpowiednim ziarnem.
+Następnie kod genetyczny zostanie uaktualniony o~nowe elementy list.
 
 \noindent\\
-Jeżeli liczba warstw ukrytych jest mniejsza niż liczba elementów w listach,
-to nadmiarowe elementy zostaną zignorowane w fenotypie.
+Jeżeli liczba warstw ukrytych jest mniejsza niż liczba elementów w~listach,
+to nadmiarowe elementy zostaną zignorowane w~fenotypie.
 
 \subsection{Selekcja}
 Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowania.
-W przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
+W~przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
 to zostanie użyta selekcja losowa.
 
 % Krzyżowanie będzie odbywało się różnie dla części binarnej
-% i listowej kodu genetycznego.
+% i~listowej kodu genetycznego.
 \subsection{Krzyżowanie - część binarna}
-W przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
+W~przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
 gdzie losowo zostanie wybrany punkt podziału i
 części kodu genetycznego zostaną zamienione między dwoma rodzicami.
 
 \noindent\\
 Matematyczny opis krzyżowania, gdzie\\
 $n$ - długość genotypu (liczba bitów),\\
-$R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
+$R\left(p, k\right)$ - funkcja losowa o~rozkładzie jednostajnym dyskretnym
   na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
-$r_1\left[i\right]$ i $r_2\left[i\right]$ -
-  rodzice 1 i 2 dla
+$r_1\left[i\right]$ i~$r_2\left[i\right]$ -
+  rodzice 1 i~2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$,\\
 $d_1\left[i\right]$ i $d_2\left[i\right]$ -
-  dzieci 1 i 2 dla
+  dzieci 1 i~2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$:
 
 \noindent\\
-Wylosowanie punktu przecięcia i końcowa postać kodu dzieci:\\
+Wylosowanie punktu przecięcia i~końcowa postać kodu dzieci:\\
 $\displaystyle
   p_r=R\left(0, n\right)\\
   d_1\left[i\right]=\begin{cases}
@@ -103,46 +103,46 @@ $\displaystyle
 $
 
 \subsection*{Elitaryzm}
-Zrezygnowano z elitaryzmu w celu zwiększenia
-różnorodności populacji i ograniczenia
+Zrezygnowano z~elitaryzmu w~celu zwiększenia
+różnorodności populacji i~ograniczenia
 ryzyka przedwczesnej zbieżności.
 
 \subsection{Krzyżowanie - część listowa}
-W przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
-% gdzie losowo są wybrane punkty podziału w obu listach\,\sscite{synapsing_varlen_crossover}.
-Natomiast jest on inny od opisanego w przypisie algorytmu,
-ponieważ o ile pierwszy punkt podziału jest wybierany z pełnego zakresu
+W~przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
+% gdzie losowo są wybrane punkty podziału w~obu listach\,\sscite{hutt2007varlengthcrossover}.
+Natomiast jest on inny od opisanego w~przypisie algorytmu,
+ponieważ o~ile pierwszy punkt podziału jest wybierany z~pełnego zakresu
 (biorąc pod uwagę wszystkie bity listy),
 to punkt podziału drugiej listy jest wybierany na podstawie
 wylosowanego elementu listy, by zachować spójność długości list.
 Dodatkowo algorytm pilnuje by lista nie miała mniej elementów,
-niż minimalna liczba, a regulowanie do maksymalnej wartości
+niż minimalna liczba, a~regulowanie do maksymalnej wartości
 jest wykonywane przez przycinanie listy po krzyżowaniu.
 
 \noindent\\
 Oznacza to, że pierwsze losowanie,
-poza decydowaniem konkretnego przecięcia, decyduje o tym czy
-i w którym punkcie nastąpi podział elementów w drugiej liście.
+poza decydowaniem konkretnego przecięcia, decyduje o~tym czy
+i~w którym punkcie nastąpi podział elementów w~drugiej liście.
 
 \noindent\\
 Matematyczny opis krzyżowania, gdzie\\
 $e_s$ - wielkość pojedyńczego elementu,\\
-$l_{\min}$ i $l_{\max}$ - minimalna i maksymalna liczba elementów,\\
-$R\left(p, k\right)$ - funkcja losowa o rozkładzie jednostajnym dyskretnym
+$l_{\min}$ i~$l_{\max}$ - minimalna i~maksymalna liczba elementów,\\
+$R\left(p, k\right)$ - funkcja losowa o~rozkładzie jednostajnym dyskretnym
   na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
-$n_{r_1}$ i $n_{r_2}$ - liczba elementów dla rodzica 1 i 2,\\
-$r_1\left[i_{r_1}\right]$ i $r_2\left[i_{r_2}\right]$ -
-  rodzice 1 i 2 odpowiednio dla
+$n_{r_1}$ i~$n_{r_2}$ - liczba elementów dla rodzica 1 i~2,\\
+$r_1\left[i_{r_1}\right]$ i~$r_2\left[i_{r_2}\right]$ -
+  rodzice 1 i~2 odpowiednio dla
   $i_{r_1} \in \mathbb{N} \cap \left[1, e_s n_{r_1}\right]$
-  i $i_{r_2} \in \mathbb{N} \cap \left[1, e_s n_{r_2}\right]$,\\
-$n_{d_1}$ i $n_{d_2}$ - liczba elementów dla dziecka 1 i 2,\\
-$d_1\left[i_{d_1}\right]$ i $d_2\left[i_{d_2}\right]$ -
-  dzieci 1 i 2 odpowiednio dla
+  i~$i_{r_2} \in \mathbb{N} \cap \left[1, e_s n_{r_2}\right]$,\\
+$n_{d_1}$ i~$n_{d_2}$ - liczba elementów dla dziecka 1 i~2,\\
+$d_1\left[i_{d_1}\right]$ i~$d_2\left[i_{d_2}\right]$ -
+  dzieci 1 i~2 odpowiednio dla
   $i_{d_1} \in \mathbb{N} \cap \left[1, e_s n_{d_1}\right]$
-  i $i_{d_2} \in \mathbb{N} \cap \left[1, e_s n_{d_2}\right]$:
+  i~$i_{d_2} \in \mathbb{N} \cap \left[1, e_s n_{d_2}\right]$:
 
 \noindent\\
-Losowanie punktu przecięcia dla pierwszego rodzica i obliczenia dla niego:\\
+Losowanie punktu przecięcia dla pierwszego rodzica i~obliczenia dla niego:\\
 $\displaystyle
   p_{r_1}=R\left(0, e_s n_{r_1}\right)\\
   l_b=p_{r_1} \mod e_s\\
@@ -159,7 +159,7 @@ $\displaystyle
 $
 
 \noindent\\
-Przygotowanie do losowania i losowanie punktu przecięcia dla drugiego rodzica:\\
+Przygotowanie do losowania i~losowanie punktu przecięcia dla drugiego rodzica:\\
 $\displaystyle
   p_{r_{2_p}}=\begin{cases}
     0
@@ -177,7 +177,7 @@ $\displaystyle
 $
 
 \noindent\\
-Końcowa długość i postać kodu dzieci:\\
+Końcowa długość i~postać kodu dzieci:\\
 $\displaystyle
   {\Delta p_r}=p_{r_1}-p_{r_2}\\
   n_{d_1}=\begin{cases}
@@ -214,33 +214,33 @@ $
 
 \subsection{Mutacja}
 Mutacja będzie odbywała się przez odwracanie losowych bitów.
-Decyzja o mutacji będzie podejmowana dla każdego bitu
-z osobna z ustalonym prawdopodobieństwem mutacji.
+Decyzja o~mutacji będzie podejmowana dla każdego bitu
+z~osobna z~ustalonym prawdopodobieństwem mutacji.
 
 \subsection{Ocena przystosowania}
 Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
-pięciu sieci o parametrach i z parametrami wynikającymi
-z fenotypu osobnika.
+pięciu sieci o~parametrach i~z parametrami wynikającymi
+z~fenotypu osobnika.
 Obliczone dokładności na danych testowych zostaną uśrednione
-i przekształcone na przystosowanie za pomocą wzoru:
+i~przekształcone na przystosowanie za pomocą wzoru:
 $$
 \mbox{fit} = \frac{\mbox{dokładność}}{1 - \mbox{dokładność}} % TODO: change it
 $$
 
 \noindent\\
-Jeżeli użytkownik poda tylko dane treningowe i testowe, to:\\
+Jeżeli użytkownik poda tylko dane treningowe i~testowe, to:\\
 Uczenie będzie odbywało się na tylko danych treningowych.
 Po zakończeniu uczenia zostanie obliczona dokładność na danych testowych.
-Zwrócona sieć będzie tą z ostatniej epoki uczenia.
+Zwrócona sieć będzie tą z~ostatniej epoki uczenia.
 
 \noindent\\
 Jeżeli użytkownik poda dodatkowo dane walidacyjne, to:\\
 Uczenie będzie odbywało się na danych treningowych,
-a po każdej epoce będzie sprawdzana dokładność na danych walidacyjnych.
-Zwrócona sieć będzie tą z epoki,
+a~po każdej epoce będzie sprawdzana dokładność na danych walidacyjnych.
+Zwrócona sieć będzie tą z~epoki,
 która dała najlepszą dokładność na danych walidacyjnych.
 Jeżeli dokładność ta będzie reprezentowana przez kilka epok,
-to zostanie wybrana ta z najwcześniejszej epoki. % może lepsze z najpóźniejszej?
+to zostanie wybrana ta z~najwcześniejszej epoki. % może lepsze z~najpóźniejszej?
 
 % \begin{minted}[frame=single]{python3}
 %   gen=(
@@ -259,8 +259,8 @@ to zostanie wybrana ta z najwcześniejszej epoki. % może lepsze z najpóźniejs
 %   #   wskaźnik uczenia się (learning rate): 1/2^13-1.0 [13bit],
 %   # ? wskaźnik uczenia się (learning rate): 1/2^13-0.5 [12bit],
 %   #   liczba epok: 1-1024,
-%   #   ilość neuronów w warstwach: lista[2-1 048 577],
-%   #   typy aktywacji w warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
+%   #   ilość neuronów w~warstwach: lista[2-1 048 577],
+%   #   typy aktywacji w~warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
 %   # )
 %   # gen=(
 %   #   '|0000000100|0001001011|0001010100|0|0001001100101|0000110001|',

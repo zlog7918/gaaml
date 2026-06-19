@@ -1,13 +1,13 @@
 \chapter{Wstęp}
 Dobór architektury sieci neuronowej
-i parametrów uczenia jest procesem,
+i~parametrów uczenia jest procesem,
 wymagającym doświadczenia.
 Natomiast nawet posiadając
 doświadczenie nie jest to pewne,
 że dany model będzie odpowiednio działał ani,
-że jest najlepszym z możliwych.
+że jest najlepszym z~możliwych.
 Konsekwencją tego jest potrzeba licznych
-eksperymentów z różnymi modelami,
+eksperymentów z~różnymi modelami,
 by zapewniać coraz lepiej działające modele.
 Trzeba testować wiele konfiguracji warstw,
 liczby neuronów, funkcji aktywacji
@@ -21,7 +21,7 @@ na końcowy wygląd sieci po uczeniu.
 
 \noindent\\
 Potrzeba ograniczenia ręcznego
-zmieniania parametrów i testowania,
+zmieniania parametrów i~testowania,
 kieruje do automatyzacji tego procesu.
 Do tego zostanie wykorzystany algorytm genetyczny,
 ponieważ jest dobrze przystosowany
@@ -29,18 +29,18 @@ do przeszukiwania dużych przestrzeni rozwiązań.
 
 \section*{Cel}
 Celem pracy jest opracowanie biblioteki
-w języku Python, która umożliwi automatyczne
+w~języku Python, która umożliwi automatyczne
 optymalizowanie sieci neuronowej
-z pomocą algorytmu genetycznemu
+z~pomocą algorytmu genetycznemu
 pod względem architektury sieci
-i jej parametrów uczenia
+i~jej parametrów uczenia
 na podstawie danych treningowych
-i walidacyjnych, i testowych.
+i~walidacyjnych, i~testowych.
 
 % \noindent\\
 % Algorytmy genetyczne, pozwalają efektywnie przeszukiwać przestrzeń możliwych modeli
 % dzieki budowaniu ich na podstawie "genów".
-% Dzięki tej charakterystyce powinien dobrze sprawdzić się w~dobieraniu odpowiedniej architektury i parametrów.
+% Dzięki tej charakterystyce powinien dobrze sprawdzić się w~dobieraniu odpowiedniej architektury i~parametrów.
 
 % \noindent\\
 % Celem pracy jest zbudowanie biblioteki,
@@ -48,35 +48,35 @@ i walidacyjnych, i testowych.
 
 \section*{Cele szczegółowe}
 Pierwszym kamieniem milowym jest opracowanie struktury
-kodu genetycznego umożliwiającego generowanie z nich,
-w spójny sposób, architektury sieci neuronowej
+kodu genetycznego umożliwiającego generowanie z~nich,
+w~spójny sposób, architektury sieci neuronowej
 oraz parametrów uczenia.
 
 \noindent\\
-Kolejnym jest zawarcie w kodzie nauczania
+Kolejnym jest zawarcie w~kodzie nauczania
 sieci neuronowych, które będzie względnie niezależne
 od wybranego przez użytkownika platformy
 (tensorflow, pytorch).
 
 \noindent\\
 Ostatnim krokiem jest raportowanie wszystkich
-prób do pliku wraz z ich nauczonymi wagami.
+prób do pliku wraz z~ich nauczonymi wagami.
 
 \section*{Zakres}
 Program powininen optymalizować
 architekturę sieci neuronowej
-wraz z jej parametrami uczenia
+wraz z~jej parametrami uczenia
 dla danych podanych przez użytkownika.
-Dane będą przyjmowane w postaci
+Dane będą przyjmowane w~postaci
 tabel pakietu \texttt{numpy}.
 
 % is in theory?
 % \noindent\\
-% Przez architekturę sieci, w niniejszym dokumencie,
+% Przez architekturę sieci, w~niniejszym dokumencie,
 % rozumie się liczbę warstw,
-% liczbę neuronów w~każdej z warstw
-% oraz funkcje aktywacji dla każdej z warstw.
-% A przez parametry uczenia
+% liczbę neuronów w~każdej z~warstw
+% oraz funkcje aktywacji dla każdej z~warstw.
+% A~przez parametry uczenia
 % rozumie się rodzaj optymalizatora,
 % wskaźnik uczenia się oraz liczbę epok.
 
@@ -85,14 +85,14 @@ Optymalizacja powinna się odbywać dla konkretnych
 danych dostarczonych przez użytkownika,
 za pomocą algorytmu genetycznego.
 Implementacja algorytmu genetycznego będzie obejmowała:
-osobników, selekcję, krzyżowanie i mutację.
+osobników, selekcję, krzyżowanie i~mutację.
 
 \noindent\\
 Każdy osobnik będzie przechowywał
 jednoznaczny kod genetyczny, to znaczy,
 że dany kod genetyczny za każdym razem
 doprowadzi do takiej samej architektury
-wraz z takimi samymi parametrami uczenia.
+wraz z~takimi samymi parametrami uczenia.
 
 \noindent\\
 Zostaną przeprowadzone eksperymenty,
@@ -110,14 +110,14 @@ Program nie operuje na wszystkich
 typach sieci neuronowych,
 tworzy tylko sieci MLP,
 więc po użyciu stworzonego
-w niniejszej pracy programu,
+w~niniejszej pracy programu,
 można dalej zoptymalizować sieć.
 Do jeszcze lepszego działania
 mogą się przyczynić:
 połączenia przechodzące na inne warstwy
-niż tylko następna w kolejności
+niż tylko następna w~kolejności
 i/lub mniejsza ilość połączeń między neuronami
-(czyli gdy przestaną być w pełni połączone).
+(czyli gdy przestaną być w~pełni połączone).
 
 \noindent\\
 Uczenie sieci neuronowej jest operacją zużywającą
@@ -131,16 +131,16 @@ Powoduje to, że działanie programu
 jest znacząco uzależnione
 od mocy obliczeniowej urządzenia
 wykonującego operacje
-i proces optymalizacji
+i~proces optymalizacji
 poprzez algorytm genetyczny
 jest stosunkowo długi.
 
 \section*{Teza}
-W niniejszej pracy przyjęto tezę,
+W~niniejszej pracy przyjęto tezę,
 że wykorzystanie algorytmu genetycznego
 do optymalizacji architektury sieci neuronowej
-i jej parametrów uczenia umożliwia uzyskanie modeli
-o jakości porównywalnej lub lepszej
+i~jej parametrów uczenia umożliwia uzyskanie modeli
+o~jakości porównywalnej lub lepszej
 niż rozwiązania dobierane manualnie
 przy ograniczeniu nakładu pracy użytkownika.
 
