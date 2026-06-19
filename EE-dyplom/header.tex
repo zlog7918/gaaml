@@ -5,14 +5,52 @@
 
 \usepackage{enumitem}
 \setlist[itemize]{nosep}
+% \setlist[enumerate]{nosep}
 \usepackage{lipsum}
 \setlipsum{auto-lang=false}
 \usepackage{microtype}
 % \pretolerance=20
 \usepackage{tikz}
-\usetikzlibrary{decorations.pathreplacing}
-\usetikzlibrary{calc}
-\usetikzlibrary{math}
+\usetikzlibrary{
+  calc,
+  math,
+  positioning,
+  arrows.meta,
+  shapes.geometric,
+  decorations.pathreplacing,
+}
+\usepackage[nameinlink]{cleveref}
+\crefname{figure}{rys.}{rys.}
+\crefname{chapter}{roz.}{roz.}
+\crefname{section}{roz.}{roz.}
+\crefname{subsection}{roz.}{roz.}
+\crefname{subsubsection}{roz.}{roz.}
+\Crefname{figure}{Rysunek}{Rysunki}
+\Crefname{chapter}{Rozdział}{Rozdziały}
+\Crefname{section}{Podrozdział}{Podrozdziały}
+\Crefname{subsection}{Podrozdział}{Podrozdziały}
+\Crefname{subsubsection}{Podrozdział}{Podrozdziały}
 
-\newcommand{\sscite}[1]{\textsuperscript{\cite{\detokenize{#1}}}}
+\newcommand{\sscite}[1]{%
+  \foreach \l in {#1} {%
+    \if\relax\detokenize\expandafter{\l}\relax% if empty
+      % do nothing
+    \else%
+      \textsuperscript{%
+        \relax\cite{\detokenize\expandafter{\l}}\relax%
+      }%
+    \fi%
+  }%
+}
+\newcommand{\nocontentsline}[3]{}
+\newcommand{\tocless}[2]{\bgroup%
+  \let\addcontentsline=\nocontentsline#1{#2}%
+\egroup}
+\newcommand{\toclesslabel}[3]{\bgroup%
+  \let\addcontentsline=\nocontentsline#1{%
+    #2\label{#3}%
+  }%
+\egroup}
 \linespread{1.3}
+
+\usepackage[skip=\baselineskip]{parskip}
