@@ -1,0 +1,17 @@
+\begin{tikzpicture}
+  \input{img/02_img/fitting/plane.tikz.tex}
+
+  % img
+  \pic (pic_u) at (0, 0) {data_pic};
+  \begin{scope}[shift={(pic_u-oo)}]
+    \draw[red, line width=1.5pt]
+      (0,2.86) -- (4,4.29);
+  \end{scope}
+
+  % % titles
+  % \draw (pic_u-top) node[anchor=south] {Zbyt prosty model};
+
+  % axis
+  \draw (pic_u-bottom) node[anchor=north] {$x$};
+  \draw (pic_u-left) node[anchor=east] {$y$};
+\end{tikzpicture}

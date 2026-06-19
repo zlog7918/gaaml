@@ -1,0 +1,23 @@
+\begin{tikzpicture}[>=Latex]
+  % nodes
+  \node (in) at (0,0) {we};
+  \node (h1) at (1,0) {u};
+  \node (dots) at (2,0) {$\cdots$};
+  \node (hN) at (3,0) {u};
+  \node (out) at (4,0) {wy};
+  \node (where) at ($(5,-8pt)!2pt!(6,-8pt)$) {, gdzie:};
+
+  % arrows
+  \draw[->] (in)--(h1);
+  \draw[->] (h1)--(dots);
+  \draw[->] (dots)--(hN);
+  \draw[->] (hN)--(out);
+
+  % brace
+  \coordinate (a) at (1,-5pt);
+  \coordinate (b) at (3,-5pt);
+  \draw[
+    decorate,
+    decoration={brace,mirror,amplitude=8pt},
+  ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
+\end{tikzpicture}

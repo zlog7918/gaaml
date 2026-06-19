@@ -80,8 +80,10 @@ oraz transformatory (ang. \textit{transformers}).
 Do drugiej grupy należą sieci RNN, LSTM i~GRU,
 wykorzystywane przede wszystkim
 do przetwarzania danych sekwencyjnych%
-\sscite{Goodfellow-et-al-2016}%
-\sscite{rutkowski2009ai}.
+\sscite{
+  Goodfellow-et-al-2016,
+  rutkowski2009ai,
+}.
 
 Sieci składają się z~trzech segmentów:
 wejściowego, przetwarzającego i~wyjściowego.
@@ -105,29 +107,7 @@ do trzech podstawowych rodzajów warstw:
     generującą końcowy wynik działania sieci.
 \end{itemize}
 Oraz są one ułożone szeregowo w~następujący sposób:\\
-\begin{tikzpicture}[>=Latex]
-  % nodes
-  \node (in) at (0,0) {we};
-  \node (h1) at (1,0) {u};
-  \node (dots) at (2,0) {$\cdots$};
-  \node (hN) at (3,0) {u};
-  \node (out) at (4,0) {wy};
-  \node (where) at ($(5,-8pt)!2pt!(6,-8pt)$) {, gdzie:};
-
-  % arrows
-  \draw[->] (in)--(h1);
-  \draw[->] (h1)--(dots);
-  \draw[->] (dots)--(hN);
-  \draw[->] (hN)--(out);
-
-  % brace
-  \coordinate (a) at (1,-5pt);
-  \coordinate (b) at (3,-5pt);
-  % \draw[
-  %   decorate,
-  %   decoration={brace,mirror,amplitude=8pt},
-  % ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
-\end{tikzpicture}
+\input{img/02_img/layers.tikz.tex}
 \begin{itemize}
   \item we - warstwa wejściowa,
   \item u - warstwa ukryta,
@@ -206,83 +186,44 @@ do zależności występujących tylko
 w~danych treningowych (ang. \textit{overfitting}),
 co spowoduje nie adekwatne odpowiedzi
 dla danych uprzednio nieznanych.
-% Widać to na \cref{fig:fitting_under_over},
-\begin{center}
-  \begin{tikzpicture}[>=latex]
-    \tikzset{
-      data_pic/.pic={
-        % Plot frame
-        \draw[line width=1.2pt] (0,0) rectangle (4,6.5);
+Widać to na \cref{fig:fitting_under_over},
+\begin{figure}
+  \centering
+  \begin{subfigure}{0.3\textwidth}
+    \input{img/02_img/fitting/under.tikz.tex}
+    \caption{Zbyt prosty model}
+    \label{subfig:underfitting}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\textwidth}
+    \input{img/02_img/fitting/good.tikz.tex}
+    \caption{Odpowiedni model}
+    \label{subfig:appropriate_capacity}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.3\textwidth}
+    \input{img/02_img/fitting/over.tikz.tex}
+    \caption{Zbyt złożony model}
+    \label{subfig:overfitting}
+  \end{subfigure}
+          
+  \caption{
+    Trzy płaszczyzny
+    z~\cite[rys. 5.2]{Goodfellow-et-al-2016}
+    ukazujące możliwe zachowania
+    dla modeli zbyt prostych w~stosunku
+    do danych (po lewej), zbyt złożonych (po prawej)
+    oraz sieci o~złożoności odpowiadającej
+    tej występującej w~danych.
+    Punkty to przykładowe dane treningowe,
+    a~linie (czerwone i~zielone),
+    to przykładowe odpowiedzi modeli
+    po nauczeniu sieci.
+  }
+  \label{fig:fitting_under_over}
+\end{figure}
 
-        % Data points
-        \filldraw[blue, draw=black, line width=0.8pt] (0.24,1.95) circle (0.12);
-        \filldraw[blue, draw=black, line width=0.8pt] (1.92,4.29) circle (0.12);
-        \filldraw[blue, draw=black, line width=0.8pt] (2.40,4.42) circle (0.12);
-
-        \filldraw[blue, draw=black, line width=0.8pt] (3.48,3.84) circle (0.12);
-        \filldraw[blue, draw=black, line width=0.8pt] (3.56,3.77) circle (0.12);
-        \filldraw[blue, draw=black, line width=0.8pt] (3.64,3.64) circle (0.12);
-
-        \coordinate (-oo) at (0, 0);
-        \coordinate (-top) at (2, 6.5);
-        \coordinate (-bottom) at (2, 0);
-        \coordinate (-left) at (0, 3.25);
-      }
-    }
-
-    % img
-    \pic (pic_u) at (0, 0) {data_pic};
-    \begin{scope}[shift={(pic_u-oo)}]
-      \draw[blue, line width=1.5pt]
-        (0,2.86) -- (4,4.29);
-    \end{scope}
-
-    \pic (pic_a) at (5.5, 0) {data_pic};
-    \begin{scope}[shift={(pic_a-oo)}]
-      \draw[blue, line width=1.5pt]
-        (0,1.5)
-        .. controls (1.5,4.9) and (2.8,5.1) ..
-        (4,3.2);
-    \end{scope}
-
-    \pic (pic_o) at (11, 0) {data_pic};
-    \begin{scope}[shift={(pic_o-oo)}]
-      \clip (0,0) rectangle (4,6.5);
-      \draw[
-        blue,
-        line width=1.5pt
-      ] plot[smooth] coordinates {
-        (0.23,6.5)
-        (0.24,2.0)
-        (0.25,0.0)
-        (0.26,-2.0)
-        (1.30,-0.1)
-        (1.30,-2.0)
-        (1.85,4.2)
-        (3.45,3.90)
-        (3.55,3.70)
-        (3.65,3.55)
-        (4.00,2.2)
-        (4.10,-2.0)
-      };
-    \end{scope}
-
-    % titles
-    \draw (pic_u-top) node[anchor=south] {Zbyt prosty model};
-    \draw (pic_a-top) node[anchor=south] {Odpowiedni model};
-    \draw (pic_o-top) node[anchor=south] {Zbyt złożony model};
-
-    % axis
-    \draw (pic_u-bottom) node[anchor=north] {$x$};
-    \draw (pic_a-bottom) node[anchor=north] {$x$};
-    \draw (pic_o-bottom) node[anchor=north] {$x$};
-    \draw (pic_u-left) node[anchor=east] {$y$};
-    \draw (pic_a-left) node[anchor=east] {$y$};
-    \draw (pic_o-left) node[anchor=east] {$y$};
-  \end{tikzpicture}
-\end{center}
-
-\subsection*{Architektura sieci neuronowej}
+\toclesslabel\subsection{Architektura sieci neuronowej}{subsec:nn_architecture_theory}
 Architektura sieci neuronowej określa
 ułożenie i~typy neuronów oraz ich połączeń.
 Jest ona jednym z~najważniejszych czynników,
@@ -335,21 +276,18 @@ liczba parametrów jest znacząca.
 Z~tego powodu można wykorzystać metody
 automatycznej optymalizacji, które są przeznaczone
 do przeszukiwania dużych przestrzeni rozwiązań%
-\sscite{yao1999evolving}%
-\sscite{domashova2021optimal}.
+\sscite{
+  yao1999evolving,
+  domashova2021optimal
+}.
 
 \section{Algorytmy genetyczne}
 Algorytmy genetyczne należą do grupy
-algorytmów inspirowanych 
-
-czyli metod optymalizacyjnych inspirowanych
-mechanizmami ewolucji biologicznej.
-Ich działanie opiera się na założeniu,
-że wielokrotne tworzenie nowych rozwiązań
-poprzez krzyżowanie i~mutację
-oraz preferowanie lepiej przystosowanych osobników
-prowadzi do stopniowej poprawy jakości rozwiązań
-w kolejnych pokoleniach%
+algorytmów inspirowanych biologiczną ewolucją.
+Algorytmy ewolucyjne opierają się na założeniu,
+iż ewolucja, a~więc krzyżownie, mutacja
+oraz naturalna selekcja, powoduje dążenie
+do coraz większej optymalności w~populacji%
 \sscite{
   goldberg1989genetic,
   eiben2015evolutionary,
@@ -390,7 +328,7 @@ po czym proces oceny i~reprodukcji jest powtarzany
 aż do spełnienia warunku zakończenia algorytmu%
 \sscite{eiben2015evolutionary}.
 
-\subsection*{Selekcja}
+\tocless\subsection{Selekcja}
 Selekcja jest procesem wyboru osobników,
 które zostaną wykorzystane
 do utworzenia kolejnego pokolenia.
@@ -403,7 +341,7 @@ między innymi selekcja ruletkowa,
 turniejowa oraz rankingowa%
 \sscite{goldberg1989genetic}.
 
-\subsection*{Krzyżowanie}
+\tocless\subsection{Krzyżowanie}
 Krzyżowanie jest operacją polegającą
 na łączeniu informacji genetycznej pochodzącej
 od dwóch lub większej liczby rodziców.
@@ -420,7 +358,7 @@ przeznaczone dla struktur o~zmiennej długości%
   synapsing_varlen_crossover,
 }.
 
-\subsection*{Mutacja}
+\tocless\subsection{Mutacja}
 Mutacja polega na losowej modyfikacji genotypu osobnika.
 Jej zadaniem jest wprowadzanie nowej
 informacji genetycznej do populacji
@@ -432,7 +370,7 @@ zamianie elementów miejscami
 lub dodawaniu i~usuwaniu fragmentów kodu genetycznego%
 \sscite{goldberg1989genetic}.
 
-\subsection*{Elitaryzm}
+\tocless\subsection{Elitaryzm}
 W~wielu implementacjach algorytmów genetycznych
 stosowany jest mechanizm elitaryzmu.
 Polega on na bezpośrednim przenoszeniu najlepszych
@@ -442,7 +380,7 @@ Pozwala to uniknąć utraty najlepszych znalezionych
 rozwiązań i~często przyspiesza proces optymalizacji%
 \sscite{eiben2015evolutionary}.
 
-\subsection*{Zastosowanie do optymalizacji}
+\tocless\subsection{Zastosowanie do optymalizacji}
 Algorytmy genetyczne znajdują zastosowanie w~problemach,
 dla których wyznaczenie rozwiązania optymalnego
 metodami analitycznymi jest trudne lub niemożliwe.
@@ -604,5 +542,4 @@ dla określonych problemów%
 
 % https://dl.acm.org/doi/10.1145/3292500.3330648
 % https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
-\noindent
 \includegraphics[width=\textwidth,clip]{img/02_img/AutoKeras.png}

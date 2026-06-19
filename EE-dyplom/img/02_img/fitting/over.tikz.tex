@@ -1,0 +1,33 @@
+\begin{tikzpicture}
+  \input{img/02_img/fitting/plane.tikz.tex}
+
+  % img
+  \pic (pic_o) at (11, 0) {data_pic};
+  \begin{scope}[shift={(pic_o-oo)}]
+    \clip (0,0) rectangle (4,6.5);
+    \draw[
+      red,
+      line width=1.5pt
+    ] plot[smooth] coordinates {
+      (0.23,6.5)
+      (0.24,2.0)
+      (0.25,0.0)
+      (0.26,-2.0)
+      (1.30,-0.1)
+      (1.30,-2.0)
+      (1.85,4.2)
+      (3.45,3.90)
+      (3.55,3.70)
+      (3.65,3.55)
+      (4.00,2.2)
+      (4.10,-2.0)
+    };
+  \end{scope}
+
+  % % titles
+  % \draw (pic_o-top) node[anchor=south] {Zbyt złożony model};
+
+  % axis
+  \draw (pic_o-bottom) node[anchor=north] {$x$};
+  \draw (pic_o-left) node[anchor=east] {$y$};
+\end{tikzpicture}
