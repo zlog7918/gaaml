@@ -31,9 +31,9 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{EE-dyplom}[2026/03/03 Praca dyplomowa na Politechnice Warszawskiej]
 
-% \LoadClass[a4paper,11pt,twoside,openright]{book}
+\LoadClass[a4paper,11pt,twoside,openright]{book}
 % Alternatywnie: 12 pt
-\LoadClass[a4paper,12pt,twoside,openright]{book}
+% \LoadClass[a4paper,12pt,twoside,openright]{book}
 
 % -------------------------------------------------------------------
 % Możliwość kompilacji przez pdflatex i xelatex
@@ -291,9 +291,13 @@
 % Zalecenie: 9 pt, "justowany do lewej strony" (?)
 % -------------------------------------------------------------------
 % Gdy główny stopień pisma to 11 pt wtedy footnotesize daje 9 pt 
-%\RequirePackage[format=plain, labelfont=bf, labelsep=period, 
-%            font=footnotesize, justification=RaggedRight]
-%        {caption}
+%\RequirePackage[
+%   format=plain,
+%   labelfont=bf,
+%   labelsep=period, 
+%   font=footnotesize,
+%   justification=RaggedRight
+% ]{caption}
 % Alternatywnie: 10 pt gdy główny to 11 pt i 11 pt gdy główny to 12 pt
 \RequirePackage[
   format=hang,
