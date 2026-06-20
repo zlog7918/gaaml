@@ -1,0 +1,85 @@
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  node distance=8mm and 8mm,
+  >=Latex,
+  arrow/.style={
+    -{Latex[length=3mm,width=2mm]},
+    thick,
+    draw=gray!75,
+  },
+  process/.style={
+    rectangle,
+    draw=blue!60!black,
+    % draw=gray!60!black,
+    very thick,
+    fill=blue!8,
+    % fill=gray!8,
+    align=center,
+    text width=36mm,
+    minimum height=10mm,
+    inner xsep=3mm,
+    inner ysep=2mm,
+  },
+  terminator/.style={
+    rectangle,
+    rounded corners,
+    draw=green!45!black,
+    % draw=gray!45!black,
+    very thick,
+    fill=green!10,
+    % fill=gray!10,
+    align=center,
+    minimum width=24mm,
+    minimum height=10mm,
+    inner xsep=4mm,
+    inner ysep=2mm,
+  },
+  decision/.style={
+    diamond,
+    aspect=2.15,
+    draw=orange!70!black,
+    % draw=gray!70!black,
+    very thick,
+    fill=orange!12,
+    % fill=gray!12,
+    align=center,
+    text width=32mm,
+    inner xsep=1mm,
+    inner ysep=1mm,
+  },
+  label/.style={
+    font=\sffamily\footnotesize,
+    fill=white,
+    inner sep=1.5pt,
+    text=gray!20!black,
+  },
+]
+  % nodes
+  \node[process] (B) {Wygenerowanie początkowej populacji osobników};
+  \node[decision, right=of B] (D) {Czy spełnione warunki końcowe?};
+  \node[terminator, above=of D] (J) {Koniec};
+  \node[terminator] (A) at (B |- J) {Początek};
+
+  \node[process, right=of D] (I) {Wybranie osobników do następnej generacji};
+
+  \node[process, below=of D] (E) {Wykonanie selekcji rodziców};
+
+  \node[process, below=of E] (F) {Wykonanie krzyżowania rodziców};
+  \node[process] (G) at (F -| I) {Wykonanie mutacji dzieci};
+  \node[process] (H) at ($(G.north)!0.5!(I.south)$) {Wyliczenie przystosowania wszystkich nowych osobników};
+  \node[process, anchor=south west] (C) at (B.west |- H.south) {Wyliczenie przystosowania każdego z~osobników};
+
+  % edges
+  \draw[arrow] (A) -- (B);
+  \draw[arrow] (B) -- (C);
+  \draw[arrow] (C.east) -| ($(C.east)!0.5!(D.west) - (1.5mm,0)$) |- (D.west);
+
+  \draw[arrow] (D) -- node[label, right=1pt, yshift=-1.5mm] {Tak} (J);
+  \draw[arrow] (D) -- node[label, right=1pt, yshift=1.5mm] {Nie} (E);
+
+  \draw[arrow] (E) -- (F);
+  \draw[arrow] (F) -- (G);
+  \draw[arrow] (G) -- (H);
+  \draw[arrow] (H) -- (I);
+  \draw[arrow] (I) -- (D);
+\end{tikzpicture}
