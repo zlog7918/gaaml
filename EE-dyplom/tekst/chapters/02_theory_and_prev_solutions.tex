@@ -175,18 +175,27 @@ mają następujące parametry:
 
 Ich dobór ma bezpośredni skutek
 w~zdolnościach sieci do generalizacji
-oraz osiąganiu zadawalających wyników.
-Mniejsza sieć może nie być
-w~stanie odwzorować zależności
+oraz osiąganiu zadawalających wyników,
+co zostało zobrazowane na
+\cref{fig:fitting_under_over}.
+Mniejsza sieć (\cref{subfig:underfitting})
+może nie być w~stanie odwzorować zależności
 występujących w~danych (ang. \textit{underfitting}).
 Z~kolei zbyt rozbudowana architektura
-powoduje dłuższe uczenie i~działanie modelu
-oraz może prowadzić do dopasowania się
-do zależności występujących tylko
-w~danych treningowych (ang. \textit{overfitting}),
+(\cref{subfig:overfitting}) powoduje dłuższe uczenie
+i~działanie modelu oraz może prowadzić
+do dopasowania się do zależności występujących
+tylko w~danych treningowych (ang. \textit{overfitting}),
 co spowoduje nie adekwatne odpowiedzi
 dla danych uprzednio nieznanych.
-Widać to na \cref{fig:fitting_under_over},
+Dlatego ważne jest dobranie sieci
+o odpowiedniej złożoności
+(\cref{subfig:appropriate_capacity}),
+gdyż przy nich istnieje
+największe prawdopodobieństwo,
+że będą po nauczeniu zdolne
+do zadawalającej generalizacji.
+
 \begin{figure}
   \centering
   \begin{subfigure}{0.3\textwidth}
@@ -211,9 +220,13 @@ Widać to na \cref{fig:fitting_under_over},
     Trzy płaszczyzny
     z~\cite[rys. 5.2]{Goodfellow-et-al-2016}
     ukazujące możliwe zachowania
-    dla modeli zbyt prostych w~stosunku
-    do danych (po lewej), zbyt złożonych (po prawej)
-    oraz sieci o~złożoności odpowiadającej
+    dla modeli:
+    \textbf{(\subref*{subfig:underfitting})}
+    zbyt prostych w~stosunku do danych,
+    \textbf{(\subref*{subfig:overfitting})}
+    zbyt złożonych oraz
+    \textbf{(\subref*{subfig:appropriate_capacity})}
+    sieci o~złożoności odpowiadającej
     tej występującej w~danych.
     Punkty to przykładowe dane treningowe,
     a~linie (czerwone i~zielone),
@@ -322,7 +335,7 @@ do następnych pokoleń%
 
 Klasyczny przebieg algorytmu genetycznego
 przedstawia \cref{fig:genetic_flow},
-którego elementy są omawiane w~poniższych podrozdziałach.
+którego szczególne elementy są omawiane w~poniższych podrozdziałach.
 \begin{figure}
   \centering \scalebox{0.9}{%
     \input{img/02_img/genetic_flow.tikz.tex}%
