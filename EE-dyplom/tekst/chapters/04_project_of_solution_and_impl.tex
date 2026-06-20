@@ -3,9 +3,9 @@
 W~niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
 architekturę sieci i~jej parametry uczenia.
 Kod genetyczny będzie składał się z~trzech części:
-\begin{itemize}
+\begin{nospitemize}
   \item Część binarna:
-    \begin{itemize}
+    \begin{nospitemize}
       \item liczba warstw ukrytych: 5 bitów $\left[1, 32\right]$
       \item ziarno generatora liczby neuronów: 10 bitów $\left[0, 1023\right]$
       \item ziarno generatora typów aktywacji: 10 bitów $\left[0, 1023\right]$
@@ -15,13 +15,13 @@ Kod genetyczny będzie składał się z~trzech części:
       % \item wskaźnik uczenia się (learning rate): 13 bitów $\left[2^{-13}, 1.0)\right]$
       \item liczba epok: 7 bitów $\left[1, 128\right]$
       \item wielkość partii: 10 bitów $\left[1, 1024\right]$
-    \end{itemize}
+    \end{nospitemize}
   \item Część list - generowane po części binarnej;
     długości list są nie mniejsze niż liczba warstw ukrytych,
     przy czym długości wygenerowanych są równe tej liczbie;
     minimalne i~maksymalne długości list są zależne
     od minimalnych i~maksymalnych wartości liczby warstw ukrytych:
-    \begin{itemize}
+    \begin{nospitemize}
       \item lista ilości neuronów w~warstwach ukrytych -\\
         \hspace*{1em}liczba elementów - taka sama:
           $\left[1, 128\right]$,\\
@@ -43,8 +43,8 @@ Kod genetyczny będzie składał się z~trzech części:
             3 \textrightarrow leaky relu%
           ),\\
         \hspace*{1em}każdy element składa się z~2 bitów.
-    \end{itemize}
-\end{itemize}
+    \end{nospitemize}
+\end{nospitemize}
 Ważnym mechanizmem podczas czytania kodu genetycznego
 w~celu utworzenia fenotypu są ziarna generatora.
 

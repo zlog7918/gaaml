@@ -29,13 +29,13 @@ $$
   \right),
 $$
 gdzie:
-\begin{itemize}
+\begin{nospitemize}
   \item $x_i$ - wartości wejściowe neuronu,
   \item $w_i$ - wagi połączeń,
   \item $b$ - wyraz wolny,
   \item $f\left(\dots\right)$ - funkcja aktywacji,
   \item $y$ - wartość wyjściowa neuronu.
-\end{itemize}
+\end{nospitemize}
 Oznacza to, że otrzymuje on zestaw wartości wejściowych,
 które są mnożone przez odpowiadające im wagi,
 a~następnie sumowane.
@@ -97,7 +97,7 @@ bez występowania cykli oraz sprzężeń zwrotnych.
 W~perceptronie wielowarstwowym
 segmenty sieci upraszczają się odpowiednio
 do trzech podstawowych rodzajów warstw:
-\begin{itemize}
+\begin{nospitemize}
   \item \textbf{warstwę wejściową} -
     odpowiedzialną za przyjęcie danych wejściowych,
   \item \textbf{warstwy ukryte} -
@@ -105,10 +105,10 @@ do trzech podstawowych rodzajów warstw:
     i~ekstrakcję cech,
   \item \textbf{warstwę wyjściową} -
     generującą końcowy wynik działania sieci.
-\end{itemize}
+\end{nospitemize}
 Oraz są one ułożone szeregowo w~następujący sposób:\\
 \input{img/02_img/layers.tikz.tex}
-\begin{itemize}
+\begin{nospitemize}
   \item we - warstwa wejściowa,
   \item u - warstwa ukryta,
   \item wy - warstwa wyjściowa,
@@ -116,7 +116,7 @@ Oraz są one ułożone szeregowo w~następujący sposób:\\
   \item \raisebox{3pt}{\tikz[>=Latex]{
     \draw[->] (0,0)--(10pt,0)
   }} - kierunek przetwarzania danych.
-\end{itemize}
+\end{nospitemize}
 Zatem wynik działania
 każdego neuronu zależy jedynie
 od wartości neuronów znajdujących się
@@ -165,13 +165,13 @@ obszarem optymalizacji.
 
 Największy wpływ na proces uczenia MLP
 mają następujące parametry:
-\begin{itemize}
+\begin{nospitemize}
   \item liczba warstw ukrytych,
   \item liczba neuronów w~poszczególnych warstwach,
   \item topologia połączeń pomiędzy neuronami,
   \item sposób inicjalizacji wag,
   \item parametry procesu uczenia.
-\end{itemize}
+\end{nospitemize}
 
 Ich dobór ma bezpośredni skutek
 w~zdolnościach sieci do generalizacji
@@ -266,11 +266,11 @@ lecz wynika bezpośrednio z~liczby neuronów
 znajdujących się w~sąsiednich warstwach.
 Zatem architektura sieci neuronowej
 rozumiana będzie wyłącznie jako:
-\begin{itemize}
+\begin{nospitemize}
   \item liczba warstw ukrytych,
   \item liczba neuronów w~każdej warstwie ukrytej,
   \item funkcja aktywacji zastosowana w~każdej warstwie.
-\end{itemize}
+\end{nospitemize}
 
 Do architektury nie będą natomiast zaliczane
 wartości wag i~wyrazów wolnych neuronów,
