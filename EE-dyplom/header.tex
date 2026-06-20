@@ -1,15 +1,23 @@
-% \usepackage{pygmentize}
+% standard to include text and graphics
 \usepackage{minted}
 \usepackage{graphicx}
+% otherwise latex warns that biblatex wants this
 \usepackage{csquotes}
 
+% to fill space
+\usepackage{lipsum}
+\setlipsum{auto-lang=false}
+
+% to make itemize have no unnecessary space
 \usepackage{enumitem}
 \setlist[itemize]{nosep}
 % \setlist[enumerate]{nosep}
-\usepackage{lipsum}
-\setlipsum{auto-lang=false}
+
+% manages text better, less "underfull \hbox"
 \usepackage{microtype}
 % \pretolerance=20
+
+% tikz with its necessary (as of now) libraries
 \usepackage{tikz}
 \usetikzlibrary{
   calc,
@@ -19,6 +27,8 @@
   shapes.geometric,
   decorations.pathreplacing,
 }
+
+% clever_ref with polish ref names
 \usepackage[nameinlink]{cleveref}
 \crefname{figure}{rys.}{rys.}
 \crefname{chapter}{roz.}{roz.}
@@ -31,6 +41,7 @@
 \Crefname{subsection}{Podrozdział}{Podrozdziały}
 \Crefname{subsubsection}{Podrozdział}{Podrozdziały}
 
+% superscript cite
 \newcommand{\sscite}[1]{%
   \foreach \l in {#1} {%
     \if\relax\detokenize\expandafter{\l}\relax% if empty
@@ -42,6 +53,9 @@
     \fi%
   }%
 }
+
+% For section and others to have numbers
+% but not appear in toc
 \newcommand{\nocontentsline}[3]{}
 \newcommand{\tocless}[2]{\bgroup%
   \let\addcontentsline=\nocontentsline#1{#2}%
@@ -51,6 +65,23 @@
     #2\label{#3}%
   }%
 \egroup}
+
+% Too big space around itemize:
+\newenvironment{nospitemize}{%
+  \bgroup%
+    \setlength{\parskip}{0pt}%
+    \begin{itemize}%
+}{
+    \end{itemize}%
+  \egroup%
+}
+
+% I do not know how it interacts with `setstretch`,
+% but it seems to be the best combination (
+%   \setstretch{1.2213}
+%   \linespread{1.3}
+% )
 \linespread{1.3}
 
+% space between paragraphs and no indent
 \usepackage[skip=\baselineskip]{parskip}
