@@ -66,9 +66,11 @@ to zostanie użyta selekcja losowa.
 % Krzyżowanie będzie odbywało się różnie dla części binarnej
 % i~listowej kodu genetycznego.
 \subsection{Krzyżowanie - część binarna}
-W~przypadku części binarnej zostanie użyte krzyżowanie jednopunktowe,
-gdzie losowo zostanie wybrany punkt podziału i
-części kodu genetycznego zostaną zamienione między dwoma rodzicami.
+W~przypadku części binarnej zostanie
+użyte krzyżowanie jednopunktowe,
+gdzie losowo zostanie wybrany punkt podziału
+i~części kodu genetycznego zostaną zamienione
+między dwoma rodzicami.
 
 Matematyczny opis krzyżowania, gdzie\\
 $n$ - długość genotypu (liczba bitów),\\
@@ -77,7 +79,7 @@ $R\left(p, k\right)$ - funkcja losowa o~rozkładzie jednostajnym dyskretnym
 $r_1\left[i\right]$ i~$r_2\left[i\right]$ -
   rodzice 1 i~2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$,\\
-$d_1\left[i\right]$ i $d_2\left[i\right]$ -
+$d_1\left[i\right]$ i~$d_2\left[i\right]$ -
   dzieci 1 i~2 dla
   $i \in \mathbb{N} \cap \left[1, n\right]$:
 
@@ -116,8 +118,9 @@ niż minimalna liczba, a~regulowanie do maksymalnej wartości
 jest wykonywane przez przycinanie listy po krzyżowaniu.
 
 Oznacza to, że pierwsze losowanie,
-poza decydowaniem konkretnego przecięcia, decyduje o~tym czy
-i~w którym punkcie nastąpi podział elementów w~drugiej liście.
+poza decydowaniem konkretnego przecięcia,
+decyduje o~tym czy i~w~którym punkcie
+nastąpi podział elementów w~drugiej liście.
 
 Matematyczny opis krzyżowania, gdzie\\
 $e_s$ - wielkość pojedyńczego elementu,\\
@@ -210,7 +213,7 @@ z~osobna z~ustalonym prawdopodobieństwem mutacji.
 
 \subsection{Ocena przystosowania}
 Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
-pięciu sieci o~parametrach i~z parametrami wynikającymi
+pięciu sieci o~parametrach i~z~parametrami wynikającymi
 z~fenotypu osobnika.
 Obliczone dokładności na danych testowych zostaną uśrednione
 i~przekształcone na przystosowanie za pomocą wzoru:
