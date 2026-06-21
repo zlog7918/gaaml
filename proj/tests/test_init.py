@@ -1,10 +1,13 @@
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-import gaaml
 import pytest
+import warnings
 import numpy as np
 import typing as t
 from pathlib import Path
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
+with warnings.catch_warnings():
+  warnings.filterwarnings('ignore', category=ResourceWarning)
+import gaaml
 from gaaml.classes.Generations import Generations as _G
 
 class MockPlt:

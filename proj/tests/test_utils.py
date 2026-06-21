@@ -5,14 +5,15 @@ import numpy as np
 import typing as t
 from pathlib import Path
 from types import FunctionType
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
   import torch
   import tensorflow as tf
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS']='0'
 os.environ['TF_CPP_MIN_LOG_LEVEL']='3'
-from gaaml import utils as util
+with warnings.catch_warnings():
+  warnings.filterwarnings('ignore', category=ResourceWarning)
+  from gaaml import utils as util
 from gaaml import consts as const
 from gaaml.classes.NetIndividual import NetIndividual as _NI
 import keras as krs
@@ -345,7 +346,7 @@ def test_conv_to_tensor_initialized(
   if not check_if_backend_available(backend):
     pytest.skip(f"{backend} not installed")
   monkeypatch.setattr(krs.config, "backend", lambda: backend)
-  with warnings.catch_warnings(record=False):
+  with warnings.catch_warnings():
     warnings.filterwarnings('ignore', category=ResourceWarning)
     reloaded_util=t.cast(util, importlib.reload(util))
 
