@@ -259,6 +259,20 @@ def get_fit_func(
       verbose=0, # type: ignore
     )
 
+    ret=model.evaluate(
+      *(
+        (training_data_x, training_data_y)
+          if _validation_data is None else
+        _validation_data
+      ),
+      verbose=0, # type: ignore
+    )
+    test_ret=model.evaluate(
+      test_data_x,
+      test_data_y,
+      verbose=0, # type: ignore
+    )
+
     # get_weights() and save_weights() throw warning
     with warnings.catch_warnings():
       warnings.filterwarnings(
@@ -277,23 +291,11 @@ def get_fit_func(
           'backend': krs.config.backend(),
           'hidden_len': hidden_len,
           'fit_ret': str(fit_ret.history),
+          'evaluation': float(ret),
+          'evaluation_on_test_data': float(test_ret),
           # 'fit_ret_epoch': str(fit_ret.epoch),
         },
         meta,
       )
-
-    ret=model.evaluate(
-      *(
-        (training_data_x, training_data_y)
-          if _validation_data is None else
-        _validation_data
-      ),
-      verbose=0, # type: ignore
-    )
-    test_ret=model.evaluate(
-      test_data_x,
-      test_data_y,
-      verbose=0, # type: ignore
-    )
     return ret, test_ret
   return f
