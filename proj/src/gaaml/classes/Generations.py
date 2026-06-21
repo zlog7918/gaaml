@@ -19,6 +19,7 @@ class Generations(t.Generic[util.IndividualType]):
     self.__pop=pop_factory(*args, **kwargs)
     self.__gpo=generations_progress_output
     self.__max_num_gen=max_num_gen
+    self.__save_of_fits: list[list[list[tuple[float, float]]]]=[[]]*(self.__max_num_gen+1)
     self.__maxs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__avgs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__mins: list[float]=[.0]*(self.__max_num_gen+1)
@@ -47,6 +48,7 @@ class Generations(t.Generic[util.IndividualType]):
 
   def __arrange_min_max(self) -> None:
     _max_sol, _min_sol, _max, _avg, _min=self.__pop.get_max_avg_min()
+    fits=self.__pop.fitnesses_all
     if _max>self.__max_of_max:
       self.__max_of_max=_max
       self.__max_sol=_max_sol
@@ -56,16 +58,32 @@ class Generations(t.Generic[util.IndividualType]):
     self.__maxs[self.__curr_generations]=_max
     self.__avgs[self.__curr_generations]=_avg
     self.__mins[self.__curr_generations]=_min
+    self.__save_of_fits[self.__curr_generations]=fits
 
   @property
   def curr_generations(self) -> int:
     return self.__curr_generations
 
-  def get_statistics(self) -> tuple[tuple[util.IndividualType, util.IndividualType], tuple[float, float], tuple[list[float], list[float], list[float]]]:
+  def get_statistics(self) -> tuple[
+    tuple[util.IndividualType, util.IndividualType],
+    tuple[float, float],
+    tuple[
+      list[float],
+      list[float],
+      list[float],
+    ],
+  ]:
     assert self.__max_sol is not None
     assert self.__min_sol is not None
     return (
       (self.__max_sol, self.__min_sol),
       (self.__max_of_max, self.__min_of_min),
-      (self.__maxs[:self.__curr_generations+1], self.__avgs[:self.__curr_generations+1], self.__mins[:self.__curr_generations+1]),
+      (
+        self.__maxs[:self.__curr_generations+1],
+        self.__avgs[:self.__curr_generations+1],
+        self.__mins[:self.__curr_generations+1],
+      ),
     )
+
+  def get_save_of_fits(self) -> list[list[list[tuple[float, float]]]]:
+    return self.__save_of_fits[:self.__curr_generations+1]

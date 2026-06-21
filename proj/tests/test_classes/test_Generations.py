@@ -1,5 +1,6 @@
 import pytest
 import itertools
+import numpy as np
 import typing as t
 import random as rnd
 from pathlib import Path
@@ -53,6 +54,7 @@ class DummyPop(_P[DummyInd]):
       1.,
       .0,
       fitnesses_progress_output=fitnesses_progress_output,
+      num_of_fit_calc=1,
       max_worker_num=1,
     )
   def next_generation(self, gen_num: int) -> None:
@@ -117,6 +119,12 @@ def get_privates(
     min_of_min,
   )
 
+def get_private_hist(
+  gens: G[DummyInd],
+) -> list[list[list[tuple[float, float]]]]:
+  save_of_fits=gens._Generations__save_of_fits # type: ignore
+  return save_of_fits
+
 def generations_asserts(
   gens: G[DummyInd],
   *,
@@ -137,12 +145,14 @@ def generations_asserts(
     max_of_max,
     min_of_min,
   )=get_privates(gens)
+  hist=get_private_hist(gens)
   exp_maxs, exp_avgs, exp_mins=expected_max_avg_min
   num_generations_asserts(gens, curr_generation=curr_generation)
   if expected_len is not None:
     assert len(maxs)==expected_len
     assert len(avgs)==expected_len
     assert len(mins)==expected_len
+    assert len(hist)==expected_len
   assert maxs[:curr_generation+1]==pytest.approx(exp_maxs)
   assert avgs[:curr_generation+1]==pytest.approx(exp_avgs)
   assert mins[:curr_generation+1]==pytest.approx(exp_mins)
@@ -198,6 +208,19 @@ def statistics_asserts(
   ))
   assert max_of_max==pytest.approx(exp_max_of_max)
   assert min_of_min==pytest.approx(exp_min_of_min)
+
+def hist_asserts(
+  ret: list[list[list[tuple[float, float]]]],
+  *,
+  exp_ret: list[list[list[float]]],
+) -> None:
+  assert isinstance(ret, list)
+  assert len(ret)==len(exp_ret)
+  assert np.array([[
+    [fit[0] for fit in _r]
+      for _r in
+    r
+  ] for r in ret])==pytest.approx(np.array(exp_ret))
 
 def create_gens(
   number_of_generations: int,
@@ -287,6 +310,58 @@ def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
+mark__test_get_save_of_fits_on_start=pytest.mark.parametrize(
+  ('pop_num', 'expected_hist'),
+  [
+    (9, [[
+      [0.0],
+      [0.5],
+      [1.0],
+      [1.5],
+      [2.0],
+      [2.5],
+      [3.0],
+      [3.5],
+      [4.0],
+    ]]),
+    (2, [[[0.0], [0.5]]]),
+    (5, [[
+      [0.0],
+      [0.5],
+      [1.0],
+      [1.5],
+      [2.0],
+    ]]),
+    (8, [[
+      [0.0],
+      [0.5],
+      [1.0],
+      [1.5],
+      [2.0],
+      [2.5],
+      [3.0],
+      [3.5],
+    ]]),
+  ]
+)
+@mark__test_get_save_of_fits_on_start
+def test_get_save_of_fits_on_start(
+  pop_num: int,
+  expected_hist: list[list[list[float]]],
+) -> None:
+  # values
+  number_of_generations=2
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
+
+  # test
+  ret=gens.get_save_of_fits()
+
+  # results
+  num_generations_asserts(gens, curr_generation=0)
+  hist_asserts(ret, exp_ret=expected_hist)
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
+
 @pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
@@ -342,6 +417,66 @@ def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num:
     curr_generation=number_of_generations,
     expected_max_avg_min=expected_max_avg_min,
   )
+  bar_asserts(bar2, pop_num)
+  bar_asserts(bar1, gens.curr_generations)
+
+mark__test_get_save_of_fits_after_all_the_way=pytest.mark.parametrize(
+  ('go_num_generations', 'pop_num', 'expected_hist'),
+  [
+    (2, 2, [
+      [[0.0], [0.5]],
+      [[0.1], [0.6]],
+      [[0.2], [0.7]],
+    ]),
+    (None, 2, [
+      [[0.0], [0.5]],
+      [[0.1], [0.6]],
+      [[0.2], [0.7]],
+    ]),
+    (3, 2, [
+      [[0.0], [0.5]],
+      [[0.1], [0.6]],
+      [[0.2], [0.7]],
+    ]),
+    (2, 3, [
+      [[0.0], [0.5], [1.0]],
+      [[0.1], [0.6], [1.1]],
+      [[0.2], [0.7], [1.2]],
+    ]),
+    (None, 3, [
+      [[0.0], [0.5], [1.0]],
+      [[0.1], [0.6], [1.1]],
+      [[0.2], [0.7], [1.2]],
+    ]),
+    (3, 3, [
+      [[0.0], [0.5], [1.0]],
+      [[0.1], [0.6], [1.1]],
+      [[0.2], [0.7], [1.2]],
+    ]),
+  ]
+)
+@mark__test_get_save_of_fits_after_all_the_way
+def test_get_save_of_fits_after_all_the_way(
+  go_num_generations: int|None,
+  pop_num: int,
+  expected_hist: list[list[list[float]]],
+) -> None:
+  # values
+  number_of_generations=2
+  gens, bar1, bar2=create_gens(number_of_generations, pop_num)
+  gens.go_through_generations(go_num_generations)
+
+  # test
+  ret=gens.get_save_of_fits()
+
+  # results
+  print([[
+    [fit[0] for fit in _r]
+      for _r in
+    r
+  ] for r in ret])
+  num_generations_asserts(gens, curr_generation=number_of_generations)
+  hist_asserts(ret, exp_ret=expected_hist)
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
