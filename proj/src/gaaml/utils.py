@@ -257,7 +257,7 @@ def get_fit_func(
       epochs=epochs,
       validation_data=_validation_data,
       verbose=0, # type: ignore
-    ) # throws 3 warnings: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed.
+    )
 
     # get_weights() and save_weights() throw warning
     with warnings.catch_warnings():
@@ -266,20 +266,21 @@ def get_fit_func(
         # message='__array__ implementation doesn\'t accept a copy keyword',
         category=DeprecationWarning,
       )
-      with open(dir/'model_meta.data', 'x') as meta:
-        json.dump(
-          {
-            'id': count,
-            'epoch': epochs,
-            'batch': batch_size,
-            'backend': krs.config.backend(),
-            'hidden_len': len(model.get_weights())//2-1,
-            'fit_ret': str(fit_ret.history),
-            # 'fit_ret_epoch': str(fit_ret.epoch),
-          },
-          meta,
-        )
+      hidden_len=len(model.get_weights())//2-1
       model.save_weights(dir/'model.weights.h5')
+    with open(dir/'model_meta.data', 'x') as meta:
+      json.dump(
+        {
+          'id': count,
+          'epoch': epochs,
+          'batch': batch_size,
+          'backend': krs.config.backend(),
+          'hidden_len': hidden_len,
+          'fit_ret': str(fit_ret.history),
+          # 'fit_ret_epoch': str(fit_ret.epoch),
+        },
+        meta,
+      )
 
     ret=model.evaluate(
       *(
