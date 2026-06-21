@@ -106,7 +106,14 @@ def cr_network(
         const.NEURON_TYPE,
       ),
     ),
-    lambda net_ind, dir: fitness_func(net_ind, fit_func(net_ind, dir)),
+    lambda net_ind, dir: t.cast(
+      tuple[float, float],
+      tuple(
+        fitness_func(net_ind, r)
+          for r in
+        fit_func(net_ind, dir)
+      )
+    ),
     cross_rate,
     mutation_rate
   ), {

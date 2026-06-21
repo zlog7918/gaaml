@@ -10,13 +10,16 @@ from concurrent.futures import ThreadPoolExecutor
 from .MaxAvgMinHolder import MaxAvgMinHolder as MAMHolder
 
 class Population(t.Generic[util.IndividualType]):
-  __calc_avg_from_fittnesses: t.Callable[[list[float]], float]=staticmethod(lambda i: sum(i)/len(i))
+  __calc_avg_from_fittnesses=staticmethod(t.cast(
+    t.Callable[[list[tuple[float, float]]], float],
+    # second float (test_ret) is not used for fitness calculation
+    lambda i: sum(_i[0] for _i in i)/len(i),
+  ))
   @property
   def population(self) -> list[util.IndividualType]:
     return self.__population[:]
-  __fitnesses: MAMHolder[list[float]]
   @property
-  def fitnesses_all(self) -> list[list[float]]:
+  def fitnesses_all(self) -> list[list[tuple[float, float]]]:
     return self.__fitnesses.arr
   @property
   def fitnesses(self) -> list[float]:
@@ -26,7 +29,7 @@ class Population(t.Generic[util.IndividualType]):
     self,
     pop_num: int,
     individual_factory: t.Callable[[], util.IndividualType],
-    calc_fitness_func: t.Callable[[util.IndividualType, Path], float],
+    calc_fitness_func: t.Callable[[util.IndividualType, Path], tuple[float, float]],
     cross_rate: float,
     mutate_rate: float,
     *,
@@ -37,14 +40,14 @@ class Population(t.Generic[util.IndividualType]):
   ) -> None:
     super().__init__()
     self.__population: list[util.IndividualType]=[individual_factory() for _ in range(pop_num)]
-    def calc_fitness(ind: util.IndividualType, dir: Path) -> float:
+    def calc_fitness(ind: util.IndividualType, dir: Path) -> tuple[float, float]:
       dir.mkdir(parents=True)
       fit=calc_fitness_func(ind, dir)
       return fit
     self.__fpo: tqdm|None=fitnesses_progress_output
     self.__calc_fitness: t.Callable[
       [util.IndividualType, Path],
-      float,
+      tuple[float, float],
     ]=calc_fitness
     self.__cross_rate: float=cross_rate
     self.__mutate_rate: float=mutate_rate
@@ -66,7 +69,7 @@ class Population(t.Generic[util.IndividualType]):
     gen_num: int,
     ind_i: int,
     ind: util.IndividualType,
-  ) -> list[float]:
+  ) -> list[tuple[float, float]]:
     path = self.__dir.path/f'gen_{gen_num}'/f'ind_{ind_i}'
     ind.save_to(path/'model.gen')
     return [
@@ -99,7 +102,7 @@ class Population(t.Generic[util.IndividualType]):
       )
 
   def __calc_fitnesses(self, gen_num: int) -> None:
-    fitnesses=MAMHolder[list[float]](len(self.__population), self.__calc_avg_from_fittnesses)
+    fitnesses=MAMHolder[list[tuple[float, float]]](len(self.__population), self.__calc_avg_from_fittnesses)
     for fit in self.__yield_fits(gen_num):
       if self.__fpo is not None:
         self.__fpo.update()
@@ -108,7 +111,7 @@ class Population(t.Generic[util.IndividualType]):
     gc.collect()
 
   @staticmethod
-  def _calc_to_add(fitnesses: MAMHolder[list[float]]) -> float:
+  def _calc_to_add(fitnesses: MAMHolder[list[tuple[float, float]]]) -> float:
     # add more elaborate way, so if fitnesses for example are: [0, 0, 0, 5, 0], id does not always cross one and the same individual
     # a=\frac{
     #   2S

@@ -83,7 +83,11 @@ def test_cr_network(
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
   population_size=10
-  monkeypatch.setattr(util, "get_fit_func", lambda *args, **kwargs: lambda x, dir: 1)
+  monkeypatch.setattr(
+    util,
+    "get_fit_func",
+    lambda *args, **kwargs: lambda x, dir: (1, ),
+  )
 
   # test
   ret=core.cr_network(
@@ -112,7 +116,11 @@ def test_cr_network_plot(
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(util, "get_fit_func", lambda *args, **kwargs: lambda x, dir: 0)
+  monkeypatch.setattr(
+    util,
+    "get_fit_func",
+    lambda *args, **kwargs: lambda x, dir: (0, ),
+  )
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -154,7 +162,11 @@ def test_cr_network_plot_0_in_fitnesses(
   import matplotlib
   mock_plt=MockPlt()
   monkeypatch.setattr(matplotlib, "pyplot", mock_plt)
-  monkeypatch.setattr(util, "get_fit_func", lambda *args, **kwargs: lambda x, dir: float('inf'))
+  monkeypatch.setattr(
+    util,
+    "get_fit_func",
+    lambda *args, **kwargs: lambda x, dir: (float('inf'), ),
+  )
 
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
@@ -199,7 +211,7 @@ def test_error_cr_network_0generations(
   monkeypatch.setattr(
     util,
     "get_fit_func",
-    lambda *args, **kwargs: lambda x, dir: 1,
+    lambda *args, **kwargs: lambda x, dir: (1, ),
   ) # first population also has calculated fittness (before generations obj is created)
 
   # test

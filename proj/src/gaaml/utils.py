@@ -153,7 +153,7 @@ def get_fit_func(
   test_data: np.ndarray,
   number_of_attributes: int,
   categorial: bool=False,
-) -> t.Callable[[NetIndividual, Path], float]:
+) -> t.Callable[[NetIndividual, Path], tuple[float, float]]:
   if any(data.ndim!=2 for data in __into_tuple(
     (training_data,),
     (validation_data,),
@@ -241,7 +241,7 @@ def get_fit_func(
   def f(
     net_ind: NetIndividual,
     dir: Path,
-  ) -> float:
+  ) -> tuple[float, float]:
     global count
     count+=1
     model, batch_size, epochs=cr_net_from_ind(
@@ -282,9 +282,17 @@ def get_fit_func(
       model.save_weights(dir/'model.weights.h5')
 
     ret=model.evaluate(
+      *(
+        (training_data_x, training_data_y)
+          if _validation_data is None else
+        _validation_data
+      ),
+      verbose=0, # type: ignore
+    )
+    test_ret=model.evaluate(
       test_data_x,
       test_data_y,
       verbose=0, # type: ignore
     )
-    return ret
+    return ret, test_ret
   return f

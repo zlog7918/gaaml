@@ -1,6 +1,7 @@
 import pytest
 import itertools
 import typing as t
+import random as rnd
 from pathlib import Path
 from tqdm.auto import tqdm
 from gaaml.classes.Generations import Generations as G
@@ -44,7 +45,7 @@ class DummyPop(_P[DummyInd]):
     fitnesses_progress_output: tqdm,
     individual_factory: t.Callable[[], DummyInd],
   ) -> None:
-    calc_fitness_func: t.Callable[[DummyInd, Path], float]=lambda ind, dir: ind.gen
+    calc_fitness_func: t.Callable[[DummyInd, Path], tuple[float, float]]=lambda ind, dir: (ind.gen, rnd.random())
     super().__init__(
       pop_num,
       individual_factory,

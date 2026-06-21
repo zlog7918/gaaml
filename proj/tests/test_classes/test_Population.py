@@ -145,10 +145,10 @@ def test_mutate(seed: int, flag: bool) -> None:
 def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None:
   # values
   # private access: calc_avg_from_fittnesses=P.__calc_avg_from_fittnesses
-  calc_avg_from_fittnesses=P._Population__calc_avg_from_fittnesses # type: ignore
-  handle=MAMH[list[float]](5, calc_avg_from_fittnesses)
+  calc_avg_from_fittnesses=t.cast(t.Callable[[list[tuple[float, float]]], float],P._Population__calc_avg_from_fittnesses) # type: ignore
+  handle=MAMH[list[tuple[float, float]]](5, calc_avg_from_fittnesses)
   for v in values:
-    handle.append(v)
+    handle.append(list(map(lambda x: (x, rnd.random()),v)))
 
   # test
   to_add=P._calc_to_add(handle)
@@ -190,8 +190,8 @@ def test_create(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -234,7 +234,7 @@ def test_create(
         min_v<=fit
         and fit<=max_v
         and fit==exp_fit
-      for fit in fits
+      for (fit,_) in fits
     )
       for fits, exp_fit in
     zip(pop.fitnesses_all, exp_fitnesses)
@@ -271,8 +271,8 @@ def test_set_dir(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -321,8 +321,8 @@ def test_set_dir_after_cr_with_path(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -375,8 +375,8 @@ def test_set_dir_after_set_dir(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -403,8 +403,8 @@ def test_population_returns_copy() -> None:
   bit,min_v,max_v=4, 1, 11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -438,8 +438,8 @@ def test_get_max_avg_min() -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -469,10 +469,10 @@ def test_selection_sum_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=7
-    return 0 if ret<0 else ret
+    return 0 if ret<0 else ret, rnd.random()
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '0100', # fit: 4+1=5 -> 5-7=-2 -> 0
@@ -517,10 +517,10 @@ def test_selection_sum_not_zero() -> None:
   pop_num=3
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
-    return 0 if ret<0 else ret
+    return 0 if ret<0 else ret, rnd.random()
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
@@ -561,10 +561,10 @@ def test_selection_no_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
-    return 0 if ret<0 else ret
+    return 0 if ret<0 else ret, rnd.random()
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
@@ -602,8 +602,8 @@ def test_next_generation(tmp_path: Path) -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   class _tqdm(tqdm):
@@ -654,8 +654,8 @@ def test_multi_vs_single_thread_consistency(workers: int) -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -675,8 +675,8 @@ def test_error_change_population() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -697,8 +697,8 @@ def test_error_change_fitnesses() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -719,8 +719,8 @@ def test_error_change_fitnesses_all() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> float:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
+  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)

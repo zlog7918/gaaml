@@ -687,7 +687,10 @@ def test_get_fit_func(
 
   # results
   assert isinstance(ret, t.Callable)
+  assert isinstance(_ret, tuple)
+  _ret, _test_ret=_ret
   assert isinstance(float(_ret), float)
+  assert isinstance(float(_test_ret), float)
   # assert _ret==pytest.approx(expected_fit)
   assert (tmp_path/'model_meta.data').exists()
   assert (tmp_path/'model.weights.h5').exists()
