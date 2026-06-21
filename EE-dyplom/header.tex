@@ -42,16 +42,21 @@
 \Crefname{subsubsection}{Podrozdział}{Podrozdziały}
 
 % superscript cite
-\newcommand{\sscite}[1]{%
-  \foreach \l in {#1} {%
+\newcommand{\toprotectsscite}[2][]{%
+  \foreach \l in {#2} {%
     \if\relax\detokenize\expandafter{\l}\relax% if empty
       % do nothing
     \else%
       \textsuperscript{%
-        \relax\cite{\detokenize\expandafter{\l}}\relax%
+        \relax\cite[#1]{\detokenize\expandafter{\l}}\relax%
       }%
     \fi%
   }%
+}
+\newcommand{\sscite}[2][]{\protect\toprotectsscite[#1]{#2}}
+\newcommand{\authorcite}[2][]{%
+  \citeauthor*{#2}%
+  \sscite[#1]{#2}%
 }
 
 % For section and others to have numbers
