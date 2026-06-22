@@ -570,6 +570,47 @@ dla określonych problemów%
 }.
 
 \section{Przegląd rozwiązań}
+\tocless\subsection{\citefield{miller1989designing}{title}}
+Jedna z~pierwszych prac wykorzystujących
+algorytmy ewolucyjne do tworzenia
+architektury jest autorstwa
+\citebook{miller1989designing}.
+Autorzy zaproponowali zakodowanie
+w~genotypie macierzy połączeń,
+jak widać na \cref{fig:miller1989}.
+Dzięki takiemu rozwiązaniu można rozwijać
+ewolucyjnie sieć do ustawionej
+przez użytkownika maksymalnej
+wielkości sieci (ilości neuronów).
+\begin{figure}
+  \centering \scalebox{0.85}{%
+    \input{img/02_img/miller1989.tikz.tex}%
+  }
+  \caption{
+    Przykład dekodowania
+    z~\citebook[rys. 1]{miller1989designing}.
+    Pokazany jest sposób zapisu przyjęty w~pracy
+    oraz jak będzie wyglądała sieć
+    przy przyjętym genotypie: $
+      00000 0  00000 0  11000 1  11000 1 00110 1
+    $ dla maksymalnie pięciu neuronów.
+  }
+  \label{fig:miller1989}
+\end{figure}
+
+Ograniczeniem przedstawionego podejścia jest
+reprezentacja architektury,
+której wielkość rośnie kwadratowo
+w stosunku do ustalonej
+maksymalnej ilości neuronów.
+Dla $5$ neuronów wielkość genotypu
+(przyjmując, że znak 0 lub 1 to jeden bit)
+będzie wynosiła $5^2+5=30$, natomiast
+dla $15$ - już $15^2+15=240$.
+Ten wzrost danych oraz ograniczone możliwości
+obliczeniowe dostępne w~czasie prowadzenia badań,
+utrudniały zastosowanie metody
+do bardziej złożonych sieci.
 
 % https://dl.acm.org/doi/10.1145/3292500.3330648
 % https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
