@@ -42,18 +42,18 @@
 \Crefname{subsubsection}{Podrozdział}{Podrozdziały}
 
 % superscript cite
-\newcommand{\toprotectsscite}[2][]{%
-  \foreach \l in {#2} {%
-    \if\relax\detokenize\expandafter{\l}\relax% if empty
+\newcommand{\sscite}[2][]{%
+  \foreach \citekey in {#2} {%
+    \ifx\citekey\empty%
       % do nothing
     \else%
       \textsuperscript{%
-        \relax\cite[#1]{\detokenize\expandafter{\l}}\relax%
+        \edef\tmp{\noexpand\cite[#1]{\citekey}}%
+        \tmp%
       }%
     \fi%
   }%
 }
-\newcommand{\sscite}[2][]{\protect\toprotectsscite[#1]{#2}}
 \newcommand{\citebook}[2][]{%
   \citeauthor*{#2}%
   \sscite[#1]{#2}%
