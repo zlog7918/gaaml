@@ -54,9 +54,33 @@
     \fi%
   }%
 }
-\newcommand{\citebook}[2][]{%
-  \citeauthor*{#2}%
-  \sscite[#1]{#2}%
+\pgfkeys{
+  /citebook/.is family,
+  /citebook,
+  author/.estore in=\citebookauthor,
+  cite/.estore in=\citebookcite,
+  both/.estore in=\citebookboth,
+}
+\NewDocumentCommand{\citebook}{O{}m}{%
+  \def\citebookauthor{}%
+  \def\citebookcite{}%
+  \def\citebookboth{}%
+  \pgfkeys{/citebook,#1}%
+  \ifx\citebookboth\empty%
+    \ifx\citebookauthor\empty%
+      \citeauthor*{#2}%
+    \else%
+      \citeauthor*[\citebookauthor]{#2}%
+    \fi%
+    \ifx\citebookcite\empty%
+      \sscite{#2}%
+    \else%
+      \sscite[\citebookcite]{#2}%
+    \fi%
+  \else%
+    \citeauthor*[\citebookboth]{#2}%
+    \sscite[\citebookboth]{#2}%
+  \fi%
 }
 
 % For section and others to have numbers
