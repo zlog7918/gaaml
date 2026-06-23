@@ -36,7 +36,7 @@ class _BaseIndividual(t.Generic[_BI, _CPType, _T, _RT], metaclass=abc.ABCMeta):
   @abc.abstractmethod
   def _load_from_format(cls: type[_BI], saved_model: dict[str, object]) -> _BI: ...
   @classmethod
-  def _load_err_raiser(cls: type[_BI]) -> t.Never:
+  def _load_err_raiser(cls: type[_BI]) -> t.NoReturn:
     raise ValueError(f'Model saved is not {cls.__name__}')
   @classmethod
   def load_from(cls: type[_BI], path: Path) -> _BI:
