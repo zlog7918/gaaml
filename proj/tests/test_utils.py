@@ -5,8 +5,7 @@ import numpy as np
 import typing as t
 from pathlib import Path
 from types import FunctionType
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
+if t.TYPE_CHECKING:
   import torch
   import tensorflow as tf
 import os

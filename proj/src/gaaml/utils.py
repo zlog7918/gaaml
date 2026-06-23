@@ -1,11 +1,10 @@
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
+import typing as t
+if t.TYPE_CHECKING:
   import torch
   import tensorflow as tf
 import json
 import warnings
 import numpy as np
-import typing as t
 import keras as krs
 from pathlib import Path
 from . import consts as const
