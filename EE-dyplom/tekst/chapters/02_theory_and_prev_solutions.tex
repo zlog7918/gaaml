@@ -612,6 +612,93 @@ obliczeniowe dostępne w~czasie prowadzenia badań,
 utrudniały zastosowanie metody
 do bardziej złożonych sieci.
 
+\tocless\subsection{\citefield{kitnano1990nndesigning}{title}}
+Możliwość ewoluowania sieci używając
+generowania reguł została pokazana
+w~\citebook{kitnano1990nndesigning}.
+Autor rozszerzył wcześniejsze podejścia
+o reprezentowanie w genach reguł podmian,
+zamiast gotowej macierzy.
+Umożliwiło to ewolucję bardziej złożonych struktur
+niż w~klasycznych reprezentacjach chromosomowych
+oraz zwiększyło elastyczność procesu
+projektowania sieci neuronowych.
+Macierz połączeń jest generowana
+przez zestaw gramatycznych podmian,
+w kolejnych cyklach,
+aż do uzyskania macierzy z samymi
+bit{\textquotesingle}ami.
+\begin{figure}
+  \centering \input{img/02_img/kitnano1990.tikz.tex}
+  \caption{
+    Przykład generowania sieci jednokierunkowej
+    z~\citebook[rys. 3]{kitnano1990nndesigning}.
+    Pokazany jest sposób powstawania macierzy
+    od początkowej postaci ($\displaystyle
+      \begin{matrix}S\\\end{matrix}
+    $) korzystając z~następujących reguł:
+    $\displaystyle
+      S \rightarrow \left[\begin{matrix}
+        A & B\\C & D\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      A \rightarrow \left[\begin{matrix}
+        c & p\\a & c\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      B \rightarrow \left[\begin{matrix}
+        a & a\\a & e\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      C \rightarrow \left[\begin{matrix}
+        a & a\\a & a\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      D \rightarrow \left[\begin{matrix}
+        a & a\\a & d\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      a \rightarrow \left[\begin{matrix}
+        0 & 0\\0 & 0\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      b \rightarrow \left[\begin{matrix}
+        0 & 0\\0 & 1\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      c \rightarrow \left[\begin{matrix}
+        1 & 0\\0 & 1\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      e \rightarrow \left[\begin{matrix}
+        0 & 1\\0 & 1\\
+      \end{matrix}\right]
+    $, $\displaystyle
+      p \rightarrow \left[\begin{matrix}
+        1 & 1\\1 & 1\\
+      \end{matrix}\right]
+    $.
+  }
+  \label{fig:kitnano1990}
+\end{figure}
+
+Takie podejście daje możliwość generowania
+tak jak i~w~uprzednio omawianej pracy sieci
+rekurencyjnych oraz jednokierunkowych,
+a dodatkowo zmniejsza długość konieczną
+do zapisania architektury.
+Zmianie w kodzie genetycznym podlegają reguły podmian,
+dzięki którym następuje przejście sieci
+z~podstawowej formy do końcowej postaci
+co widać na \cref{fig:kitnano1990}.
+
+Pomimo większej swobody w~opisie architektury,
+metoda charakteryzowała się wysoką złożonością
+procesu kodowania i~dekodowania grafów,
+co utrudniało jej praktyczne zastosowanie
+oraz zwiększało koszt obliczeniowy
+wyszukiwania rozwiązań.
+
 % https://dl.acm.org/doi/10.1145/3292500.3330648
 % https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
 \includegraphics[width=\textwidth,clip]{img/02_img/AutoKeras.png}

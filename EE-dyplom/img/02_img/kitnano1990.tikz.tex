@@ -1,0 +1,42 @@
+\begin{tikzpicture}[>=Latex]
+  \node (S) at (0, 0) {$\displaystyle\begin{matrix}
+    S\\
+  \end{matrix}$};
+  \node[right=0.7 of S] (ABCD) {
+    $\displaystyle\begin{matrix}
+      A & B\\
+      C & D\\
+    \end{matrix}$
+  };
+  \coordinate (vec_len) at ($(ABCD.west)-(S.east)$);
+  \node[anchor=west] (ap) at ($(ABCD.east)+(vec_len)$) {
+    $\displaystyle\begin{matrix}
+      c & p & a & a\\
+      a & c & a & e\\
+      a & a & a & a\\
+      a & a & a & b\\
+    \end{matrix}$
+  };
+  \node[anchor=west] (b01) at ($(ap.east)+(vec_len)$) {
+    $\displaystyle\begin{matrix}
+      1 & 0 & 1 & 1 & 0 & 0 & 0 & 0\\
+      0 & 1 & 1 & 1 & 0 & 0 & 0 & 0\\
+      0 & 0 & 1 & 0 & 0 & 0 & 0 & 1\\
+      0 & 0 & 0 & 1 & 0 & 0 & 0 & 1\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+      0 & 0 & 0 & 0 & 0 & 0 & 0 & 1\\
+    \end{matrix}$
+  };
+
+  \draw ($ (b01.north east)+(0, -3pt) $)
+    -- ($ (b01.south east)+(0, 12pt) $)
+    -- ($ (b01.north west)+(7pt, -3pt) $)
+    -- cycle
+  ;
+
+  \draw[->] (S) -- (ABCD);
+  \draw[->] (ABCD) -- (ap);
+  \draw[->] (ap) -- (b01);
+\end{tikzpicture}
