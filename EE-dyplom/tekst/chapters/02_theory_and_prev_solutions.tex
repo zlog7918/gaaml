@@ -699,6 +699,42 @@ co utrudniało jej praktyczne zastosowanie
 oraz zwiększało koszt obliczeniowy
 wyszukiwania rozwiązań.
 
+\tocless\subsection{\citefield{stanley2002neat}{title}}
+Kolejnym znaczącym osiągnięciem w~dziedzinie
+neuroewolucji jest algorytm NEAT
+(\textit{NeuroEvolution of Augmenting Topologies}),
+który został przedstawiony
+w~\citebook{stanley2002neat}.
+W~przeciwieństwie do wcześniej opisywanych rozwiązań,
+NEAT umożliwia jednoczesną optymalizację
+wag połączeń oraz topologii sieci.
+Algorytm, zaczynając proces od prostych struktur
+i~stopniowo zwiększając ich złożoność
+poprzez dodawanie nowych neuronów i~połączeń,
+ogranicza możliwość zbudowania modelu zbyt złożonego.
+Wymagało to jednak mechanizmu specjacji
+chroniącego innowacyjne rozwiązania,
+by nie zaginęły w ewolucji,
+przełożyło się to jednakże
+na poprawioną efektywność
+procesu ewolucyjnego.
+
+Genotyp osobnika został tam przedstawiony
+jako dwie osobne listy: węzłów oraz połączeń.
+Węzły pokazują ile jest neuronów oraz jakich są typów,
+a połączenia pokazują między którymi
+neuronami występują, z jaką wagą,
+czy są aktywne oraz wskaźnik innowacyjności.
+
+Jednocześnie jak i zaletą tego algorytmu
+jest zaczynanie od małych modeli,
+tak i jest jego ograniczeniem.
+Powoduje to, że wymagana jest duża liczba
+ewaluacji do znalezienia dobrej architektury,
+co prowadzi do wysokich kosztów obliczeniowych,
+szczególnie w~przypadku większych sieci neuronowych
+i~dużych zbiorów danych.
+
 % https://dl.acm.org/doi/10.1145/3292500.3330648
 % https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
 \includegraphics[width=\textwidth,clip]{img/02_img/AutoKeras.png}
