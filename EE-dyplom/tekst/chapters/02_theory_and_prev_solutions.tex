@@ -735,6 +735,40 @@ co prowadzi do wysokich kosztów obliczeniowych,
 szczególnie w~przypadku większych sieci neuronowych
 i~dużych zbiorów danych.
 
-% https://dl.acm.org/doi/10.1145/3292500.3330648
-% https://dl.acm.org/doi/epdf/10.1145/3292500.3330648
-\includegraphics[width=\textwidth,clip]{img/02_img/AutoKeras.png}
+\tocless\subsection{\citefield{jin2019autokeras}{title}}
+Wraz z~rozwojem głębokiego uczenia wzrosło
+zainteresowanie automatycznym wyszukiwaniem
+architektur sieci neuronowych
+(\textit{Neural Architecture Search}, NAS).
+Przykładem takiego podejścia jest system
+Auto-Keras opisany w \citebook{jin2019autokeras}.
+Rozwiązanie to wykorzystuje techniki
+automatycznego uczenia maszynowego
+do wyszukiwania architektur sieci neuronowych
+przy ograniczonych zasobach obliczeniowych.
+Dzięki morfizmowi sieci
+(ang. \textit{network morphism})
+sieci nie muszą być uczone od nowa,
+a jedynie douczone do jej nowej postaci.
+
+Zrezygnowano tu z~podejścia wektorowego,
+a~architekturę reprezentuje się
+bezpośrednio jako graf.
+Algorytm działa poprzez zapisywanie modelów
+i~przeprowadzaniu na nich jednej z~dwóch zmian:
+poszerzenie warstwy i/lub wstawienie nowej.
+Dzięki temu jest w~stanie jedną sieć rozwijać
+w~kilka innych kierunków.
+Dodatkowo całość używa
+optymalizacji bayesowskiej,
+która jest w~stanie przemieszczać się
+w~przestrzeni nie-euklidowskiej,
+która występuje w ramach tego programu.
+
+Ograniczeniem tego rozwiązania jest stosunkowo
+duża złożoność implementacyjna oraz fakt,
+że sieci w tym algorytmie mogą jedynie rosnąć.
+Przy czym to ostatnie jest rekompensowane
+przez wspomniane wracanie do modeli
+i rozwijanie ich w innym kierunku.
+
