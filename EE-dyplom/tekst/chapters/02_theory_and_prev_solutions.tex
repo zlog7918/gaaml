@@ -127,13 +127,16 @@ Oraz są one ułożone szeregowo w~następujący sposób:\\
     \draw[->] (0,0)--(10pt,0)
   }} - kierunek przetwarzania danych.
 \end{nospitemize}
+{\setlength{\parskip}{0pt}
 Zatem wynik działania
 każdego neuronu zależy jedynie
 od wartości neuronów znajdujących się
 w~poprzednich warstwach%
 \sscite{Goodfellow-et-al-2016}.
+}
 
-W~sieci MLP połączenia występują tylko
+Jest to charakterystyczne dla sieci MLP,
+w których połączenia występują tylko
 pomiędzy sąsiadującymi warstwami, co powoduje,
 iż każda warstwa przetwarza dane wyłącznie
 dostarczone przez warstwę
@@ -141,17 +144,41 @@ bezpośrednio ją poprzedzającą.
 Eliminuje to możliwość występowania
 bezpośrednich połączeń pomiędzy warstwami
 niesąsiadującymi ze sobą.
-Oznacza to, że obie poniższe sieci są jednokierunkowe,
-jednak tylko ta po prawej spełnia
+Co oznacza, iż obie sieci przedstawione
+na \cref{fig:fnn_vs_mlp} są jednokierunkowe,
+jednak tylko \textbf{\subref{subfig:fnn_mlp}} spełnia
 definicję wielowarstwowego perceptronu%
-\sscite{haykin2009neural}:
-\begin{center}
-  \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio}
-  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
+\sscite{haykin2009neural}.
+\begin{figure}
+  \centering
+  \subcaptionbox{FNN\label{subfig:fnn}}{%
+    \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio}
+    \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
+  }
   \hspace{2cm}
-  \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
-  \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
-\end{center}
+  \subcaptionbox{FNN - MLP\label{subfig:fnn_mlp}}{%
+    \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
+    \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
+  }
+  \caption{
+    Przedstawione dwie sieci neuronowe
+    zawierające po jednej z~każdego rodzaju warstwy:
+    wejściowa, ukryta oraz wyjściowa.
+    Obie architektury mają po dwa wejścia
+    i~jednym wyjściu, dodatkowo są w~pełni połączone
+    między sąsiednimi warstwami.
+    Jedyna różnica, to jedno
+    połączenie międzywarstwowe
+    od neurony wejściowego
+    do wyjściowego, omijające
+    warstwę ukrytą,
+    w~sieci \textbf{\subref*{subfig:fnn}},
+    które nie występuje
+    w~\textbf{\subref*{subfig:fnn_mlp}}.
+  }
+  \label{fig:fnn_vs_mlp}
+\end{figure}
+
 Liczba neuronów w~warstwie wejściowej
 odpowiada liczbie cech w~danych wejściowych.
 W~zadaniach klasyfikacji liczba neuronów wyjściowych
