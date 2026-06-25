@@ -5,7 +5,10 @@
   \node (dots) at (2,0) {$\cdots$};
   \node (hN) at (3,0) {u};
   \node (out) at (4,0) {wy};
-  \node (where) at ($(5,-8pt)!2pt!(6,-8pt)$) {, gdzie:};
+  \node[anchor=west] (where)
+    at ($(out.east)+(0,-8pt)$)
+    {, gdzie:}
+  ;
 
   % arrows
   \draw[->] (in)--(h1);
@@ -14,10 +17,10 @@
   \draw[->] (hN)--(out);
 
   % brace
-  \coordinate (a) at (1,-5pt);
-  \coordinate (b) at (3,-5pt);
+  \coordinate (a) at ($ (h1)+(-5pt,-5pt) $);
+  \coordinate (b) at ($ (hN)+(5pt,-5pt) $);
   \draw[
     decorate,
     decoration={brace,mirror,amplitude=8pt},
-  ] ($ (a)!-5pt!(b) $)--($ (b)!-5pt!(a) $) node[midway,below=8pt] {$n$};
+  ] (a)--(b) node[midway,below=8pt] {$n$};
 \end{tikzpicture}
