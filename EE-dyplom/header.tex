@@ -1,6 +1,7 @@
 % standard to include text and graphics
 \usepackage{minted}
 \usepackage{graphicx}
+\usepackage{tabularx}
 % otherwise latex warns that biblatex wants this
 \usepackage{csquotes}
 
@@ -30,11 +31,13 @@
 
 % clever_ref with polish ref names
 \usepackage[nameinlink]{cleveref}
+\crefname{table}{tab.}{tab.}
 \crefname{figure}{rys.}{rys.}
 \crefname{chapter}{roz.}{roz.}
 \crefname{section}{roz.}{roz.}
 \crefname{subsection}{roz.}{roz.}
 \crefname{subsubsection}{roz.}{roz.}
+\Crefname{table}{Tabela}{Tabele}
 \Crefname{figure}{Rysunek}{Rysunki}
 \Crefname{chapter}{Rozdział}{Rozdziały}
 \Crefname{section}{Podrozdział}{Podrozdziały}

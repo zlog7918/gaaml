@@ -714,7 +714,7 @@ poprzez dodawanie nowych neuronów i~połączeń,
 ogranicza możliwość zbudowania modelu zbyt złożonego.
 Wymagało to jednak mechanizmu specjacji
 chroniącego innowacyjne rozwiązania,
-by nie zaginęły w ewolucji,
+by nie zaginęły w~ewolucji,
 przełożyło się to jednakże
 na poprawioną efektywność
 procesu ewolucyjnego.
@@ -722,13 +722,13 @@ procesu ewolucyjnego.
 Genotyp osobnika został tam przedstawiony
 jako dwie osobne listy: węzłów oraz połączeń.
 Węzły pokazują ile jest neuronów oraz jakich są typów,
-a połączenia pokazują między którymi
-neuronami występują, z jaką wagą,
+a~połączenia pokazują między którymi
+neuronami występują, z~jaką wagą,
 czy są aktywne oraz wskaźnik innowacyjności.
 
-Jednocześnie jak i zaletą tego algorytmu
+Jednocześnie jak i~zaletą tego algorytmu
 jest zaczynanie od małych modeli,
-tak i jest jego ograniczeniem.
+tak i~jest jego ograniczeniem.
 Powoduje to, że wymagana jest duża liczba
 ewaluacji do znalezienia dobrej architektury,
 co prowadzi do wysokich kosztów obliczeniowych,
@@ -741,7 +741,7 @@ zainteresowanie automatycznym wyszukiwaniem
 architektur sieci neuronowych
 (\textit{Neural Architecture Search}, NAS).
 Przykładem takiego podejścia jest system
-Auto-Keras opisany w \citebook{jin2019autokeras}.
+Auto-Keras opisany w~\citebook{jin2019autokeras}.
 Rozwiązanie to wykorzystuje techniki
 automatycznego uczenia maszynowego
 do wyszukiwania architektur sieci neuronowych
@@ -749,7 +749,7 @@ przy ograniczonych zasobach obliczeniowych.
 Dzięki morfizmowi sieci
 (ang. \textit{network morphism})
 sieci nie muszą być uczone od nowa,
-a jedynie douczone do jej nowej postaci.
+a~jedynie douczone do jej nowej postaci.
 
 Zrezygnowano tu z~podejścia wektorowego,
 a~architekturę reprezentuje się
@@ -763,12 +763,79 @@ Dodatkowo całość używa
 optymalizacji bayesowskiej,
 która jest w~stanie przemieszczać się
 w~przestrzeni nie-euklidowskiej,
-która występuje w ramach tego programu.
+która występuje w~ramach tego programu.
 
 Ograniczeniem tego rozwiązania jest stosunkowo
 duża złożoność implementacyjna oraz fakt,
-że sieci w tym algorytmie mogą jedynie rosnąć.
+że sieci w~tym algorytmie mogą jedynie rosnąć.
 Przy czym to ostatnie jest rekompensowane
 przez wspomniane wracanie do modeli
-i rozwijanie ich w innym kierunku.
+i~rozwijanie ich w~innym kierunku.
 
+\tocless\subsection{\citefield{domashova2021optimal}{title}}
+We współczesnych badaniach nadal można
+znaleźć wykorzystywanie algorytmów ewolucyjnych
+do optymalizacji architektury sieci neuronowych.
+Jedną z~takich prac jest \citebook{domashova2021optimal}.
+Jak i~w~niniejszej pracy, zostały w~niej
+wzięte do optymalizacji tylko sieci MLP.
+Kod genetyczny przedstawiony jest
+jako trzy liczby oraz dwie listy,
+co zostało uwidocznione na \cref{tab:domashova2021}.
+\begin{table}
+  \centering \begin{tabularx}{0.9\textwidth}{%
+    >{\hsize=\dimexpr2\hsize+2\tabcolsep}XXXXXXX%
+  }
+    \hline
+    Osobnik & epoki & rozmiar
+      & warstwy & neurony & aktywacje\\\hline
+    Osobnik a & 4 & 912
+      & 2 & [9, 1] & [1, 0]\\
+    Osobnik b & 3 & 686
+      & 3 & [6, 19, 21] & [0, 1, 0]\\\hline
+  \end{tabularx}
+  \caption{
+    Przykładowe kody genetyczne
+    z~\citebook[cite={tab. 2}]{domashova2021optimal}.
+    Osobnik reprezentuje liczbę epok,
+    rozmiar wsadu (ang. \textit{batch}),
+    liczbę warstw ukrytych
+    oraz dwie listy zawierające:
+    liczbę neuronów w~poszczególnych warstwach
+    i~ich funkcje aktywacji (kodowane numerycznie:
+    0 dla ReLU, 1 dla tangensa hiperbolicznego,
+    2 dla funkcji sigmoidalnej).
+  }
+  \label{tab:domashova2021}
+\end{table}
+
+Reprezentacja kodu genetycznego
+jako wektor liczb powoduje,
+iż autorzy musieli użyć
+niestandardowych operatorów
+krzyżowania oraz mutacji.
+Krzyżowanie ma dwa sposoby działania,
+które zachowują się inaczej w~zależności
+od tego czy są różne długości list.
+Jeżeli są równe zostaje zastosowana
+dysretna rekombinacja, czyli geny
+są wymieniane z~pewnym prawdopodobieństwem.
+W~przeciwnym wypadku sprawdzane jest
+czy potomek nie odziedziczył nadmiarowych
+genów w~stosunku do jego liczby warstw
+ukrytych określonej w~genotypie,
+w~takim wypadku jest on poddawany mutacji
+przetasowującej nowonabytych nadmiernych genów
+
+Ograniczeniem w~zaproponowanym podejściu
+jest odejście od klasycznego kodowania
+binarnego na rzecz wektorów o~zmiennej długości,
+co uniemożliwia zmianę pojedynczego bitu,
+wymuszając tworzenie skomplikowanych
+i~niestandardowych operatorów
+mutacji oraz rekombinacji.
+Dodatkowo sami autorzy jako ograniczenie wskazują
+również brak zrównoleglenia
+w~obecnej wersji algorytmu,
+co negatywnie wpływa na czas
+i~prędkość wykonywania obliczeń.
