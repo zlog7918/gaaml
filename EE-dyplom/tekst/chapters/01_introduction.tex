@@ -1,11 +1,11 @@
 \chapter{Wstęp}
 \label{chap:intro}
-W ostatnich latach sieci neuronowe
+W~ostatnich latach sieci neuronowe
 zyskują coraz bardziej na znaczeniu
 dzięki dynamicznemu rozwojowi uczena maszynowego.
-Są one obecnie używane jako jeden z podstawowych
+Są one obecnie używane jako jeden z~podstawowych
 narzędzi służących do analizy danych.
-Znajdują zastosowanie między innymi w klasyfikacji,
+Znajdują zastosowanie między innymi w~klasyfikacji,
 regresji, analizie obrazów, znajdywaniu wzorców
 czy przetwarzaniu języka naturalnego,
 ponieważ sprawują się lepiej
@@ -17,10 +17,10 @@ lecz również od optymalności topologii danej sieci
 oraz odpowiednich parametrów uczenia.
 Ich dobór jest procesem wymagającym doświadczenia,
 jednakże nawet posiadanie odpowiednich
-kompetencji nie gwarantuje w praktyce
+kompetencji nie gwarantuje w~praktyce
 zaprojektowania zadowalającej struktury.
-W konsekwencji tego potrzeba licznych eksperymentów
-z różnymi modelami i parametrami uczenia,
+W~konsekwencji tego potrzeba licznych eksperymentów
+z~różnymi modelami i~parametrami uczenia,
 by zapewnić coraz lepiej działające sieci.
 
 Określenie struktury sieci neuronowych
@@ -32,19 +32,19 @@ Dodatkowo by upewnić się, że dana konfiguracja
 jest odpowiednia należy przeprowadzić kilka razy
 proces uczenia po nowej inicjalizacji wag,
 ponieważ jest to proces losowy,
-a może znacząco wpływać na końcowe zdolności sieci.
+a~może znacząco wpływać na końcowe zdolności sieci.
 Wskazuje to na potrzebę ograniczenia ręcznego
 zmieniania parametrów i~testowania,
-i kieruje do automatyzacji tego procesu.
+i~kieruje do automatyzacji tego procesu.
 
 Dobieranie wyżej wymienionych własności można
 ozpatrywać jako problem optymalizacyjny
-o wysokiej wymiarowości przestrzeni.
+o~wysokiej wymiarowości przestrzeni.
 Dziedzina ta składa się zarówno ze zmiennych dyskretnych
 (np. liczba neuronów, epok czy rodzaj funkcji aktywacji)
-jak i ciągłych (np. współczynnik uczenia).
+jak i~ciągłych (np. współczynnik uczenia).
 Dodatkowo funkcja celu nie posiada postaci analitycznej,
-a jej wartość jest uzyskiwana dopiero
+a~jej wartość jest uzyskiwana dopiero
 po przeprowadzeniu procesu uczenia,
 który jest kosztowny obliczeniowo.
 
@@ -53,22 +53,22 @@ hiperparametrów obejmują przeszukiwanie
 siatki (ang. \textit{grid search})
 oraz losowe przeszukiwanie
 (ang. \textit{random search}).
-Pierwsze z nich polega na sprawdzeniu wszystkich
-możliwych kombinacji z uprzednio zdefiniowanego zbioru,
+Pierwsze z~nich polega na sprawdzeniu wszystkich
+możliwych kombinacji z~uprzednio zdefiniowanego zbioru,
 co będąc proste implementacyjnie jest również
-wykładniczo rosnące w kosztach obliczeniowych
-wraz z wzrostem liczby parametrów.
-Druga w wielu przpadkach okazuje się bardziej efektywna,
+wykładniczo rosnące w~kosztach obliczeniowych
+wraz z~wzrostem liczby parametrów.
+Druga w~wielu przpadkach okazuje się bardziej efektywna,
 natomiast wymaga przeprowadzania dużej liczby
 procesów uczenia dla tej samej architektury.
-W nowszej literaturze pojawiają się
+W~nowszej literaturze pojawiają się
 metody optymalizacji bayesowskiej,
 których to implementacja jest bardziej złożona,
-a skuteczność jest wrażliwa na przyjęte założenia.
+a~skuteczność jest wrażliwa na przyjęte założenia.
 
 Kolejną trudością jest otymalizacja architektury
 sieci neuronowej, której to parametry
-są dyskretne i mają zmienną wymiarowość.
+są dyskretne i~mają zmienną wymiarowość.
 Utrudnia to zastosowanie metod gradientowych
 co skłania ku wykorzystaniu metod,
 które nie wymagają ciągłości
@@ -77,19 +77,19 @@ ani różniczkowalności funcji celu.
 Taką metodą jest między innymi algorytm genetyczny,
 należący do rodziny algorytmów ewolucyjnych.
 Algorytm ten dobrze radzi sobie
-z dużymi przestrzeniami rozwiązań,
+z~dużymi przestrzeniami rozwiązań,
 dzięki stosowaniu zainspirowanych
-z natury mechanizmów takich jak
-krzyżowanie, mutacja i selekcja.
+z~natury mechanizmów takich jak
+krzyżowanie, mutacja i~selekcja.
 Klasycznie każde rozwiązanie jest reprezentowane
-w postaci kodu genetycznego, który jest modyfikowny
+w~postaci kodu genetycznego, który jest modyfikowny
 przez operatory genetyczne.
 
 Ich zaletą jest zdolność do równoległego
 przeszukiwania wielu obszarów przestrzeni rozwiązań,
-co zmniejsza ryzyko utknięcia w lokalnym ekstremum.
+co zmniejsza ryzyko utknięcia w~lokalnym ekstremum.
 Sprawdzają się również dla mieszanych reprezentacji
-oraz w sytuacjach gdy nie istnieje
+oraz w~sytuacjach gdy nie istnieje
 lub nie jest znany gradient funkcji celu
 ani jej analityczna postać.
 To sprawia, że idealnie pasują
@@ -98,15 +98,15 @@ architektury sieci neuronowej.
 
 \section*{Cel}
 Celem niniejszej pracy jest opracowanie biblioteki
-w języku Python umożliwiającej automatyczną
+w~języku Python umożliwiającej automatyczną
 optymalizację architektury wielowarstwowego
-perceptronu wraz z jej parametrami uczenia
+perceptronu wraz z~jej parametrami uczenia
 za pomocą algorytmu genetycznego.
 Biblioteka ma umożliwić użytkownikowi przekazywanie
-danych w postaci tablic pakietu \texttt{numpy},
-a następnie po przeprowadzeniu procesu ewolucyjnego
+danych w~postaci tablic pakietu \texttt{numpy},
+a~następnie po przeprowadzeniu procesu ewolucyjnego
 powinno zwracać pełny obraz procesu wraz
-z podstawową statystyką.
+z~podstawową statystyką.
 
 \section*{Cele szczegółowe}
 Pierwszym krokiem jest opracowanie struktury
@@ -115,7 +115,7 @@ w~spójny sposób, architektury sieci neuronowej
 oraz parametrów uczenia.
 
 Kolejnym kamieniem milowym jest zaprojektowanie systemu
-w sposób umożliwiający łatwe rozszerzanie zakresu
+w~sposób umożliwiający łatwe rozszerzanie zakresu
 przestrzeni rozwiązań oraz rozwijanie biblioteki. 
 
 Kolejnym jest zawarcie w~kodzie nauczania
@@ -124,24 +124,24 @@ od wybranej przez użytkownika platformy
 (tensorflow, pytorch).
 
 Ostatnim krokiem jest pełna archiwizacja prób
-do wybranego folderu wraz z nauczonymi wagami
-z każdego uczenia, by umożliwić użytkownikowi
+do wybranego folderu wraz z~nauczonymi wagami
+z~każdego uczenia, by umożliwić użytkownikowi
 wybranie już gotowego modelu
 na podstawie dostarczonych danych,
 bez następnego uczenia.
 
 \section*{Pytania badawcze}
-W pracy podjęto próbę odpowiedzi
+W~pracy podjęto próbę odpowiedzi
 na następujące pytania badawcze:
 \begin{nospitemize}
     \item Czy zastosowanie algorytmu genetycznego
-      pozwala uzyskać modele o jakości porównywalnej
+      pozwala uzyskać modele o~jakości porównywalnej
       lub wyższej niż modele projektowane manualnie?
     \item Jak parametry algorytmu genetycznego wpływają
       na skuteczność procesu optymalizacji?
     \item Jak zmienia się czas trwania optymalizacji
-      w zależności od rozmiaru populacji
-      i liczby pokoleń?
+      w~zależności od rozmiaru populacji
+      i~liczby pokoleń?
 \end{nospitemize}
 
 \section*{Zakres}
@@ -175,7 +175,7 @@ oraz procedurę oceny przystosowania.
 
 Każdy osobnik ma przechowywać
 jednoznaczny kod genetyczny, to znaczy,
-że wybrany genotyp w sposób
+że wybrany genotyp w~sposób
 deterministyczny ma doprowadzić
 do danej architektury
 i~parametrów uczenia.
@@ -188,17 +188,17 @@ określonych parametrów dla algorytmu genetycznego,
 by wybrać domyślne parametry
 dla algorytmu genetycznego.
 Parametry obejmują liczbę generacji
-i osobników w populacji
-oraz współczynnik krzyżowania i mutacji.
+i~osobników w~populacji
+oraz współczynnik krzyżowania i~mutacji.
 
 \section*{Ograniczenia}
-W pracy rozważane są wyłącznie
-sieci MLP w pełni połączone.
-Nie uwzględnia się nie w pełni połączonych MLP,
+W~pracy rozważane są wyłącznie
+sieci MLP w~pełni połączone.
+Nie uwzględnia się nie w~pełni połączonych MLP,
 sieci konwolucyjnych, rekurencyjnych
-ani modeli z połączeniami rezydualnymi.
+ani modeli z~połączeniami rezydualnymi.
 Powoduje to, że sieci stworzona
-w wyniku działania biblioteki
+w~wyniku działania biblioteki
 może być ona dalej optymalizowana.
 
 Uczenie sieci neuronowej jest operacją zużywającą
@@ -228,15 +228,15 @@ nakładu pracy użytkownika.
 
 \section*{Struktura pracy}
 Niniejsza praca składa się
-z \total{chapter} rozdziałów.
+z~\total{chapter} rozdziałów.
 Obecny rozdział opisuje cele pracy,
 pytania badawcze, zakres, ograniczenia,
-tezę, a w niniejszej sekcji
-znajduje się informacja o strukturze dokumentu.
+tezę, a~w~niniejszej sekcji
+znajduje się informacja o~strukturze dokumentu.
 \Cref{chap:theory} zawiera teorię
 algorytmów genetycznych oraz sieci neuronowych,
-z szczególnym uwzględnieniem MLP.
-Znajduje się w nim również przegląd wybranych
+z~szczególnym uwzględnieniem MLP.
+Znajduje się w~nim również przegląd wybranych
 poprzednich rozwiązań optymalizujących sieci
 za pomocą algorytmów ewolucyjnych.
 
