@@ -1,4 +1,5 @@
 \chapter{Projekt rozwiązania i~implementacja}
+\label{chap:sol_and_impl}
 \section{Kod genetyczny osobnika}
 W~niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
 architekturę sieci i~jej parametry uczenia.
@@ -218,7 +219,8 @@ z~fenotypu osobnika.
 Obliczone dokładności na danych testowych zostaną uśrednione
 i~przekształcone na przystosowanie za pomocą wzoru:
 $$
-\mbox{fit} = \frac{\mbox{dokładność}}{1 - \mbox{dokładność}} % TODO: change it
+  \mbox{fit}\left(d, n\right)=\frac{1}{1-d\left(1+0.2\frac{n-1}{n_{\max}-1}\right)}
+  % \mbox{fit}=\frac{\mbox{dokładność}}{1 - \mbox{dokładność}} % TODO: change it
 $$
 
 Jeżeli użytkownik poda tylko dane treningowe i~testowe, to:\\
