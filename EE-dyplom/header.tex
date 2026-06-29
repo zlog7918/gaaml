@@ -2,6 +2,7 @@
 \usepackage{minted}
 \usepackage{graphicx}
 \usepackage{tabularx}
+
 % otherwise latex warns that biblatex wants this
 \usepackage{csquotes}
 
@@ -120,3 +121,7 @@
 
 % use parentheses in `\subref` command
 \captionsetup{subrefformat=parens}
+
+% count of chapters
+\usepackage{totcount}
+\regtotcounter{chapter}

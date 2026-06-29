@@ -1,127 +1,217 @@
 \chapter{Wstęp}
-Dobór architektury sieci neuronowej
-i~parametrów uczenia jest procesem,
-wymagającym doświadczenia.
-Natomiast nawet posiadając
-doświadczenie nie jest to pewne,
-że dany model będzie odpowiednio działał ani,
-że jest najlepszym z~możliwych.
-Konsekwencją tego jest potrzeba licznych
-eksperymentów z~różnymi modelami,
-by zapewniać coraz lepiej działające modele.
-Trzeba testować wiele konfiguracji warstw,
-liczby neuronów, funkcji aktywacji
-czy parametrów uczenia,
-co oznacza dużą przestrzeń możliwych rozwiązań.
-Do tego najlepiej testować
-daną konfigurację kilka razy,
-ponieważ są losowane startowe wagi,
-które mogą wpływać znacząco
-na końcowy wygląd sieci po uczeniu.
+W ostatnich latach sieci neuronowe
+zyskują coraz bardziej na znaczeniu
+dzięki dynamicznemu rozwojowi uczena maszynowego.
+Są one obecnie używane jako jeden z podstawowych
+narzędzi służących do analizy danych.
+Znajdują zastosowanie między innymi w klasyfikacji,
+regresji, analizie obrazów, znajdywaniu wzorców
+czy przetwarzaniu języka naturalnego,
+ponieważ sprawują się lepiej
+niż klasyczne metody statystyczne.
 
-Potrzeba ograniczenia ręcznego
+Skuteczność modeli zależy jednak nie tylko
+od dobrze dobranych danych uczących,
+lecz również od optymalności topologii danej sieci
+oraz odpowiednich parametrów uczenia.
+Ich dobór jest procesem wymagającym doświadczenia,
+jednakże nawet posiadanie odpowiednich
+kompetencji nie gwarantuje w praktyce
+zaprojektowania zadowalającej struktury.
+W konsekwencji tego potrzeba licznych eksperymentów
+z różnymi modelami i parametrami uczenia,
+by zapewnić coraz lepiej działające sieci.
+
+Określenie struktury sieci neuronowych
+oraz hiperparametrów ma istotny wpływ
+na szybkość modelu, zdolność do generalizacji
+oraz na stabilność procesu uczenia.
+Tworzą one jednak dużą przestrzeń możliwych rozwiązań.
+Dodatkowo by upewnić się, że dana konfiguracja
+jest odpowiednia należy przeprowadzić kilka razy
+proces uczenia po nowej inicjalizacji wag,
+ponieważ jest to proces losowy,
+a może znacząco wpływać na końcowe zdolności sieci.
+Wskazuje to na potrzebę ograniczenia ręcznego
 zmieniania parametrów i~testowania,
-kieruje do automatyzacji tego procesu.
-Do tego zostanie wykorzystany algorytm genetyczny,
-ponieważ jest dobrze przystosowany
-do przeszukiwania dużych przestrzeni rozwiązań.
+i kieruje do automatyzacji tego procesu.
+
+Dobieranie wyżej wymienionych własności można
+ozpatrywać jako problem optymalizacyjny
+o wysokiej wymiarowości przestrzeni.
+Dziedzina ta składa się zarówno ze zmiennych dyskretnych
+(np. liczba neuronów, epok czy rodzaj funkcji aktywacji)
+jak i ciągłych (np. współczynnik uczenia).
+Dodatkowo funkcja celu nie posiada postaci analitycznej,
+a jej wartość jest uzyskiwana dopiero
+po przeprowadzeniu procesu uczenia,
+który jest kosztowny obliczeniowo.
+
+Klasyczne metody przeszukiwania
+hiperparametrów obejmują przeszukiwanie
+siatki (ang. \textit{grid search})
+oraz losowe przeszukiwanie
+(ang. \textit{random search}).
+Pierwsze z nich polega na sprawdzeniu wszystkich
+możliwych kombinacji z uprzednio zdefiniowanego zbioru,
+co będąc proste implementacyjnie jest również
+wykładniczo rosnące w kosztach obliczeniowych
+wraz z wzrostem liczby parametrów.
+Druga w wielu przpadkach okazuje się bardziej efektywna,
+natomiast wymaga przeprowadzania dużej liczby
+procesów uczenia dla tej samej architektury.
+W nowszej literaturze pojawiają się
+metody optymalizacji bayesowskiej,
+których to implementacja jest bardziej złożona,
+a skuteczność jest wrażliwa na przyjęte założenia.
+
+Kolejną trudością jest otymalizacja architektury
+sieci neuronowej, której to parametry
+są dyskretne i mają zmienną wymiarowość.
+Utrudnia to zastosowanie metod gradientowych
+co skłania ku wykorzystaniu metod,
+które nie wymagają ciągłości
+ani różniczkowalności funcji celu. 
+
+Taką metodą jest między innymi algorytm genetyczny,
+należący do rodziny algorytmów ewolucyjnych.
+Algorytm ten dobrze radzi sobie
+z dużymi przestrzeniami rozwiązań,
+dzięki stosowaniu zainspirowanych
+z natury mechanizmów takich jak
+krzyżowanie, mutacja i selekcja.
+Klasycznie każde rozwiązanie jest reprezentowane
+w postaci kodu genetycznego, który jest modyfikowny
+przez operatory genetyczne.
+
+Ich zaletą jest zdolność do równoległego
+przeszukiwania wielu obszarów przestrzeni rozwiązań,
+co zmniejsza ryzyko utknięcia w lokalnym ekstremum.
+Sprawdzają się również dla mieszanych reprezentacji
+oraz w sytuacjach gdy nie istnieje
+lub nie jest znany gradient funkcji celu
+ani jej analityczna postać.
+To sprawia, że idealnie pasują
+do charakterystyki problematyki optymalizacji
+architektury sieci neuronowej.
 
 \section*{Cel}
-Celem pracy jest opracowanie biblioteki
-w~języku Python, która umożliwi automatyczne
-optymalizowanie sieci neuronowej
-z~pomocą algorytmu genetycznemu
-pod względem architektury sieci
-i~jej parametrów uczenia
-na podstawie danych treningowych
-i~walidacyjnych, i~testowych.
-
-% Algorytmy genetyczne, pozwalają efektywnie przeszukiwać przestrzeń możliwych modeli
-% dzieki budowaniu ich na podstawie "genów".
-% Dzięki tej charakterystyce powinien dobrze sprawdzić się w~dobieraniu odpowiedniej architektury i~parametrów.
-
-% Celem pracy jest zbudowanie biblioteki,
-% która automatyzuje proces dobierania przez wspomniany algorytm genetyczny.
+Celem niniejszej pracy jest opracowanie biblioteki
+w języku Python umożliwiającej automatyczną
+optymalizację architektury wielowarstwowego
+perceptronu wraz z jej parametrami uczenia
+za pomocą algorytmu genetycznego.
+Biblioteka ma umożliwić użytkownikowi przekazywanie
+danych w postaci tablic pakietu \texttt{numpy},
+a następnie po przeprowadzeniu procesu ewolucyjnego
+powinno zwracać pełny obraz procesu wraz
+z podstawową statystyką.
 
 \section*{Cele szczegółowe}
-Pierwszym kamieniem milowym jest opracowanie struktury
+Pierwszym krokiem jest opracowanie struktury
 kodu genetycznego umożliwiającego generowanie z~nich,
 w~spójny sposób, architektury sieci neuronowej
 oraz parametrów uczenia.
 
+Kolejnym kamieniem milowym jest zaprojektowanie systemu
+w sposób umożliwiający łatwe rozszerzanie zakresu
+przestrzeni rozwiązań oraz rozwijanie biblioteki. 
+
 Kolejnym jest zawarcie w~kodzie nauczania
 sieci neuronowych, które będzie względnie niezależne
-od wybranego przez użytkownika platformy
+od wybranej przez użytkownika platformy
 (tensorflow, pytorch).
 
-Ostatnim krokiem jest raportowanie wszystkich
-prób do pliku wraz z~ich nauczonymi wagami.
+Ostatnim krokiem jest pełna archiwizacja prób
+do wybranego folderu wraz z nauczonymi wagami
+z każdego uczenia, by umożliwić użytkownikowi
+wybranie już gotowego modelu
+na podstawie dostarczonych danych,
+bez następnego uczenia.
+
+\section*{Pytania badawcze}
+W pracy podjęto próbę odpowiedzi
+na następujące pytania badawcze:
+\begin{nospitemize}
+    \item Czy zastosowanie algorytmu genetycznego
+      pozwala uzyskać modele o jakości porównywalnej
+      lub wyższej niż modele projektowane manualnie?
+    \item Jak parametry algorytmu genetycznego wpływają
+      na skuteczność procesu optymalizacji?
+    \item Jak zmienia się czas trwania optymalizacji
+      w zależności od rozmiaru populacji
+      i liczby pokoleń?
+\end{nospitemize}
 
 \section*{Zakres}
 Program powininen optymalizować
-architekturę sieci neuronowej
+architekturę wielowarstwowych perceptronów
 wraz z~jej parametrami uczenia
 dla danych podanych przez użytkownika.
-Dane będą przyjmowane w~postaci
+Przez architekturę,
+rozumie się liczbę warstw,
+liczbę neuronów w~każdej z~warstw
+oraz funkcje aktywacji dla każdej z~warstw.
+Parametry uczenia obejmują natomiast
+rodzaj optymalizatora,
+wskaźnik uczenia się
+oraz liczbę epok.
+
+Dane podawane przez użytkownika
+powinny być przyjmowane w~postaci
 tabel pakietu \texttt{numpy}.
+Dwie tabele obowiązkowe - treningowa oraz testowa.
+Jedna tabela opcjonalna - walidacyjna.
 
-% is in theory?
-% Przez architekturę sieci, w~niniejszym dokumencie,
-% rozumie się liczbę warstw,
-% liczbę neuronów w~każdej z~warstw
-% oraz funkcje aktywacji dla każdej z~warstw.
-% A~przez parametry uczenia
-% rozumie się rodzaj optymalizatora,
-% wskaźnik uczenia się oraz liczbę epok.
-
-Optymalizacja powinna się odbywać dla konkretnych
-danych dostarczonych przez użytkownika,
+Przez optymalizację rozumie się znajdowanie
+architektury sieci oraz parametrów jej uczenia
+dla konkretnych danych dostarczonych przez użytkownika,
 za pomocą algorytmu genetycznego.
-Implementacja algorytmu genetycznego będzie obejmowała:
-osobników, selekcję, krzyżowanie i~mutację.
+Implementacja algorytmu genetycznego obejmuje
+reprezentację osobników, mechanizm selekcji,
+operatory krzyżowania i~mutacji
+oraz procedurę oceny przystosowania.
 
-Każdy osobnik będzie przechowywał
+Każdy osobnik ma przechowywać
 jednoznaczny kod genetyczny, to znaczy,
-że dany kod genetyczny za każdym razem
-doprowadzi do takiej samej architektury
-wraz z~takimi samymi parametrami uczenia.
+że wybrany genotyp w sposób
+deterministyczny ma doprowadzić
+do danej architektury
+i~parametrów uczenia.
 
-Zostaną przeprowadzone eksperymenty,
-gdzie będzie spradzane
-czy automatycznie dobrane sieci
-są lepszej lub takiej samej jakości
-jak te dobrane manualnie.
-Oraz zostaną określone domyślne parametry
-dla algorytmu genetycznego,
-które będą możliwie najkorzystniejsze
-dla optymalizacji architektur sieci neuronowych.
+Przeprowadzenie eksperymentów obejmuje
+sprawdzenie czy automatycznie dobrane sieci
+są porównywalnej lub lepszej jakości
+jak wybrane manualnie oraz porównanie
+określonych parametrów dla algorytmu genetycznego,
+by wybrać domyślne parametry
+dla algorytmu genetycznego.
+Parametry obejmują liczbę generacji
+i osobników w populacji
+oraz współczynnik krzyżowania i mutacji.
 
 \section*{Ograniczenia}
-Program nie operuje na wszystkich
-typach sieci neuronowych,
-tworzy tylko sieci MLP,
-więc po użyciu stworzonego
-w~niniejszej pracy programu,
-można dalej zoptymalizować sieć.
-Do jeszcze lepszego działania
-mogą się przyczynić:
-połączenia przechodzące na inne warstwy
-niż tylko następna w~kolejności
-i/lub mniejsza ilość połączeń między neuronami
-(czyli gdy przestaną być w~pełni połączone).
+W pracy rozważane są wyłącznie
+sieci MLP w pełni połączone.
+Nie uwzględnia się nie w pełni połączonych MLP,
+sieci konwolucyjnych, rekurencyjnych
+ani modeli z połączeniami rezydualnymi.
+Powoduje to, że sieci stworzona
+w wyniku działania biblioteki
+może być ona dalej optymalizowana.
 
 Uczenie sieci neuronowej jest operacją zużywającą
 dużą ilość mocy obliczeniowej.
 Dodatkowo ponieważ proces uczenia sieci zależy
 od pierwotnie wylosowanych wag,
 to dla uzyskania większej pewności
-co do uzyskanego wyniku należy
+co do uzyskanego wyniku przystosowania należy
 proces uczenia wykonać kilkakrotnie.
 Powoduje to, że działanie programu
 jest znacząco uzależnione
 od mocy obliczeniowej urządzenia
 wykonującego operacje
-i~proces optymalizacji
+a~proces optymalizacji
 poprzez algorytm genetyczny
 jest stosunkowo długi.
 
@@ -131,14 +221,25 @@ W~niniejszej pracy przyjęto tezę,
 do optymalizacji architektury sieci neuronowej
 i~jej parametrów uczenia umożliwia uzyskanie modeli
 o~jakości porównywalnej lub lepszej
-niż rozwiązania dobierane manualnie
-przy ograniczeniu nakładu pracy użytkownika.
+niż rozwiązania projektowane manualnie
+przy jednoczesnym ograniczeniu
+nakładu pracy użytkownika.
 
 \section*{Struktura pracy}
-Tu jeszcze nic nie ma,
-ponieważ będą na bieżąco dodawane
-krótkie opisy do danego
-rozdziału po jego skończeniu.
+Niniejsza praca składa się
+z \total{chapter} rozdziałów.
+Obecny rozdział opisuje cele pracy,
+pytania badawcze, zakres, ograniczenia,
+tezę, a w niniejszej sekcji
+znajduje się informacja o strukturze dokumentu.
+\Cref{chap:theory} zawiera teorię
+algorytmów genetycznych oraz sieci neuronowych,
+z szczególnym uwzględnieniem MLP.
+Znajduje się w nim również przegląd wybranych
+poprzednich rozwiązań optymalizujących sieci
+za pomocą algorytmów ewolucyjnych.
 
+Będą dalsze opisy na bieżąco dodawane
+dla danych rozdziałów po ich skończeniu.
 Aktualnie by wypełnić przestrzeń:\\
-\lipsum[1][1-10]
+\lipsum[1][1-7]
