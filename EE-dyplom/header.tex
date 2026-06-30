@@ -101,12 +101,12 @@
 
 % Too big space around itemize:
 \newenvironment{nospitemize}{%
-  \bgroup%
-    \setlength{\parskip}{0pt}%
-    \begin{itemize}%
+  \ifvmode\vspace{-\parskip}\fi%
+  \leavevmode%
+  \begin{itemize}[topsep=-\parskip]%
 }{
-    \end{itemize}%
-  \egroup%
+  \end{itemize}%
+  \leavevmode\ignorespacesafterend%
 }
 
 % I do not know how it interacts with `setstretch`,
