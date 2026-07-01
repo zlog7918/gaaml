@@ -1,48 +1,188 @@
 \chapter{Analiza problemu i~wymagania}
 \label{chap:prob_and_req}
-% TODO: change after the end of this chapter
-Optymalizacja architektury sieci jest złożonym zagadnieniem i~wymaga dokładnego rozplanowania co jest jej poddawane.
+Optymalizacja architektury sieci jest złożonym
+zagadnieniem ze względu na dużą liczbę parametrów.
+Z~tego względu przed rozpoczęciem implementacji
+należy określić dokładne wymagania funkcjonalne
+oraz opisać sposób użytkowania oprocowanej biblioteki.
 
+\section{Cel projektowanego rozwiązania}
+Biblioteka ma umożliwiać automatyczne wyszukiwanie
+architektury sieci MLP za pomocą algorytmu genetycznego.
+By to umożliwić biblioteka udostępnia dwie funkcje:
+\begin{nospitemize}
+  \item realizującą automatyczne wyszukiwanie
+    optymalnej architektury MLP,
+  \item tworzącą model sieci na podstawie
+    genotypu osobnika
+\end{nospitemize}
 
-Biblioteka udostępnia: funkcję umożliwiającą automatyczne wyszukiwanie optymalnej architektury sieci MLP z wykorzystaniem algorytmu genetycznego oraz funkcję tworzącą sieć z osobnika. Pierwsza funkcja odpowiada za przeprowadzenie całego procesu optymalizacji - od wygenerowania populacji początkowej, poprzez ewolucję kolejnych generacji, aż do zwrócenia wyników i zapisania przebiegu eksperymentu. Przyjmuje ona następujące parametry obligatoryjne: dane treningowe i testowe oraz ścieżkę do zapisu przebiegu optymalizacji. Oraz ma jeden parametr opcjonalny: dane walidacyjne.
-Dodatkowo można zmieniać następujące parametry domyślne: liczba atrybutów wejściowych, wielkość populacji, liczba generacji, współczynnik krzyżowania i mutacji, część korygująca funkcji przystosowania, maksymalną liczbę zrównolegleń, liczba obliczań przystosowania, flaga wyświetlania postępu oraz flaga rysowania wykresu. Funkcja zwraca wartości funkcji przystosowania w kolejnych generacjach wraz z populacją końcową.
-Przyjmowane dane muszą być w następujących formatach:
-\begin{nospitemize}
-  \item dane treningowe - tabela danych zawierająca w jednym wierszu atrybuty wchodzące i wychodzące,
-  \item dane walidacyjne - tabela danych zawierająca w jednym wierszu atrybuty wchodzące i wychodzące,
-  \item dane testowe - tabela danych zawierająca w jednym wierszu atrybuty wchodzące i wychodzące,
-  \item ścieżka do zapisu przebiegu optymalizacji - ścieżka do pustego (istniejącego lub nie) folderu,
-  \item liczba atrybutów wejściowych - liczba całkowita różna zeru (liczba dodatnia bezpośrednio wskazuje zadaną wartość, a wartość absolutna ujemnej oznacza ile od wszystkich atrybutów należy odjąć by uzyskać zadaną wartość),
-  \item wielkość populacji - liczba całkowita dodatnia,
-  \item liczba generacji - liczba całkowita dodatnia,
-  \item współczynnik krzyżowania - liczba rzeczywista z przdziału $\langle 0, 1 \rangle$,
-  \item współczynnik mutacji - liczba rzeczywista z przdziału $\langle 0, 1 \rangle$,
-  \item część korygująca funkcji przystosowania - funkcja przyjmująca następujące parametry:
-  \begin{nospitemize}
-    \item osobnik - osobnik deterministycznie określający strukturę sieci neuronowej,
-    \item dopasowanie reakcji nauczonej sieci do przewidywanych odpowiedzi - liczba rzeczywista
-  \end{nospitemize}%
-  a zwracająca przystosowanie osobnika - liczba rzeczywista wzrastająca wraz z jego większym przystosowaniem, pozwala to w rezultacie korygować funkcję celu, by na przykład bardziej preferowała mniejsze sieci,
-  \item maksymalna liczba zrównolegleń - liczba całkowita dodatnia,
-  \item liczba obliczań przystosowania - liczba całkowita dodatnia,
-  \item flaga wyświetlania postępu - wartość prawda/fałsz,
-  \item flaga rysowania wykresu - wartość prawda/fałsz.
-\end{nospitemize}
-Dane treningowe, walidacyjne i testowe mogą mieć wyjście klasyfikacyjne lub regresyjne, a wejście regresyjne, jednakże muszą być to jednolite względem siebie oraz muszą mieć tą samą ilość kolumn z atrybutami wejściowymi jak i wyjściowymi.
-Funkcja ma zakończyć działanie po wykonaniu zadanej liczby generacji. Funkcja ma udostępniać pod wybraną przez uczestnika lokalizacją: dane wszystkich osobników w sposób umożliwiający odtworzenie ich, ich nauczone wagi oraz wartości przystosowania przed przejściem przez funkcję korygującą.
-Po wywołaniu funkcji przeprowadzony jest pełny przebieg ewolucji pokazany na \cref{fig:genetic_flow}. Jest tworzona populacja początkowa, po czym dla każdego osobnika jest $n$-krotnie ($n$=liczba obliczań przystosowania) obliczana funkcja przystosowania, w ramach której jest tworzona i uczona sieć neuronowa, a wyniki funkcji są uśredniane by uzyskać końcowe przystosowanie. Następnie wykonywane są kolejno selekcja, krzyżowanie, mutacja i wyliczenie przystosowania nowej populacji (ponieważ wszystkie nowe osobniki mają być wzięte do populacji w nowej generacji), kroki podane w niniejszym zdaniu są powtarzane aż do osiągnięcia warunku końcowego będącego dojściem do zadanej (lub domyślnej) liczby generacji.
+Druga funkcja w~ramach swojego działania umożliwia
+deterministyczne odtworzenie architektury sieci
+na podstawie genotypu osobnika.
+Pierwsza funkcja odpowiada
+za przeprowadzenie całego procesu optymalizacji
+- od wygenerowania populacji początkowej,
+poprzez ewolucję kolejnych pokoleń,
+aż do zwrócenia wyników i~zapisania przebiegu procesu.
 
-Druga funkcja ma przyjomwać osobnika, liczbę atrybutów wejściowych i wyjściowych oraz flagę czy dane wyjściowe są klasyfikacyjne. Ich format to:
+\section{Wymagania dotyczące funkcji optymalizującej}
+Funkcja optymalizująca przyjmuje dane treningowe,
+testowe oraz ścieżkę folderu do zapisu przebiegu
+optymalizacji jako parametry obowiązkowe.
+Opcjonalne jest podanie danych walidacyjnych.
+Dodatkowo użytkownik ma możliwość
+zmodyfikowania parametrów konfiguracyjnych,
+które posiadają wartości domyślne:
 \begin{nospitemize}
-  \item osobnik - osobnik deterministycznie określający strukturę sieci neuronowej,
-  \item liczba atrybutów wejściowych - liczba całkowita dodatnia,
-  \item liczba atrybutów wyjściowych - liczba całkowita dodatnia.
-  \item flaga klasyfikacji - wartość prawda/fałsz
+  \item liczba atrybutów wejściowych
+  \item wielkość populacji,
+  \item liczba generacji,
+  \item współczynnik krzyżowania,
+  \item współczynnik mutacji,
+  \item funkcja korygująca wartość przystosowania,
+  \item maksymalna liczba zrównolegleń,
+  \item liczba obliczeń funkcji przystosowania,
+  \item flaga wyświetlania postępu,
+  \item flaga rysowania wykresu przebiegu optymalizacji.
 \end{nospitemize}
-Funkcja zwraca stworzony model sieci oraz parametry z jakimi ma być uczona: wielkość wsadu i liczba epok. Mają mieć one format:
+
+Dane treningowe, walidacyjne oraz testowe powinny
+być w~postaci tabeli, w~których każdy wiersz
+zawiera komplet atrybutów wejściowych
+i~odpowiadającym im wartości wyjściowych.
+Wszystkie zbiory danych muszą być jednolite
+pod względem liczby wejść i~wyjść.
+Funkcja obsługuje zadania klasyfikacji oraz regresji.
+
+Ścieżka zapisu przebiegu optymalizacji
+ma wskazywać na pusty katalog lub katalog,
+który powinien zostać utworzony przez program.
+
+Liczba atrybutów wejściowych jest
+liczbą całkowitą różną od zera.
+Wartość dodatnia wskazuje
+na bezpośrednią zadaną wartość,
+natomiast ujemna powinna wartością absolutną
+być równa liczbie trybutów wyjściowych,
+by po dodaniu do liczby wszystkich
+atrybutów uzyskać zadaną wartość.
+
+Parametry wielkości populacji, liczby generacji,
+liczby obliczeń funkcji przystosowania
+oraz maksymalnej liczby zrównolegleń mają należeć
+do zbioru liczb całkowitych dodatnich ($\mathbb{C}_+$).
+Współczynniki krzyżowania oraz mutacji
+muszą być liczbami rzeczywistymi
+z~przedziału $\langle0,1\rangle$.
+
+Parametry odpowiedzialne za wyświetlanie postępu
+oraz rysowanie wykresów są wartościami logicznymi.
+Gdzie dla pierwszego z~nich prawda oznacza,
+że funkcja ma wyświetlać,
+na której generacji jest aktualnie
+algorytm genetyczny oraz ilu osobnikom
+zostało już policzone przystosowanie,
+a~fałsz - brak wyświetlania.
+Dla drugiego z~nich prawda oznacza,
+że na końcu działania funkcji powinien być
+narysowany wykres przebiegu optymalizacji,
+a~fałsz - brak rysowania.
+
+Możliwe jest również przekazanie własnej
+funkcji korygującej wartość przystosowania.
+Jest ona uruchamiana po etapie uczenia i~daje wartość,
+która po uśrednieniu będzie przetwarzana
+przez algorytm genetyczny.
+Funkcja ta otrzymuje jako argumenty osobnika
+oraz wartość dopasownia reakcji nauczonej sieci
+na dane do przewidywanych odpowiedzi.
+Wynikiem działania funkcji powinno
+być przystosowanie modelu,
+które będzie tym większe im większa ma być
+preferencja przy selekcji dla danego osobnika.
+Pozwala to dostosować przebieg
+procesu ewolucji do potrzeb użytkowania,
+na przykład poprzez dawanie prostszym sieciom
+(posiadającym mniejszą liczbę warstw ukrytych)
+większą wartość przystosowania dla takiego samego
+dopasowania co bardziej skomplikowane modele.
+
+Funkcja kończy działanie algorytmu genetycznego
+po wykonaniu zadanej liczby generacji.
+Po jego zakończeniu zwracane są:
+historia wartości przystosowania w~kolejnych
+generacjach dla każdego osobnika,
+najlepiej i~najgorzej przystosowany
+osobnik oraz populacja końcowa.
+Dodatkowo w~lokalizacji podanej przez ścieżkę
+zapisu umieszczane są dane wszystkich osobników,
+wyuczone wagi odpowiadających im sieci neuronowych
+oraz wartości przystosowania przed
+zastosowaniem funkcji korygującej.
+Informacje te umożliwiają późniejszą analizę
+przebiegu ewolucji, nauczenie własnej sieci
+o~zoptymalizowanej architekturze
+oraz odtworzenie dowolnej nauczonej już sieci.
+
+\section{Przebieg działania funkcji optymalizującej}
+Po wywołaniu funkcji przeprowadzony jest pełny przebieg
+ewolucji pokazany na \cref{fig:genetic_flow}.
+Tworzona jest populacja początkowa,
+po czym dla każdego osobnika jest
+$n$-krotnie obliczane przystosowanie,
+gdzie $n$ oznacza liczbę obliczeń przystosowania.
+W~ramach pojedynczego liczenia tworzona jest
+sieć neuronowa na podstawie genotypu badanego osobnika,
+a~następnie zostaje nauczona na danych treningowych.
+Dopasowanie wyznaczane jest na bazie danych
+walidacyjnych, jeśli zostały dostarczone;
+w~przeciwnym razie wykorzystuje się dane testowe.
+Po uzyskaniu tej wartości jest ona
+przekazywana do funkcji korygującej,
+która zwraca końcowy wynik funkcji przystosowania.
+Ostateczna wartość przystosowania osobnika
+stanowi uśrednienie uzyskanych wyników.
+
+Po uzyskaniu przystosowań wszystkich
+osobników wykonywane są kolejno operacje
+selekcji, krzyżowania oraz mutacji.
+Powstałe osobniki trafiają bezpośrednio
+do populacji w~następnej generacji
+i~są liczone dla nich wartości przystosowania.
+Jeżeli flaga wyświetlania postępu ma pozytywną wartość,
+funkcja aktualizuje wskaźniki postępu po każdym
+uzyskaniu wartości przystosowaniana osobnika.
+Proces ten zaczynając od selekcji jest powtarzany
+aż do osiągnięcia warunku końcowego,
+który jest osiągnięciem zadanej
+(lub domyślnej) liczby generacji.
+Następnie, jeżeli flaga rysowania
+wykresu ma pozytywną wartość,
+funkcja przechodzi do rysowania wykresu.
+A~ostatecznie funkcja kończy swoje
+działanie zwracając wartości.
+
+\section{Wymagania dotyczące
+funkcji tworzącej model sieci}
+Druga funkcja udostępniana przez bibliotekę
+umożliwia tworzenie modelu sieci neuronowej
+na podstawie genotypu osobnika.
+Obligatoryjnie przyjmuje następujące parametry:
 \begin{nospitemize}
-  \item model - sieć umożliwiająca uczenie, zapisanie i odtworzenie wag oraz danie odpowiedzi do danych,
-  \item wielkość wsadu - liczba całkowita dodatnia
-  \item liczba epok - liczba całkowita dodatnia
+  \item osobnik deterministycznie
+    opisujący architekturę sieci MLP,
+  \item liczba atrybutów wejściowych,
+  \item liczba atrybutów wyjściowych,
+  \item flaga określająca czy rozwiązywane
+    zagadnienie ma charakter klasyfikacyjny.
 \end{nospitemize}
-W ramach swojego działania funkcja odczytuje parametry osobnika i tworzy na ich podstawie sieć.
+
+Wynikiem działania funkcji jest stworzona sieć neuronowa
+wraz z~parametrami procesu uczenia obejmującymi
+wielkość wsadu oraz liczbę epok.
+W~ramach swojego działania funkcja odczytuje
+parametry zapisane w~genotypie osobnika
+i~na ich podstawie deterministycznie tworzy model.
+Pozwala to na odtworzenie zapisanych rozwiązań jak
+i~na ich ponowne uczenie czy analizę.
