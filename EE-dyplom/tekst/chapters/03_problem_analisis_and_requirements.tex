@@ -41,7 +41,7 @@ które posiadają wartości domyślne:
   \item współczynnik krzyżowania,
   \item współczynnik mutacji,
   \item funkcja korygująca wartość przystosowania,
-  \item maksymalna liczba zrównolegleń,
+  \item liczba zrównolegleń,
   \item liczba obliczeń funkcji przystosowania,
   \item flaga wyświetlania postępu,
   \item flaga rysowania wykresu przebiegu optymalizacji.
@@ -70,8 +70,8 @@ atrybutów uzyskać zadaną wartość.
 
 Parametry wielkości populacji, liczby generacji,
 liczby obliczeń funkcji przystosowania
-oraz maksymalnej liczby zrównolegleń mają należeć
-do zbioru liczb całkowitych dodatnich ($\mathbb{C}_+$).
+oraz liczby zrównolegleń mają należeć
+do zbioru liczb naturalnych ($\mathbb{N}$).
 Współczynniki krzyżowania oraz mutacji
 muszą być liczbami rzeczywistymi
 z~przedziału $\langle0,1\rangle$.
@@ -157,6 +157,11 @@ Proces ten zaczynając od selekcji jest powtarzany
 aż do osiągnięcia warunku końcowego,
 który jest osiągnięciem zadanej
 (lub domyślnej) liczby generacji.
+Jeżeli liczba zrównolegleń jest większa od 1,
+to wyznaczanie wartości przystosowania
+osobników jest zrównoleglane,
+do podanej liczby procesów.
+
 Następnie, jeżeli flaga rysowania
 wykresu ma pozytywną wartość,
 funkcja przechodzi do rysowania wykresu.
