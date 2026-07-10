@@ -145,7 +145,6 @@ _T=t.TypeVar('_T')
 def __into_tuple(*args: tuple[_P|None, t.Callable[[_P], _T]]|tuple[_T|None]) -> tuple[_T, ...]:
   return tuple(a[0] if len(a)==1 else a[1](a[0]) for a in args if a[0] is not None)
 
-count: int=0
 def get_fit_func(
   training_data: np.ndarray,
   validation_data: np.ndarray|None,
@@ -241,8 +240,6 @@ def get_fit_func(
     net_ind: NetIndividual,
     dir: Path,
   ) -> tuple[float, float]:
-    global count
-    count+=1
     model, batch_size, epochs=cr_net_from_ind(
       net_ind,
       input_size,
@@ -284,7 +281,6 @@ def get_fit_func(
     with open(dir/'model_meta.data', 'x') as meta:
       json.dump(
         {
-          'id': count,
           'epoch': epochs,
           'batch': batch_size,
           'backend': krs.config.backend(),
