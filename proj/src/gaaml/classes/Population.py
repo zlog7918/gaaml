@@ -129,7 +129,11 @@ class Population(t.Generic[util.IndividualType]):
     if self.__fitnesses.sum==0:
       return rnd.choice(self.__population), rnd.choice(self.__population)
       # fitness_values=[fit+1 for fit in fitness_values]
-    to_add=self._calc_to_add(self.__fitnesses) if self.__fitnesses.zero_count>0 else 0
+    to_add=(
+      self._calc_to_add(self.__fitnesses)
+        if self.__fitnesses.zero_count>0 else
+      0
+    )
 
     probs=[]
     _sum=0
