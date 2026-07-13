@@ -145,11 +145,42 @@ _T=t.TypeVar('_T')
 def __into_tuple(*args: tuple[_P|None, t.Callable[[_P], _T]]|tuple[_T|None]) -> tuple[_T, ...]:
   return tuple(a[0] if len(a)==1 else a[1](a[0]) for a in args if a[0] is not None)
 
+@t.overload
+def get_fit_func(
+  training_data: np.ndarray,
+  validation_data: np.ndarray,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  *,
+  stoping_patiance: int=...,
+  categorial: bool=False,
+) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+@t.overload
+def get_fit_func(
+  training_data: np.ndarray,
+  validation_data: None,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  *,
+  categorial: bool=False,
+) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+@t.overload
 def get_fit_func(
   training_data: np.ndarray,
   validation_data: np.ndarray|None,
   test_data: np.ndarray,
   number_of_attributes: int,
+  *,
+  stoping_patiance: int=...,
+  categorial: bool=False,
+) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+def get_fit_func(
+  training_data: np.ndarray,
+  validation_data: np.ndarray|None,
+  test_data: np.ndarray,
+  number_of_attributes: int,
+  *,
+  stoping_patiance: int=const.STOPING_PATIANCE,
   categorial: bool=False,
 ) -> t.Callable[[NetIndividual, Path], tuple[float, float]]:
   if any(data.ndim!=2 for data in __into_tuple(
@@ -246,14 +277,31 @@ def get_fit_func(
       output_size,
       categorial,
     )
-    fit_ret: krs.callbacks.History=model.fit(
-      training_data_x,
-      training_data_y,
-      batch_size=batch_size,
-      epochs=epochs,
-      validation_data=_validation_data,
-      verbose=0, # type: ignore
-    )
+
+    # get_weights() and save_weights() throw warning
+    with warnings.catch_warnings():
+      warnings.filterwarnings(
+        'ignore',
+        # message='__array__ implementation doesn\'t accept a copy keyword',
+        category=DeprecationWarning,
+      )
+      fit_ret: krs.callbacks.History=model.fit(
+        training_data_x,
+        training_data_y,
+        batch_size=batch_size,
+        epochs=epochs,
+        validation_data=_validation_data,
+        callbacks=(
+          []
+            if _validation_data is None else
+          [krs.callbacks.EarlyStopping(
+            monitor='val_loss',
+            patience=stoping_patiance,
+            restore_best_weights=True,
+          )]
+        ),
+        verbose=0, # type: ignore
+      )
 
     ret=model.evaluate(
       *(

@@ -99,6 +99,7 @@ def test_cr_network(
     save_dir_path=tmp_path,
     population_size=population_size,
     number_of_generations=number_of_generations,
+    output_progress=False,
   )
 
   # results
@@ -137,6 +138,7 @@ def test_cr_network_plot(
     population_size=population_size,
     number_of_generations=number_of_generations,
     plot=True,
+    output_progress=False,
   )
 
   # results
@@ -183,6 +185,7 @@ def test_cr_network_plot_0_in_fitnesses(
     population_size=population_size,
     number_of_generations=number_of_generations,
     plot=True,
+    output_progress=False,
   )
 
   # results
@@ -225,6 +228,7 @@ def test_error_cr_network_0generations(
       save_dir_path=tmp_path,
       population_size=population_size,
       number_of_generations=number_of_generations,
+      output_progress=False,
     )
 
   # results

@@ -26,6 +26,7 @@ def cr_network(
   /,*,
   save_dir_path: Path|str,
   number_of_attributes: int=...,
+  is_categorial: bool=False,
   population_size: int=...,
   number_of_generations: int=...,
   cross_rate: float=...,
@@ -47,6 +48,7 @@ def cr_network(
   /,*,
   save_dir_path: Path|str,
   number_of_attributes: int=...,
+  is_categorial: bool=False,
   population_size: int=...,
   number_of_generations: int=...,
   cross_rate: float=...,
@@ -57,6 +59,7 @@ def cr_network(
   ]=fitness_corrector,
   max_worker_num: int=...,
   num_of_fittnesses_calc: int=...,
+  stoping_patiance: int=...,
   output_progress: bool=True,
   plot: bool=False,
 ) -> RetType: ...
@@ -67,6 +70,7 @@ def cr_network(
   /,*,
   save_dir_path: Path|str,
   number_of_attributes: int=-1,
+  is_categorial: bool=False,
   population_size: int=const.POP_SIZE,
   number_of_generations: int=const.NUM_OF_GENERATIONS,
   cross_rate: float=const.CROSS_RATE,
@@ -77,6 +81,7 @@ def cr_network(
   ]=fitness_corrector,
   max_worker_num: int=Pop_const.MAX_WORKERS,
   num_of_fittnesses_calc: int=Pop_const.NUM_OF_FIT_CALC,
+  stoping_patiance: int=const.STOPING_PATIANCE,
   output_progress: bool=True,
   plot: bool=False,
 ) -> RetType:
@@ -87,7 +92,14 @@ def cr_network(
     (np.asarray(_validation_data), np.asarray(_test_data))
   )
   del _validation_data, _test_data
-  fit_func=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+  fit_func=util.get_fit_func(
+    training_data,
+    validation_data,
+    test_data,
+    number_of_attributes,
+    categorial=is_categorial,
+    stoping_patiance=stoping_patiance,
+  )
   if output_progress is True:
     bar1=tqdm(total=number_of_generations, desc='Generations', position=0, mininterval=0)
     bar2=tqdm(total=population_size, desc='Calculated fitnesses', position=1, mininterval=0)

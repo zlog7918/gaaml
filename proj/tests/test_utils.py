@@ -683,7 +683,13 @@ def test_get_fit_func(
   ni._update()
 
   # test
-  ret=util.get_fit_func(_training_data, _validation_data, _test_data, number_of_attributes, is_categorial)
+  ret=util.get_fit_func(
+    _training_data,
+    _validation_data,
+    _test_data,
+    number_of_attributes,
+    categorial=is_categorial,
+  )
   _ret=ret(ni, tmp_path)
 
   # results
@@ -718,7 +724,12 @@ def test_error_get_fit_func_not_2D_arr(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+    _=util.get_fit_func(
+      training_data,
+      validation_data,
+      test_data,
+      number_of_attributes
+    )
 
   # results
   assert str(excinfo.value)=='Every data must be 2D array'
@@ -746,7 +757,12 @@ def test_error_get_fit_func_not_same_training_vs_test(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+    _=util.get_fit_func(
+      training_data,
+      validation_data,
+      test_data,
+      number_of_attributes
+    )
 
   # results
   assert str(excinfo.value)=='training_data and test_data do not have the same number of attributes in data or output'
@@ -772,7 +788,12 @@ def test_error_get_fit_func_not_same_validation(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=util.get_fit_func(training_data, validation_data, test_data, number_of_attributes)
+    _=util.get_fit_func(
+      training_data,
+      validation_data,
+      test_data,
+      number_of_attributes
+    )
 
   # results
   assert str(excinfo.value)=='validation_data does not have the same number of attributes in data or output as training_data and test_data'
@@ -865,7 +886,13 @@ def test_error_get_fit_func_not_valid_type(
 
   # test
   with pytest.raises(ValueError) as excinfo:
-    _=util.get_fit_func(_training_data, _validation_data, _test_data, number_of_attributes, is_categorial)
+    _=util.get_fit_func(
+      _training_data,
+      _validation_data,
+      _test_data,
+      number_of_attributes,
+      categorial=is_categorial,
+    )
 
   # results
   # print(excinfo.value)
@@ -959,4 +986,10 @@ def test_error_get_fit_func_conv_not_correct(
 
   # test/results
   with pytest.raises(AssertionError):
-    _=util.get_fit_func(_training_data, _validation_data, _test_data, number_of_attributes, is_categorial)
+    _=util.get_fit_func(
+      _training_data,
+      _validation_data,
+      _test_data,
+      number_of_attributes,
+      categorial=is_categorial,
+    )
