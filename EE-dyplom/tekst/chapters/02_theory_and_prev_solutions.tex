@@ -41,11 +41,11 @@ $$
 $$
 gdzie:
 \begin{nospitemize}
-  \item $x_i$ - wartości wejściowe neuronu,
-  \item $w_i$ - wagi połączeń,
-  \item $b$ - wyraz wolny,
-  \item $f\left(\dots\right)$ - funkcja aktywacji,
-  \item $y$ - wartość wyjściowa neuronu.
+  \item $x_i$ -- wartości wejściowe neuronu,
+  \item $w_i$ -- wagi połączeń,
+  \item $b$ -- wyraz wolny,
+  \item $f\left(\dots\right)$ -- funkcja aktywacji,
+  \item $y$ -- wartość wyjściowa neuronu.
 \end{nospitemize}
 Oznacza to, że otrzymuje on zestaw wartości wejściowych,
 które są mnożone przez odpowiadające im wagi,
@@ -109,24 +109,24 @@ W~perceptronie wielowarstwowym
 segmenty sieci upraszczają się odpowiednio
 do trzech podstawowych rodzajów warstw:
 \begin{nospitemize}
-  \item \textbf{warstwę wejściową} -
-    odpowiedzialną za przyjęcie danych wejściowych,
-  \item \textbf{warstwy ukryte} -
-    odpowiedzialne za przetwarzanie informacji
+  \item \textbf{warstwę wejściową}
+    -- odpowiedzialną za przyjęcie danych wejściowych,
+  \item \textbf{warstwy ukryte}
+    -- odpowiedzialne za przetwarzanie informacji
     i~ekstrakcję cech,
-  \item \textbf{warstwę wyjściową} -
-    generującą końcowy wynik działania sieci.
+  \item \textbf{warstwę wyjściową}
+    -- generującą końcowy wynik działania sieci.
 \end{nospitemize}
 Oraz są one ułożone szeregowo w~następujący sposób:\\
 \input{img/02_img/layers.tikz.tex}
 \begin{nospitemize}
-  \item we - warstwa wejściowa,
-  \item u - warstwa ukryta,
-  \item wy - warstwa wyjściowa,
-  \item $n$ - liczba warstw ukrytych.
+  \item we -- warstwa wejściowa,
+  \item u -- warstwa ukryta,
+  \item wy -- warstwa wyjściowa,
+  \item $n$ -- liczba warstw ukrytych.
   \item \raisebox{3pt}{\tikz[>=Latex]{
     \draw[->] (0,0)--(10pt,0)
-  }} - kierunek przetwarzania danych.
+  }} -- kierunek przetwarzania danych.
 \end{nospitemize}
 {\setlength{\parskip}{0pt}
 Zatem wynik działania
@@ -157,7 +157,7 @@ definicję wielowarstwowego perceptronu%
     \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
   }
   \hspace{2cm}
-  \subcaptionbox{FNN - MLP\label{subfig:fnn_mlp}}{%
+  \subcaptionbox{FNN -- MLP\label{subfig:fnn_mlp}}{%
     \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
     \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
   }
@@ -419,7 +419,7 @@ turniejowa oraz rankingowa%
 Krzyżowanie odwzorowuje biologiczne mieszanie
 genów rodziców przy rozmnażaniu płciowym,
 w~którym dziecko dostaje część genów
-od jednego rodzica, a~część - od drugiego.
+od jednego rodzica, a~część -- od drugiego.
 Dzięki temu procesowi tworzone są nowe osobniki
 posiadające cechy odziedziczone po rodzicach.
 Sposób krzyżowania zależy od reprezentacji genotypu
@@ -430,7 +430,6 @@ dla struktur o~zmiennej długości%
 \sscite{
   goldberg1989genetic,
   stanley2002neat,
-  hutt2007varlengthcrossover,
 }.
 
 \tocless\subsection{Mutacja}
@@ -634,7 +633,7 @@ maksymalnej ilości neuronów.
 Dla $5$ neuronów wielkość genotypu
 (przyjmując, że znak 0 lub 1 to jeden bit)
 będzie wynosiła $5^2+5=30$, natomiast
-dla $15$ - już $15^2+15=240$.
+dla $15$ -- już $15^2+15=240$.
 Ten wzrost danych oraz ograniczone możliwości
 obliczeniowe dostępne w~czasie prowadzenia badań,
 utrudniały zastosowanie metody
@@ -812,7 +811,7 @@ jako trzy liczby oraz dwie listy,
 co zostało uwidocznione na \cref{tab:domashova2021}.
 \begin{table}
   \centering \begin{tabularx}{0.9\textwidth}{%
-    >{\hsize=\dimexpr2\hsize+2\tabcolsep}XXXXXXX%
+    >{\hsize=\dimexpr2\hsize+\tabcolsep}XXXXXXX%
   }
     \hline
     Osobnik & epoki & rozmiar
