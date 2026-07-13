@@ -35,7 +35,8 @@ Dodatkowo użytkownik ma możliwość
 zmodyfikowania parametrów konfiguracyjnych,
 które posiadają wartości domyślne:
 \begin{nospitemize}
-  \item liczba atrybutów wejściowych
+  \item liczba atrybutów wejściowych,
+  \item flaga klasyfikacji,
   \item wielkość populacji,
   \item liczba generacji,
   \item współczynnik krzyżowania,
@@ -43,6 +44,7 @@ które posiadają wartości domyślne:
   \item funkcja korygująca wartość przystosowania,
   \item liczba zrównolegleń,
   \item liczba obliczeń funkcji przystosowania,
+  \item liczba cierpliwości do zatrzymania
   \item flaga wyświetlania postępu,
   \item flaga rysowania wykresu przebiegu optymalizacji.
 \end{nospitemize}
@@ -69,25 +71,30 @@ by po dodaniu do liczby wszystkich
 atrybutów uzyskać zadaną wartość.
 
 Parametry wielkości populacji, liczby generacji,
-liczby obliczeń funkcji przystosowania
-oraz liczby zrównolegleń mają należeć
+liczby obliczeń funkcji przystosowania,
+liczby zrównolegleń oraz liczby cierpliwości
+do zatrzymania mają należeć
 do zbioru liczb naturalnych ($\mathbb{N}$).
 Współczynniki krzyżowania oraz mutacji
 muszą być liczbami rzeczywistymi
 z~przedziału $\left[0,1\right]$.
 
-Parametry odpowiedzialne za wyświetlanie postępu
+Parametry odpowiedzialne za
+klasyfikację, wyświetlanie postępu
 oraz rysowanie wykresów są wartościami logicznymi.
 Gdzie dla pierwszego z~nich prawda oznacza,
+iż problematyka jest typu klasyfikacyjnego,
+a~fałsz -- problematykę regresyjną.
+Dla drugiego z~nich prawda oznacza,
 że funkcja ma wyświetlać,
 na której generacji jest aktualnie
 algorytm genetyczny oraz ilu osobnikom
 zostało już policzone przystosowanie,
-a~fałsz - brak wyświetlania.
+a~fałsz -- brak wyświetlania.
 Dla drugiego z~nich prawda oznacza,
 że na końcu działania funkcji powinien być
 narysowany wykres przebiegu optymalizacji,
-a~fałsz - brak rysowania.
+a~fałsz -- brak rysowania.
 
 Możliwe jest również przekazanie własnej
 funkcji korygującej wartość przystosowania.
