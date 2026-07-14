@@ -1,277 +1,1354 @@
 \chapter{Projekt rozwiązania i~implementacja}
 \label{chap:sol_and_impl}
+\section{Struktura projektu i~przebieg optymalizacji}
+\label{sec:proj_struct}
+Jak oceniono w~\cref{chap:prob_and_req},
+biblioteka powinna udostępniać dwie funkcje.
+Aby wykonać to w~sposób umożliwiający
+łatwe modyfikowanie i~rozwijanie
+projekt został podzielony na części.
+Najważniejszą jest główna funkcja
+przeprowadzająca pełną ewolucję,
+używa ona wszystkich niżej wymienianych
+elementów bezpośrednio lub pośrednio.
+
+Pierwszą czynnością, którą wykonuje
+funkcja po uruchomieniu,
+jest przygotowanie danych do uczenia
+na nich i~sprawdzania dopasowania.
+Następnie tworzy obiekt pokoleń,
+który ma za zadanie zarządzać całym
+biegiem ewolucji uruchamiając
+ją na kolejnych populacjach
+oraz zapisywanie ich statystyki.
+Po stworzeniu go zostaje oddelegowane
+mu zadanie przeprowadzenia ewolucji,
+a~po zakończeniu tego procesu główna
+funkcja odbiera wyniki i~wyświetla je użytkownikowi,
+jeżeli na to wskazuje flaga rysowania wykresów.
+
+Przygotowanie polega wpierw na sprawdzeniu
+czy ilość atrybutów jest równa między danymi treningowymi,
+testowymi oraz walidacyjnymi, jeżeli są obecne.
+Następnym jest sprawdzenie danych czy dotyczą
+problematyki klasyfikacji, czy regresji.
+Oraz czy jest to zgodne z~deklaracją
+przy wywołaniu funkcji.
+Ostatecznie definiowana jest funkcja przyjmująca
+tylko osobnika i~ścieżkę do zapisu o~nim informacji.
+Funkcja ta tworzy model, uczy go
+i~oblicza dopasowanie jego odpowiedzi
+do danych walidacyjnych, a~jeżeli
+niedostępne to treningowych, oraz testowych.
+Pierwsza z~odpowiedzi będzie zwana
+dalej dopasowaniem walidacyjnym.
+Dopasowanie, oraz uzyskane po korekcji przystosowanie,
+z~danych testowych nie będzie wykorzystywane
+do żadnego procesu ewolucji,
+pozwala jedynie na ujrzenie pełnego obrazu,
+jak się ta wartość zmieniała w~czasie.
+Następnie przed zwróceniem obydwu dopasowań
+zapisuje wagi nauczonego modelu do pliku
+by użytkownik mógł je potem w~łatwy sposób wgrać,
+a~do drugiego pliku wpisywane są następujące metadane:
+liczba epok, wielkość wsadu,
+backend, liczba warstw ukrytych,
+historia dopasowań podczas kolejnych epok nauki,
+dopasowanie walidacyjne oraz dopasowanie testowe.
+
+Obiekt pokoleń tworzy na początku
+swojego działania obiekt populacji.
+Następnie po dostaniu polecenia przeprowadzenia
+ewolucji sprawdza ile generacji już było.
+Jeżeli jeszcze nie została osiągnięta zadana ilość
+jest wywoływana metoda następnej generacji
+z~obiektu populacji z~numerem,
+obliczanego w~danym momencie, pokolenia.
+Następnie pobiera wyniki z~populacji i~je zapisuje.
+
+Podczas tworzenia obiektu populacji od razu
+generowana jest populacja początkowa
+i~obliczana jest dla niej wartość przystosowania.
+Po wywołaniu metody następnej generacji
+jest przeprowadzany jeden pełny obieg
+wnętrza pętli pokazanej
+na \cref{fig:genetic_flow},
+czyli selekcja, krzyżowanie,
+mutacja oraz obliczenie przystosowania.
+Populacja powinna zawierać osobniki jednoznacznie
+reprezentujące modele sieci neuronowych
+i~udostępniające metody takie jak mutacja,
+wygenerowanie punktu/punktów do krzyżowania,
+krzyżowanie, zapisanie do pliku
+oraz odczytanie z~pliku.
+
+\section{Klasa pokoleń}
+\label{sec:generations_class}
+Obiekt pokoleń jest tworzony z~klasy,
+która zapisuje statystykę i~pełny obraz
+przystosowania z~populacji
+oraz posuwa proces ewolucji do przodu
+poprzez wywoływanie kolejnych generacji.
+Powinien umożliwiać zobaczenie obecnego numeru pokolenia.
+Powinien również umożliwiać zobaczenie zapisanej
+statystyki oraz wszystkich obliczonych przystosowań.
+
+\section{Klasa populacji}
+\label{sec:population_class}
+Obiekt populacji jest tworzony z~klasy.
+Powinien umożliwiać pobranie statystyk jaki
+jest najlepszy osobnik i~najgorszy z~populacji
+oraz ich wartości wraz ze średnią przystosowań.
+Wartości te są obliczane przez wywoływanie
+funkcji przygotowanej na początku całego procesu.
+Jest ona uruchamiana tyle razy dla każdego osobnika
+ile zostało ustalone przez liczbę obliczeń przystosowania.
+Obiekt populacji ma podawać do tej
+funkcji unikalne ścieżki do folderów,
+które będą się znajdowały wewnątrz głównego
+folderu podanego uprzednio przez użytkownika.
+
 \section{Kod genetyczny osobnika}
-W~niniejszym dokumencie kod genetyczny osobnika będzie reprezentował
-architekturę sieci i~jej parametry uczenia.
-Kod genetyczny będzie składał się z~trzech części:
+\label{sec:individual_genetic_code}
+W~niniejszym dokumencie kod genetyczny
+będzie reprezentował architekturę sieci
+i~jej parametry uczenia.
+Aby zapewnić łatwość modyfikacji
+i~rozwijania rozwiązania zostanie
+on podzielony na trzy podosobniki.
+Każdy z~nich będzie odpowiadał
+za jedną z~części genotypu.
+Wspomniane części mają być reprezentowane
+przez kod binarny i~mają to być:
 \begin{nospitemize}
-  \item Część binarna:
+  \item Część sekwencyjna:
     \begin{nospitemize}
-      \item liczba warstw ukrytych: 5 bitów $\left[1, 32\right]$
-      \item ziarno generatora liczby neuronów: 10 bitów $\left[0, 1023\right]$
-      \item ziarno generatora typów aktywacji: 10 bitów $\left[0, 1023\right]$
-      \item optymalizator: 1 bit $\left[0, 1\right]$ (0 \textrightarrow SGD, 1 \textrightarrow Adam)
-      \item wskaźnik uczenia się (learning rate): 12 bitów $\left[2^{-13}, 0.5\right]$
-      % TODO: maybe this version [2^(-13) - 0.5] → [2^(-13) - 1.]
-      % \item wskaźnik uczenia się (learning rate): 13 bitów $\left[2^{-13}, 1.0)\right]$
-      \item liczba epok: 7 bitów $\left[1, 128\right]$
-      \item wielkość partii: 10 bitów $\left[1, 1024\right]$
+      \item liczba warstw ukrytych:
+        5 bitów $\mathbb{Z} \cap \left[1, 32\right]$
+      \item ziarno generatora liczby neuronów:
+        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$
+      \item ziarno generatora typów aktywacji:
+        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$
+      \item optymalizator:
+        1 bit $\mathbb{Z} \cap \left[0, 1\right]$
+        (%
+          0 {\textrightarrow} SGD,
+          1 {\textrightarrow} Adam%
+        )
+      \item wskaźnik uczenia się (learning rate):
+        12 bitów $2^{-13}\left(
+          \mathbb{Z} \cap \left[1, 2^{12}\right]
+        \right)$
+      % TODO: maybe this version
+      %   [2^(-13) - 0.5] → [2^(-13) - .25]
+      % \item wskaźnik uczenia się (learning rate):
+        % 11 bitów $2^{-13}\left(
+        %   \mathbb{Z} \cap \left[1, 2^{11}\right]
+        % \right)$
+      \item liczba epok:
+        7 bitów $\mathbb{Z} \cap \left[1, 128\right]$
+      \item wielkość partii:
+        10 bitów $\mathbb{Z} \cap \left[1, 1024\right]$
     \end{nospitemize}
-  \item Część list - generowane po części binarnej;
-    długości list są nie mniejsze niż liczba warstw ukrytych,
-    przy czym długości wygenerowanych są równe tej liczbie;
-    minimalne i~maksymalne długości list są zależne
-    od minimalnych i~maksymalnych wartości liczby warstw ukrytych:
+  \item Części listowe
+    -- generowane po części sekwencyjnej;
+    minimalne i~maksymalne ich długości
+    są zależne od minimalnej
+    i~maksymalnej wartości
+    dla liczby warstw ukrytych:
     \begin{nospitemize}
-      \item lista ilości neuronów w~warstwach ukrytych -\\
-        \hspace*{1em}liczba elementów - taka sama:
-          $\left[1, 128\right]$,\\
-        \hspace*{1em}zawiera liczby z~zakresu:
-          $\left[2, 724\right]$,\\
-        % ze wzgędu na możliwe ograniczenia pamięci dla sieci: .5GB
-        % .5÷128÷8×1024×1024×1024=524288 -> √524288 ~ 724
-        \hspace*{1em}każdy element składa się z~10 bitów.
-      \item lista typów aktywacji w~warstwach ukrytych -\\
-        \hspace*{1em}liczba elementów - o~1 większa
-          (uwzględnia warstwę wyjściową):
-          $\left[2, 129\right]$,\\
-        \hspace*{1em}zawiera liczby z~zakresu:
-          $\left[0, 3\right]$
-          (%
-            0 \textrightarrow relu,
-            1 \textrightarrow tanh,
-            2 \textrightarrow sigmoid,
-            3 \textrightarrow leaky relu%
-          ),\\
-        \hspace*{1em}każdy element składa się z~2 bitów.
+      \item lista ilości neuronów w~warstwach ukrytych:
+        \\\hspace*{1em}liczba elementów -- taka sama:
+          $\mathbb{Z} \cap \left[1, 32\right]$,
+        \\\hspace*{1em}zawiera liczby z~zakresu:
+          $\mathbb{Z} \cap \left[2, 724\right]$,
+        \\\hspace*{1em}każdy element
+          składa się z~10 bitów.
+      \item lista typów aktywacji
+        warstw ukrytych i~wyjściowej:
+          \\\hspace*{1em}liczba elementów -- o~1 większa
+            (uwzględnia warstwę wyjściową):
+            $\mathbb{Z} \cap \left[2, 33\right]$,
+          \\\hspace*{1em}zawiera liczby z~zakresu:
+            $\mathbb{Z} \cap \left[0, 3\right]$
+            (%
+              0 \textrightarrow relu,
+              1 \textrightarrow tanh,
+              2 \textrightarrow sigmoid,
+              3 \textrightarrow leaky relu%
+            ),
+          \\\hspace*{1em}każdy element
+            składa się z~2 bitów.
     \end{nospitemize}
 \end{nospitemize}
+Zostało przyjęte ograniczenie by macierz
+wag połączeń w~warstwach ukrytych sieci
+była niewiększa niż $128\text{MB}$.
+Każda komórka w~macierzy ma typ \texttt{float}.
+Typ ten może zajmować w zależności
+od implementacji zajmuje $64\text{b} = 8\text{B}$
+lub $32\text{b} = 4\text{B}$.
+Jeżeli przyjęta zostanie wersja z~typem
+\texttt{float64} oraz maksymalna liczba
+warstw będzie ustalona jako $32$, to:
+\begin{equation}
+  \begin{gathered}
+    P_{\max}
+      = 128\,\text{MB}
+      = 131072\,\text{kB}
+      = 134217728\,\text{B}\\
+    % ---
+    \Downarrow\\
+    % ---
+    n_{\max}^2
+      \leqslant P_{\max}
+        \times \frac{1}{8}\frac{\text{komórek}}{\text{B}}
+        \times \frac{1}{32}\frac{1}{\text{warstwę}}
+      = 524288\frac{\text{komórek}}{\text{warstwę}}\\
+    % ---
+    \Downarrow\\
+    % ---
+    \sqrt{524288}
+      \approx 724.077343935
+      \geqslant n_{\max} = 724
+  \end{gathered}
+\end{equation}
+Oznacza to, że dla maksymalnej liczby
+neuronów w~każdej macierzy połączeń
+może być maksymalnie $524288$ komórek.
+Czyli maksymalna liczba neuronów
+w~warstwach musi być mniejsza niż
+pierwiastek kwadratowy wspomnianej liczby,
+więc maksymalna liczba neuronów w~warstwie to $724$.
+Minimalna wartość ($2$) wynika z~faktu,
+że architektura z~pojedynczym neuronem
+w~dowolnej warstwie ukrytej działałaby
+w~sposób zbliżony do modelu liniowego.
+
 Ważnym mechanizmem podczas czytania kodu genetycznego
 w~celu utworzenia fenotypu są ziarna generatora.
-
-Jeżeli liczba warstw ukrytych z~części binarnej,
+Jeżeli liczba warstw ukrytych z~części sekwencyjnej,
 wynosiłoby więcej niż liczba elementów w~listach,
 to~należy uzupełnić listy ilości neuronów
-i~typów aktywacji do danej liczby elementów do czego zostanie
-użyty generator z~odpowiednim ziarnem.
-Następnie kod genetyczny zostanie uaktualniony o~nowe elementy list.
-
-Jeżeli liczba warstw ukrytych jest mniejsza niż liczba elementów w~listach,
+i~typów aktywacji do danej liczby elementów
+do czego zostanie użyty generator z~odpowiednim ziarnem.
+Jeżeli liczba warstw ukrytych jest
+mniejsza niż liczba elementów w~listach,
 to nadmiarowe elementy zostaną zignorowane w~fenotypie.
 
-\subsection{Selekcja}
-Selekcja będzie odbywała się metodą ruletki proporcjonalnej do przystosowania.
-W~przypadku, gdyby wszystkie osobniki miały przystosowanie równe 0,
-to zostanie użyta selekcja losowa.
+\begin{figure}
+  \centering
+  \scalebox{0.95}{\input{img/04_img/gen_parts.tikz.tex}}
+  {%
+    \renewcommand{\thesubfigure}{I}%
+    \phantomsubcaption\label{subfig:gen_parts_I}%
+    \renewcommand{\thesubfigure}{SI}%
+    \phantomsubcaption\label{subfig:gen_parts_SI}%
+    \renewcommand{\thesubfigure}{LI}%
+    \phantomsubcaption\label{subfig:gen_parts_LI}%
+    \renewcommand{\thesubfigure}{MNSI}%
+    \phantomsubcaption\label{subfig:gen_parts_MNSI}%
+    \renewcommand{\thesubfigure}{MNLI}%
+    \phantomsubcaption\label{subfig:gen_parts_MNLI}%
+    \renewcommand{\thesubfigure}{NNI}%
+    \phantomsubcaption\label{subfig:gen_parts_NNI}%
+  }%
+  \caption{
+    Dziedziczenie i~powiązanie klas związanych
+    z~osobnikiem representującym sieć neuronową (%
+    \textbf{Neural Network Individual}
+    \textbf{\subref*{subfig:gen_parts_NNI}}%
+    ), dalej zwany osobnikiem.
+    Dziedziczy on z~klasy abstrakcyjnej
+    (ang. \textit{abstract}) osobnika (\textbf{Individual}
+    \textbf{\subref*{subfig:gen_parts_I}}),
+    jak i~inne osobniki, dalej zwane podosobnikami.
+    Osobnik posiada jako genotyp
+    zestaw trzech podosobników.
+    Pierwszy jest typu podosobnika
+    sekwencyjnego z~maksymalnymi liczbami
+    (\textbf{Sequential Individual With Max Numbers}
+    \textbf{\subref*{subfig:gen_parts_MNSI}}),
+    reprezentuje on dane z~części sekwencyjnej.
+    Dwa kolejne kodują dwie części listowe
+    -- ilości neuronów i~typów aktywacji
+    w~poszczególnych warstwach
+    -- poprzez podosobnika list
+    z~maksymalnymi liczbami
+    (\textbf{List Individual With Max Numbers}
+    \textbf{\subref*{subfig:gen_parts_MNLI}}).
+    Podosobniki te mają za zadanie budowanie podfenotypu.
+    Zarządzanie binarnym podgenotypem
+    jest pozostawiane odpowiednio:
+    podosobnikowi sekwencyjnemu
+    (\textbf{Sequential Individual}
+    \textbf{\subref*{subfig:gen_parts_SI}})
+    i~listowemu (\textbf{List Individual}
+    \textbf{\subref*{subfig:gen_parts_LI}}).
+    One bezpośrednio implementują
+    operatory krzyżowania i~mutacji.
+    Typy punktów krzyżowania
+    oznaczone jako \texttt{lcpt} to
+    \texttt{tuple{\textless}int, int{\textgreater}}.
+    Osobnik łączy dane z~podosobników
+    i~aktualizuje fenotypy listowe.
+  }
+  \label{fig:gen_parts}
+\end{figure}
 
-% Krzyżowanie będzie odbywało się różnie dla części binarnej
-% i~listowej kodu genetycznego.
-\subsection{Krzyżowanie - część binarna}
-W~przypadku części binarnej zostanie
-użyte krzyżowanie jednopunktowe,
-gdzie losowo zostanie wybrany punkt podziału
-i~części kodu genetycznego zostaną zamienione
-między dwoma rodzicami.
+Kod genetyczny ma strukturę zestawu trzech podosobników,
+którzy zajmują się poprawnym krzyżowaniem poszczególnych
+części jak pokazano na \cref{fig:gen_parts}.
+Dzięki takiemu podziałowi kod powinien być łatwy
+do zarządzania i~późniejszego rozwijania.
 
-Matematyczny opis krzyżowania, gdzie\\
-$n$ - długość genotypu (liczba bitów),\\
-$R\left(p, k\right)$ - funkcja losowa o~rozkładzie jednostajnym dyskretnym
-  na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
-$r_1\left[i\right]$ i~$r_2\left[i\right]$ -
-  rodzice 1 i~2 dla
-  $i \in \mathbb{N} \cap \left[1, n\right]$,\\
-$d_1\left[i\right]$ i~$d_2\left[i\right]$ -
-  dzieci 1 i~2 dla
-  $i \in \mathbb{N} \cap \left[1, n\right]$:
-
-Wylosowanie punktu przecięcia i~końcowa postać kodu dzieci:\\
-$\displaystyle
-  p_r=R\left(0, n\right)\\
-  d_1\left[i\right]=\begin{cases}
-    r_1[i]
-      &, i \le p_r\\
-    r_2[i]
-      &, i>p_r\\
-  \end{cases}\\
-  d_2\left[i\right]=\begin{cases}
-    r_2[i]
-      &, i \le p_r\\
-    r_1[i]
-      &, i>p_r\\
-  \end{cases}
-$
+\section{Selekcja}
+W~ogólnej sytuacji selekcja będzie odbywała się
+metodą ruletki proporcjonalnej do przystosowania.
+Selekcja musi jednakże odpowiadać na dwa szczególne
+przypadki związane z~występowaniem zer
+jako wartości przystosowań mianowicie:
+częściowe występowanie i~całkowite.
+W~drugim przypadku zostanie użyta selekcja losowa.
+Natomiast w~pierwszym nadal będzie
+używana selekcja ruletkowa,
+jednakże z~uprzednim skorygowaniem wartości
+przystosowań o~$a$~równe
+$\displaystyle \frac{1}{100}\min_{i: v_i>0}{v_i}$,
+gdzie $v$ to wektor wartości przystosowań osobników.
+Jest to na przykład konieczne w~przypadku,
+gdy wektor ma postać $\left[0,0,0,3.2157,0,0\right]$,
+ponieważ do krzyżowania zostałby wzięty za każdym
+razem jedyny osobnik z~niezerowym przystosowaniem.
+Rozwiązanie to jest również korzystne gdy tylko
+jeden z~osobników ma przystosowanie równe zeru,
+ponieważ nie jest całkowicie
+wykluczany z~procesu ewolucji.
+Korekcja przystosowań powinna się odbywać
+na wszystkich wartościach nie tylko tych zerowych,
+ponieważ to by spowodowało zbyt duże zajęcie
+przestrzeni ruletki przez osobniki,
+które poprzednio w~ogóle jej niezajmowały.
+Selekcja ruletkowa i~powyżej opisana metoda korekcji
+została wybrana ze względu na możliwość
+zachowania równowagi pomiędzy rozwijaniem
+najlepszych znalezionych architektur,
+a~przeszukiwaniem przestrzeni
+w~poszukiwaniu nowych rozwiązań.
+W~ten sposób osobniki o~wyższym przystosowaniu
+są często wybierane do krzyżowania,
+jednak również słabsze jednostki
+mają szanse zostać wybrane.
 
 \subsection*{Elitaryzm}
-Zrezygnowano z~elitaryzmu w~celu zwiększenia
-różnorodności populacji i~ograniczenia
-ryzyka przedwczesnej zbieżności.
+W~niniejszej pracy zrezygnowano z~elitaryzmu
+w~celu zwiększenia różnorodności populacji
+i~ograniczenia ryzyka przedwczesnej zbieżności,
+a~najlepsze osobniki są zapisywane w~obiekcie
+pokoleń opisanym w~\cref{sec:generations_class}.  
 
-\subsection{Krzyżowanie - część listowa}
-W~przypadku części listowej zostanie użyte krzyżowanie zmiennej długości,
-% gdzie losowo są wybrane punkty podziału w~obu listach\,\sscite{hutt2007varlengthcrossover}.
-Natomiast jest on inny od opisanego w~przypisie algorytmu,
-ponieważ o~ile pierwszy punkt podziału jest wybierany z~pełnego zakresu
+\section{Krzyżowanie}
+Krzyżowanie będzie odbywało się różnie dla części
+sekwencyjnej i~listowej kodu genetycznego.
+Choć obie składają się z~informacji binarnej,
+to pierwsza z~nich ma stałą długość,
+a~druga jest listą i~muszą być wzięte
+pod uwagę różne długości podgenotypów oraz elementy list,
+by nie było ``półelementów''.
+Jednym ze wspólnych elementów w~tym procesie
+jest fakt wykonywania operacji na binarnych podgenotypach,
+które mają pozycje takie jak
+ukazano na \cref{fig:bin_gen}.
+W~każdym z~procesów uczestniczy dwóch
+rodziców i~powstaje dwóch potomków.
+Ostatnim elementem wspólnym jest podzielenie
+operacji krzyżowania na dwie osobne podoperacje
+losowania punktu/punktów przecięcia
+oraz faktycznego wykonania cięcia
+i~łączenia wedle podanych punktów.
+
+\begin{figure}
+  \centering
+  \input{img/04_img/bin_gen.tikz.tex}
+  \caption{%
+    Zobrazowanie oznaczenia pozycji występujących
+    w~kodzie genetycznym przy krzyżowaniu,
+    dla przykładowego $5$-cio znakowego
+    binarnego genotypu: $01011$.
+    Pozycję przed kodem binarnym oznacza $0$,
+    każda następna wartość $i$ wskazuje pozycję
+    bezpośrednio za $i$-tym elementem.%
+  }
+  \label{fig:bin_gen}
+\end{figure}
+
+\subsection{Krzyżowanie -- część sekwencyjna}
+W~przypadku części sekwencyjnej zostanie
+użyte krzyżowanie jednopunktowe,
+gdzie losowo zostanie wybrany punkt podziału
+i~części kodu genetycznego zostaną wymienione
+między dwoma rodzicami tworząc parę dzieci.
+Podgenotyp, posiadając stałą długość,
+umożliwia prosty podział w~wybranym punkcie
+i~wymianę fragmentów pomiędzy rodzicami.
+Zachowuje to poprawność struktury chromosomu
+oraz pozwala na efektywne łączenie cech
+odziedziczonych po obu podosobnikach
+przy niewielkiej złożoności obliczeniowej.
+
+Przyjmując, że:\\
+$n$ to długość genotypu podosobnika (liczba bitów),\\
+$R\left(p, k\right)$ jest funkcją losową
+  o~rozkładzie jednostajnym dyskretnym
+  na zbiorze $\mathbb{Z} \cap \left[p, k\right]$,\\
+$r_1\left[i\right]$ i~$r_2\left[i\right]$
+  są rodzicami 1 i~2 dla
+  $i \in \mathbb{N} \cap \left[0, n-1\right]$,\\
+a~$d_1\left[i\right]$ i~$d_2\left[i\right]$
+  są dziećmi 1 i~2 dla
+  $i \in \mathbb{N} \cap \left[0, n-1\right]$,\\
+to krzyżowanie jednopunktowe można
+matematycznie opisać w~następujący sposób:
+\vspace{-\parskip}
+\begin{fleqn}
+  \begin{gather}
+    \label{math:seq_cp_rand}
+    p_r=R\left(0, n\right)\\
+    \label{math:seq_child1}
+    d_1\left[i\right]=\begin{cases}
+      r_1[i]
+        ,& i < p_r\\
+      r_2[i]
+        ,& i \geqslant p_r\\
+    \end{cases}\\
+    d_2\left[i\right]=\begin{cases}
+      r_2[i]
+        ,& i < p_r\\
+      r_1[i]
+        ,& i \geqslant p_r\\
+    \end{cases}
+    \label{math:seq_child2}
+  \end{gather}
+\end{fleqn}
+
+\Cref{math:seq_cp_rand} pokazuje losowanie
+punktu krzyżowania z~dyskretnego zbioru
+liczb naturalnych niewiększych niż $n$.
+Oznacza to, że może być ono w~każdym punkcie podgenotypu,
+nawet przed lub za (wylosowane odpowiednio $0$ lub $n$).
+Jest ona pierwszą podoperacją
+i~wartością zwrotną jest $p_r$.
+\Cref{math:seq_child1,math:seq_child2}
+pokazują działanie drugiej podoperacji,
+która mając punkt krzyżowania tworzy dwóch potomków.
+
+\subsection{Krzyżowanie -- część listowa}
+W~przypadku części listowej zostanie
+użyte krzyżowanie przeznaczone
+do zmiennej długości genotypu,
+inspirowane metodą przedstawioną
+w~\citebook[cite={rys. 1}]{goldberg1989messy},
+w której przedstawione jest krzyżowanie dwupunktowe.
+Natomiast jest on inny od opisanego
+w~wspomnianym dokumencie algorytmu,
+ponieważ o~ile pierwszy punkt podziału
+jest wybierany z~pełnego zakresu
 (biorąc pod uwagę wszystkie bity listy),
-to punkt podziału drugiej listy jest wybierany na podstawie
-wylosowanego elementu listy, by zachować spójność długości list.
-Dodatkowo algorytm pilnuje by lista nie miała mniej elementów,
-niż minimalna liczba, a~regulowanie do maksymalnej wartości
-jest wykonywane przez przycinanie listy po krzyżowaniu.
+to punkt podziału drugiej listy jest wybierany
+na podstawie wylosowanego elementu listy,
+by zachować spójność długości list oraz by zapobiec występowaniu ``półelementów''.
+Dodatkowo algorytm pilnuje by lista
+nie miała mniej elementów, niż minimalna liczba,
+a~regulowanie do maksymalnej wartości jest
+wykonywane przez przycinanie listy po krzyżowaniu.
 
 Oznacza to, że pierwsze losowanie,
 poza decydowaniem konkretnego przecięcia,
 decyduje o~tym czy i~w~którym punkcie
-nastąpi podział elementów w~drugiej liście.
+nastąpi podział elementu w~drugiej liście.
 
-Matematyczny opis krzyżowania, gdzie\\
-$e_s$ - wielkość pojedyńczego elementu,\\
-$l_{\min}$ i~$l_{\max}$ - minimalna i~maksymalna liczba elementów,\\
-$R\left(p, k\right)$ - funkcja losowa o~rozkładzie jednostajnym dyskretnym
-  na zbiorze $\mathbb{C} \cap \left[p, k\right]$,\\
-$n_{r_1}$ i~$n_{r_2}$ - liczba elementów dla rodzica 1 i~2,\\
-$r_1\left[i_{r_1}\right]$ i~$r_2\left[i_{r_2}\right]$ -
-  rodzice 1 i~2 odpowiednio dla
-  $i_{r_1} \in \mathbb{N} \cap \left[1, e_s n_{r_1}\right]$
-  i~$i_{r_2} \in \mathbb{N} \cap \left[1, e_s n_{r_2}\right]$,\\
-$n_{d_1}$ i~$n_{d_2}$ - liczba elementów dla dziecka 1 i~2,\\
-$d_1\left[i_{d_1}\right]$ i~$d_2\left[i_{d_2}\right]$ -
-  dzieci 1 i~2 odpowiednio dla
-  $i_{d_1} \in \mathbb{N} \cap \left[1, e_s n_{d_1}\right]$
-  i~$i_{d_2} \in \mathbb{N} \cap \left[1, e_s n_{d_2}\right]$:
+Przyjmując, iż:\\
+$e_s$ to wielkość pojedynczego elementu,\\
+$l_{\min}$ i~$l_{\max}$ są minimalną
+  i~maksymalną liczbą  elementów,\\
+$R\left(p, k\right)$ jest funkcją losową
+  o~rozkładzie jednostajnym dyskretnym na zbiorze
+  $\mathbb{Z} \cap \left[p, k\right]$,\\
+$n_{r_1}$ i~$n_{r_2}$ są liczbami
+  elementów dla rodziców 1 i~2,\\
+$r_1\left[i_{r_1}\right]$ i~$r_2\left[i_{r_2}\right]$ to
+  rodzice 1 i~2 odpowiednio dla $
+    i_{r_1} \in \mathbb{N}
+    \cap \left[0, e_s n_{r_1}-1\right]
+  $ i~$
+    i_{r_2} \in \mathbb{N}
+    \cap \left[0, e_s n_{r_2}-1\right]
+  $,\\
+$n_{d_1}$ i~$n_{d_2}$ są liczbami
+  elementów dla dzieci 1 i~2,\\
+$d_1\left[i_{d_1}\right]$ i~$d_2\left[i_{d_2}\right]$ to
+  dzieci 1 i~2 odpowiednio dla $
+    i_{d_1} \in \mathbb{N}
+    \cap \left[0, e_s n_{d_1}-1\right]
+  $ i~$
+    i_{d_2} \in \mathbb{N}
+    \cap \left[0, e_s n_{d_2}-1\right]
+  $,\\
+to krzyżowanie dwupunktowe będzie matematycznie
+opisane jak w~poniższych podrozdziałach.
+Pierwsza podoperacja zwraca typ
+\texttt{tuple{\textless}int, int{\textgreater}}.
+Opis jej został jednakże rozbity na
+\cref{subsubsec:list_cp1,subsubsec:list_cp2},
+gdzie każda z~nich zwraca po jednej
+z~wartości \texttt{int}.
+Druga podoperacja jest opisana
+w~\cref{subsubsec:list_d1_d2}.
 
-Losowanie punktu przecięcia dla pierwszego rodzica i~obliczenia dla niego:\\
-$\displaystyle
-  p_{r_1}=R\left(0, e_s n_{r_1}\right)\\
-  l_b=p_{r_1} \mod e_s\\
-  l_{p_b}=\begin{cases}
-    1 &, l_b>0\\
-    0 &, l_b=0
-  \end{cases}\\
-  l_{p_{d_1}}=\left\lfloor
-    \frac{p_{r_1}}{e_s}
-  \right\rfloor + l_{p_b}\\
-  l_{k_{d_2}}=n_{r_1}-\left\lfloor
-    \frac{p_{r_1}}{e_s}
-  \right\rfloor
-$
+\subsubsection{Punkt przecięcia pierwszego rodzica}
+\label{subsubsec:list_cp1}
+\vspace{-\parskip}
+\begin{fleqn}
+  \begin{gather}
+    \label{math:list_cp1_rand}
+    p_{r_1}=R\left(0, e_s n_{r_1}\right)\\
+    \label{math:list_b}
+    l_b=p_{r_1} \mod e_s\\
+    \label{math:list_calc1}
+    \begin{gathered}
+      l_{p_b}=\begin{cases}
+        1 ,& l_b>0\\
+        0 ,& l_b=0
+      \end{cases}\\
+      l_{p_{d_1}}=\left\lfloor
+        \frac{p_{r_1}}{e_s}
+      \right\rfloor + l_{p_b}\\
+      l_{k_{d_2}}=n_{r_1}-\left\lfloor
+        \frac{p_{r_1}}{e_s}
+      \right\rfloor
+    \end{gathered}
+  \end{gather}
+\end{fleqn}
+\Cref{math:list_cp1_rand} pokazuje sposób
+wylosowania punkt krzyżowania na pierwszym rodzicu.
+Daje to możliwość obliczenia przesunięcia cięcia
+na drugim rodzicu w~\cref{math:list_b}.
+Następnie w~\cref{math:list_calc1} wykonywane
+są obliczenia czy będzie przesunięcie ($l_{p_b}$)
+oraz jaka jest gwarantowana minimalna długość pierwszego
+potomka ($l_{p_{d_1}}$) i~drugiego ($l_{k_{d_2}}$)
+na podstawie pierwszego wylosowanego punktu przecięcia.
+Wartością zwrotną jest $p_{r_1}$, czyli punkt
+krzyżowania na pierwszym z~rodziców.
 
-Przygotowanie do losowania i~losowanie punktu przecięcia dla drugiego rodzica:\\
-$\displaystyle
-  p_{r_{2_p}}=\begin{cases}
-    0
-      &, l_{k_{d_2}} \ge l_{\min}\\
-    l_{\min}-l_{k_{d_2}}
-      &, l_{k_{d_2}}<l_{\min}\\
-  \end{cases}\\
-  p_{r_{2_k}}=\begin{cases}
-    n_{r_2}-l_{p_b}
-      &, l_{p_{d_1}} \ge l_{\min}\\
-    n_{r_2}-\left(l_{\min}-l_{p_{d_1}}+l_{p_b}\right)
-      &, l_{p_{d_1}}<l_{\min}\\
-  \end{cases}\\
-  p_{r_2}=e_s R\left(p_{r_{2_p}}, p_{r_{2_k}}\right) + l_b
-$
+\subsubsection{Punkt przecięcia drugiego rodzica}
+\label{subsubsec:list_cp2}
+\vspace{-\parskip}
+\begin{fleqn}
+  \begin{gather}
+    \label{math:list_cp2_p}
+    p_{r_{2_p}}=\begin{cases}
+      0
+        ,& l_{k_{d_2}} \geqslant l_{\min}\\
+      l_{\min}-l_{k_{d_2}}
+        ,& l_{k_{d_2}}<l_{\min}\\
+    \end{cases}\\
+    \label{math:list_cp2_k}
+    p_{r_{2_k}}=\begin{cases}
+      n_{r_2}-l_{p_b}
+        ,& l_{p_{d_1}} \geqslant l_{\min}\\
+      n_{r_2}-\left(l_{\min}-l_{p_{d_1}}+l_{p_b}\right)
+        ,& l_{p_{d_1}}<l_{\min}\\
+    \end{cases}\\
+    \label{math:list_cp2_rand}
+    p_{r_2}=e_s R\left(p_{r_{2_p}}, p_{r_{2_k}}\right)
+      +l_b
+  \end{gather}
+\end{fleqn}
+\Cref{math:list_cp2_p,math:list_cp2_k} obliczają punkt
+początkowy losowania i~końcowy, zapobiega to przypadkowi,
+iż któregoś z~potomków kod genetyczny
+będzie za krótki względem wymagań.
+Samo losowanie punktu krzyżowania na drugim rodzicu
+jest wykonywane poprzez \cref{math:list_cp2_rand}.
+Wynik tego równania jest wartością zwrotną.
 
-Końcowa długość i~postać kodu dzieci:\\
-$\displaystyle
-  {\Delta p_r}=p_{r_1}-p_{r_2}\\
-  n_{d_1}=\begin{cases}
-    \frac{p_{r_1}+\left(e_s n_{p_2}-p_{r_2}\right)}{e_s}=
-      n_{p_2}+\frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}=
-      n_{p_2}+\frac{{\Delta p_r}}{e_s}
-        &, n_{p_2}+\frac{{\Delta p_r}}{e_s} \le l_{\max}\\
-    l_{\max}
-      &, n_{p_2}+\frac{{\Delta p_r}}{e_s}>l_{\max}\\
-  \end{cases}\\
-  n_{d_2}=\begin{cases}
-    \frac{p_{r_2}+\left(e_s n_{p_1}-p_{r_1}\right)}{e_s}=
-      n_{p_1}-\frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}=
-      n_{p_1}-\frac{{\Delta p_r}}{e_s}
-        &, n_{p_1}-\frac{{\Delta p_r}}{e_s} \le l_{\max}\\
-    l_{\max}
-      &, n_{p_1}-\frac{{\Delta p_r}}{e_s}>l_{\max}\\
-  \end{cases}\\
-  d_1\left[i_{d_1}\right]=\begin{cases}
-    p_1[i_{d_1}]
-      &, i_{d_1} \le p_{r_1}\\
-    p_2[i_{d_1}-p_{r_1}+p_{r_2}]=
-      p_2[i_{d_1}-{\Delta p_r}]
-      &, i_{d_1}>p_{r_1}\\
-  \end{cases}\\
-  d_2\left[i_{d_2}\right]=\begin{cases}
-    p_2[i_{d_2}]
-      &, i_{d_2} \le p_{r_2}\\
-    p_1[i_{d_2}-p_{r_2}+p_{r_1}]=
-      p_1[i_{d_2}+{\Delta p_r}]
-      &, i_{d_2}>p_{r_2}\\
-  \end{cases}
-$
+\subsubsection{Powstanie kodu genetycznego potomków}
+\label{subsubsec:list_d1_d2}
+\vspace{-\parskip}
+\begin{fleqn}
+  \begin{gather}
+    \label{math:list_delta}
+    {\Delta p_r}=p_{r_1}-p_{r_2}\\
+    \label{math:list_nd}
+    \begin{gathered}
+      n_{d_1}=\begin{cases}
+        \frac{p_{r_1}
+          + \left(e_s n_{p_2}-p_{r_2}\right)}{e_s}
+          =n_{p_2}
+            + \frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}
+          =n_{p_2}+\frac{{\Delta p_r}}{e_s}
+            ,& n_{p_2}+\frac{{\Delta p_r}}{e_s}
+              \leqslant l_{\max}\\
+        l_{\max}
+          ,& n_{p_2}+\frac{{\Delta p_r}}{e_s}>l_{\max}\\
+      \end{cases}\\
+      n_{d_2}=\begin{cases}
+        \frac{p_{r_2}
+          + \left(e_s n_{p_1}-p_{r_1}\right)}{e_s}
+          =n_{p_1}
+            - \frac{\left(p_{r_1}-p_{r_2}\right)}{e_s}
+          =n_{p_1}-\frac{{\Delta p_r}}{e_s}
+            ,& n_{p_1}-\frac{{\Delta p_r}}{e_s}
+              \leqslant l_{\max}\\
+        l_{\max}
+          ,& n_{p_1}-\frac{{\Delta p_r}}{e_s}>l_{\max}\\
+      \end{cases}
+    \end{gathered}\\
+    \begin{gathered}
+      d_1\left[i_{d_1}\right]=\begin{cases}
+        p_1[i_{d_1}]
+          ,& i_{d_1} < p_{r_1}\\
+        p_2[i_{d_1}-p_{r_1}+p_{r_2}]
+          =p_2[i_{d_1}-{\Delta p_r}]
+          ,& i_{d_1} \geqslant p_{r_1}\\
+      \end{cases}\\
+      d_2\left[i_{d_2}\right]=\begin{cases}
+        p_2[i_{d_2}]
+          ,& i_{d_2} < p_{r_2}\\
+        p_1[i_{d_2}-p_{r_2}+p_{r_1}]
+          =p_1[i_{d_2}+{\Delta p_r}]
+          ,& i_{d_2} \geqslant p_{r_2}\\
+      \end{cases}
+    \end{gathered}
+    \label{math:list_d}
+  \end{gather}
+\end{fleqn}
+Powyżej widać wyliczenie pomocniczej
+wartości przez \cref{math:list_delta}.
+Jest ona używana przy obu
+następnych zestawach obliczeń,
+czyli obliczania ilości elementów potomków
+w~\cref{math:list_nd} oraz bezpośrednio
+ich postaci w~\cref{math:list_d}.
+Dzielenie widoczne w~\cref{math:list_nd}
+zawsze daje liczby całkowite,
+co można udowodnić po przekształceniu
+\cref{math:list_b} i~wprowadzeniu do dzielenia,
+co jest pokazane poniżej:
+\begin{equation}
+  \displaystyle
+  \label{math:list_div_prove}
+  \begin{gathered}
+    \displaystyle
+    l_b=p_{r_1} \mod e_s
+      \implies \exists {
+        k: k \in \mathbb{Z}
+        \land p_{r_1}=e_s k + l_b
+      }\\
+    \Downarrow\\
+    \begin{aligned}
+      \frac{{\Delta p_r}}{e_s}
+        &=\frac{p_{r_1} - p_{r_2}}{e_s}
+        =\frac{
+          \left(e_s k + l_b\right)
+          - \left(
+            e_s R\left(p_{r_{2_p}}, p_{r_{2_k}}\right)
+            + l_b
+          \right)
+        }{e_s}\\
+        &=\frac{
+          e_s\left(
+            k - R\left(p_{r_{2_p}}, p_{r_{2_k}}\right)
+          \right)
+        }{e_s}
+        =k - R\left(p_{r_{2_p}}, p_{r_{2_k}}\right)
+    \end{aligned}
+  \end{gathered}
+\end{equation}
+Na końcu przekształceń jest
+$k - R\left(p_{r_{2_p}}, p_{r_{2_k}}\right)$,
+oznacza to, że wynikiem dzielenia
+jest zawsze liczba całkowita,
+ponieważ $k \in \mathbb{Z}$
+oraz wynik funkcji $R\left(p, k\right)$
+jest również z~zakresu liczb całkowitych.
 
-\subsection{Mutacja}
-Mutacja będzie odbywała się przez odwracanie losowych bitów.
-Decyzja o~mutacji będzie podejmowana dla każdego bitu
-z~osobna z~ustalonym prawdopodobieństwem mutacji.
+\subsection{Krzyżowanie -- osobnik}
+\label{subsec:crossover_nni}
+Krzyżowanie na poziomie osobnika polega
+na delegowaniu zadań do podosobników.
+Podczas pierwszej podoperacji,
+polegającej na określeniu punktów krzyżowania,
+osobnik odpytuje podosobnika sekwencyjnego
+i~dwóch podosobników listowych łącząc je
+za pomocą typu \texttt{tuple},
+co zostało ukazane na \cref{fig:gen_parts}.
+Na przytoczonym rysunku widać,
+że typ punktu krzyżowania
+dla podosobnika sekwencyjnego
+to \texttt{int}, a~dla listowego
+-- \texttt{tuple{\textless}int, int{\textgreater}}.
+Po połączeniu wyników z~odpytań wychodzi
+typ \texttt{tuple{\textless}%
+  int,
+  tuple{\textless}int, int{\textgreater},
+  tuple{\textless}int, int{\textgreater}%
+{\textgreater}}.
 
-\subsection{Ocena przystosowania}
-Ocena przystosowania osobnika będzie odbywała się poprzez nauczenie
-pięciu sieci o~parametrach i~z~parametrami wynikającymi
-z~fenotypu osobnika.
-Obliczone dokładności na danych testowych zostaną uśrednione
-i~przekształcone na przystosowanie za pomocą wzoru:
-$$
-  \mbox{fit}\left(d, n\right)=\frac{1}{1-d\left(1+0.2\frac{n-1}{n_{\max}-1}\right)}
-  % \mbox{fit}=\frac{\mbox{dokładność}}{1 - \mbox{dokładność}} % TODO: change it
-$$
+Część drugiej podoperacji przebiega podobnie,
+klasa osobnika deleguje krzyżowanie do podosobników.
+Następnie klasa łączy skrzyżowane osobniki tworząc
+nowe obiekty i~dba by fenotypy podosobników były zgodne,
+co znaczy, że długość list powinna być równa
+dla listy ilości neuronów oraz o~jeden większa
+dla listy typów aktywacji w~stosunku do parametru
+liczby warstw ukrytych z~podosobnika sekwencyjnego.
+Jeżeli lista jest zbyt długa, to
+nadmiarowe elementy są usuwane z~fenotypu.
+W~przypadku gdy jest zbyt krótka są
+używane wartości ziaren generatora
+do wygenerowania dalszych wartości podgenotypu.
+Przyjmując, że:\\
+$R\left(z,n,p,k\right)$ jest funkcją
+  pseudolosową wykorzystującą generator liczb
+  pseudolosowych zainicjalizowany ziarnem $z$;
+  zwraca $n$-elementowy ciąg liczb całkowitych
+  należących do dyskretnego przedziału
+  $\mathcal{D}=\mathbb{Z} \cap \left[p, k\right]$;
+  każdy element jest losowany niezależnie
+  z~zbioru $\mathcal{D}$;
+  zastosowanie tego samego ziarna gwarantuje otrzymanie
+  tego samego ciągu dla tych samych parametrów;
+  jeżeli jedynym różnym parametrem będzie $n$
+  przykładowo $n_1$ i~$n_2$, gdzie $n_1>n_2$,
+  to pierwsze $n_2$ elementów jest identyczne,
+  czyli ciąg zwrócony dla $n_2$ stanowi prefiks
+  ciągu zwróconego dla $n_1$,\\
+$z$ to parametr ziarna generatora odpowiadający
+  wydłużanemu podosobnikowi listowemu,\\
+$n$ i~$n_o$ są liczbami elementów fenotypów
+  odpowiednio aktualnego i~oczekiwanego,\\
+$l\left[i\right]$ jest ciągiem wartości
+  fenotypu podosobnika listowego dla
+  $i~\in \mathbb{Z} \cap \left[0, n-1\right]$,\\
+$l_o\left[i_o\right]$ to ciąg wartości fenotypu
+  podosobnika listowego o~oczekiwanej
+  liczbie elementów ($n_o$) dla
+  $i_o \in \mathbb{Z} \cap \left[0, n_o-1\right]$,\\
+można opisać całość matematycznie w~następujący sposób:
+\begin{equation}
+  \label{eq:too_short_long}
+  \begin{gathered}
+    n_d=\min\left\{n, n_o\right\}\\
+    l_o\left[i_o\right]=\begin{cases}
+      l\left[i_o\right]
+        ,& i_o < n_d\\
+      {
+        R\left(z, n_o-n_d, p, k\right)
+      }{\left[i_o-n_d\right]}
+        ,& i_o \geqslant n_d\\
+    \end{cases}
+  \end{gathered}
+\end{equation}
 
-Jeżeli użytkownik poda tylko dane treningowe i~testowe, to:\\
-Uczenie będzie odbywało się na tylko danych treningowych.
-Po zakończeniu uczenia zostanie obliczona dokładność na danych testowych.
+\section{Mutacja}
+Mutacja będzie odbywała się
+przez odwracanie losowych bitów.
+Decyzja o~mutacji będzie podejmowana
+na poziomie osobnika,
+jeżeli będzie poddawany mutacji,
+to następnie wystąpi losowanie
+w~których częściach genotypu wystąpi.
+Sama operacja polega na wylosowaniu miejsca mutacji,
+a~następnie zamienieniu bitu na przeciwny.
+Losowanie powinno się odbyć poprzez funkcją losową
+o~rozkładzie jednostajnym dyskretnym na zbiorze
+$\mathbb{Z} \cap \left[0, n-1\right]$,
+gdzie $n$ to długość podgenotypu.
+
+\section{Ocena przystosowania}
+Ocena przystosowania osobnika będzie odbywała się poprzez
+nauczenie określonej liczby razy sieci o~parametrach
+i~z~parametrami wynikającymi z~fenotypu osobnika.
+Liczba ta będzie określona przez liczbę zrównolegleń.
+Obliczona dokładność walidacyjna zostaje przekształcona
+na przystosowanie za pomocą funkcji
+korygującej $f$ i~uśrednione.
+Dla celów statystycznych przekształcane
+jest również dopasowanie testowe.
+
+Jeżeli:\\
+$n$ jest liczbą warstw ukrytych,\\
+$n_{\max}$ to maksymalna liczba warstw ukrytych\\
+oraz $d$ jest błądem dopasowania
+  z~przedziału $\mathbb{R}_{+} \cup \left\{0\right\}$,
+  gdzie $0$ oznacza brak błędu,
+  czyli idealne dopasowanie,\\
+to domyślna postać funkcji $f$ wygląda następująco:
+\begin{equation}
+  \label{eq:correction_f}
+  f\left(d, n\right)
+    =\frac{1}{
+      1 + d \left(
+        1
+        + 0.2 \frac{n-1}{n_{\max}-1}
+      \right)
+    }
+\end{equation}
+Współczynnik $0.2$ został dobrany poprzez eksperymenty.
+Jest on kompromisem między jakością
+dopasowania, a~złożonością sieci.
+Dzięki takiej wartości liczba warstw
+wpływa na ocenę osobnika,
+jednakże dużo ważniejsze pozostaje jego dopasowanie.
+W~ten sposób algorytm preferuje prostsze
+architektury jedynie w~sytuacjach
+przy porównywalnej jakości działania,
+a~nie niwelują bardziej złożonych modeli
+jeśli zapewniają istotnie lepsze wyniki.
+
+Aby zapewnić wysoki poziom możliwości
+dopasowania działania biblioteki
+do indywidualnych potrzeb,
+podawany jest do funkcji korygującej cały osobnik.
+Więc w~miejscu $n$ w~\cref{eq:correction_f} jest w~bibliotece osobnik z~którego można
+uzyskać wszystkie parametry sieci,
+jeżeli ktoś chce również, na przykład,
+stosować kary dla liczby neuronów
+w poszczególnych warstwach.
+
+Jeżeli użytkownik poda tylko
+dane treningowe i~testowe, to:\\
+Uczenie będzie odbywało się tylko na danych treningowych.
+Po zakończeniu uczenia zostanie obliczona
+dokładność na danych treningowych i~testowych,
+z~czego to drugie zostanie zwrócone,
+natomiast nie będzie używane w~procesie ewolucji,
+a~jest w~celach statystycznych.
 Zwrócona sieć będzie tą z~ostatniej epoki uczenia.
 
 Jeżeli użytkownik poda dodatkowo dane walidacyjne, to:\\
 Uczenie będzie odbywało się na danych treningowych,
-a~po każdej epoce będzie sprawdzana dokładność na danych walidacyjnych.
+natomiast po każdej epoce obliczana będzie wartość
+funkcji straty na zbiorze walidacyjnym.
+Jeżeli przez ustaloną liczbę kolejnych
+epok nie nastąpi poprawa tej wartości,
+proces uczenia zostanie zakończony
+przed osiągnięciem maksymalnej liczby epok.
 Zwrócona sieć będzie tą z~epoki,
-która dała najlepszą dokładność na danych walidacyjnych.
-Jeżeli dokładność ta będzie reprezentowana przez kilka epok,
-to zostanie wybrana ta z~najwcześniejszej epoki. % może lepsze z~najpóźniejszej?
+która dała najmniejszą stratę na danych walidacyjnych.
+Jeżeli najmniejsza wartość funkcji straty
+będzie reprezentowana przez kilka epok,
+to zostaną wybrane wagi tej z~najwcześniejszej epoki.
 
-% \begin{minted}[frame=single]{python3}
-%   gen=(
-%     '000000010000010010110001010100000010011001010000110010',
-%     [64,32,8,16,4],
-%     [0,1,0,2,1]
-%   )
-% \end{minted}
-% Powyższy kod genetyczny reprezentuje następujący fenotyp:
-% \begin{minted}[frame=single]{python3}
-%   # fenotyp=(
-%   #   ilość ukrytych warstw: 1-1024,
-%   #   ziarno generatora liczby neuronów: 0-1023,
-%   #   ziarno generatora typów aktywacji: 0-1023,
-%   #   optymalizator: 0->SGD, 1->Adam,
-%   #   wskaźnik uczenia się (learning rate): 1/2^13-1.0 [13bit],
-%   # ? wskaźnik uczenia się (learning rate): 1/2^13-0.5 [12bit],
-%   #   liczba epok: 1-1024,
-%   #   ilość neuronów w~warstwach: lista[2-1 048 577],
-%   #   typy aktywacji w~warstwach: lista[0-2] (0->relu, 1->tanh, 2->sigmoid),
-%   # )
-%   # gen=(
-%   #   '|0000000100|0001001011|0001010100|0|0001001100101|0000110001|',
-%   # #  |   4+1    |    75    |    84    |0|    613+1    |   49+1   |
-%   # #  |    5     |    75    |    84    |0|  614/2^13   |    50    |
-%   # #  |    5     |    75    |    84    |0| 0.074951172 |    50    |
-%   #   [64,32,8,16,4],
-%   #   [0,1,0,2,1]
-%   # )
-%   fenotyp=(
-%     5,
-%     75,
-%     84,
-%     0,
-%     0.074951172,
-%     50,
-%     [64, 32, 8, 16, 4],
-%     [0, 1, 0, 2, 1],
-%   )
-% \end{minted}
+\section{Fenotyp}
+Jak przedstawiono na \cref{fig:gen_parts}
+genotyp osobnika podzielony jest na trzy części.
+Poniżej zostanie przedstawiony przykład
+przy którym postać genotypu podosobnika
+\textbf{\subref{subfig:gen_parts_SI}}
+ma następującą postać binarną: \texttt{%
+  0001100010010110001010100000100110010101100101101001011%
+}. A~listy liczb neuronów i~typów aktywacji,
+które są zakodowane w~dwóch podosobnikach listowych
+\textbf{\subref{subfig:gen_parts_LI}},
+mają odpowiednio następujące genotypy:
+\texttt{01000101101111110001}
+oraz \texttt{00100100111001}.
+
+Po przyjęciu że\\
+$
+  v\left(x\right)=\sum_{i=0}^{l-1}{x_i2^{l-i-1}}
+$ jest funkcją zamieniającą kod binarny $
+  x=\left(x_0,x_1,\dots,x_{l-1}\right)
+  \land x_i \in \left\{0,1\right\}
+$ w~wartość liczbową,
+  gdzie $x_0$ oznacza najbardziej znaczący bit,\\
+$v_{\max}$ i~$v_{\min}$ są odpowiednio
+  maksymalną i~minimalną wartością
+  poszukiwanej liczby należącej do zbioru
+  liczb całkowitych ($\mathbb{Z}$),\\
+$l$ to liczba naturalna ($\mathbb{N}$)
+  oznaczająca długość kodu binarnego
+  zamienianego na wartość liczbową,\\
+$b=\left(b_0, b_1, \dots, b_{l-1}\right)$ jest
+  kodem binarnym zamienianym na wartość
+  liczbową gdzie $b_i \in \left\{0, 1\right\}$,\\
+$m=\left(m_0, m_1, \dots, m_{l-1}\right)$ jest
+  kodem binarnym wartości $v_{\max}-v_{\min}$,
+  czyli największej wartości możliwej do uzyskania
+  przed dodaniem przesunięcia wynikającego
+  z~minimalnej wartości zakresu;
+  prawdziwe jest więc dla niego równanie
+  $v\left(m\right)=v_{\max}-v_{\min}$,\\
+a~$x$ to wartość poszukiwanej wartości
+  liczbowej kodu binarnego $b$,\\
+każda wartość liczby z~sekwencji lub listy
+obliczana jest w~następujący sposób:
+% \vspace{-\parskip}
+\begin{fleqn}
+  \begin{gather}
+    \label{math:first_greater_bin}
+    m_b=\min{\left\{
+      \left\{i| m_i > b_i\right\}
+      \cup \left\{l\right\}
+    \right\}}\\
+    \label{math:indexes_of_greater_bins}
+    b_m=\left\{i|b_i>m_i \lor i<m_b\right\}\\
+    \label{math:corrected_bin}
+    b'=\left(b'_0,b'_1,\dots,b'_{l-1}\right):
+      b'_i=\begin{cases}
+        0 ,& i \in b_m \\
+        b_i ,& i \notin b_m \\
+      \end{cases}\\
+    \label{math:bin_value}
+    x=v\left(b'\right)+v_{\min}
+  \end{gather}
+\end{fleqn}
+\Cref{math:first_greater_bin} wskazuje pierwszy indeks
+na którym bit kodu $m$ jest większy od $b$.
+Jeżeli nie ma takiego bitu przyjmowane zostaje $l$.
+Następnie w~\cref{math:indexes_of_greater_bins} do
+$b_m$ wpisane są wszystkie indeksy mniejsze niż $m_b$
+na których bity $b$ są większe od $m$.
+Wartość poprawionego kodu $v\left(b'\right)$
+z~\cref{math:corrected_bin} jest na pewno
+mniejsza lub równa $v\left(m\right)$,
+dodatkowo jeżeli $
+  v\left(m\right) \geqslant v\left(b\right)
+$ to $v\left(b\right)=v\left(b'\right)$.
+Końcowa wartość $x$ jest obliczona
+jak widać na \cref{math:bin_value}.
+Liczba binarna zamieniana jest na dziesiętną
+i~dodawana jest do niej minimalna
+wartość danego parametru.
+W~poniższych podrozdziałach będzie pokazana
+zmiana bitów tylko po uprzednim wykazaniu,
+iż wartość wynikowa jest większa niż maksymalna,
+bez korekcji zapewnionej przez procedurę opisaną powyżej.
+
+\subsection{Fenotyp -- część sekwencyjna}
+\label{subsec:fenotype_seq}
+Część sekwencyjna osobnika jest zależna
+od \textbf{\subref{subfig:gen_parts_MNSI}},
+a~następnie od \textbf{\subref{subfig:gen_parts_SI}}.
+Ten drugi z~nich nie tworzy podfenotypu,
+w~przeciwieństwie do pierwszego.
+Ten po odczytaniu przechowywanego kodu binarnego
+interpretuje go dzieląc na długości
+odpowiadające optymalizowanym liczbom,
+które są opisane w~\cref{sec:individual_genetic_code}.
+Po rozdzieleniu podgenotypu kody są
+przekształcane na wartości.
+Poniżej znajduje się rozpisany przykładowy podgenotyp
+\texttt{%
+  0001100010010110001010100000100110010101100101101001011%
+}.
+\begin{nospitemize}
+  \item liczba warstw ukrytych
+    -- 5 bitów $\left[1, 32\right]$
+    -- \texttt{00011}$\displaystyle
+      {}^{\left(b\right)}
+        =3^{\left(d\right)}+1
+        =4
+    $,
+  \item ziarno generatora liczby neuronów
+    -- 10 bitów $\left[0, 1023\right]$
+    -- \texttt{0001001011}$\displaystyle
+      {}^{\left(b\right)}
+        =75^{\left(d\right)}+0
+        =75
+    $,
+  \item ziarno generatora typów aktywacji
+    -- 10 bitów $\left[0, 1023\right]$
+    -- \texttt{0001010100}$\displaystyle
+      {}^{\left(b\right)}
+        =84^{\left(d\right)}+0
+        =84
+    $,
+  \item optymalizator
+    -- 1 bit $\left[0, 1\right]$
+    (%
+      0 {\textrightarrow} SGD,
+      1 {\textrightarrow} Adam%
+    ) -- \texttt{0}$\displaystyle
+      {}^{\left(b\right)}
+        =0^{\left(d\right)}+0
+        =0
+    \Rightarrow$ SGD,
+  % TODO: maybe this version
+  %   2^(-13)*[1 - 2^12] → 2^(-13)[1 - 2^11]
+  % \item wskaźnik uczenia się (learning rate):
+    % -- 11 bitów $
+    %   {2^{-13}} {\cdot} {\left[1, 2^{11}\right]}
+    % $
+  \item wskaźnik uczenia się (learning rate)
+    -- 12 bitów $
+      {2^{-13}} {\cdot} {\left[1, 2^{12}\right]}
+    $
+    -- \texttt{001001100101}$\displaystyle
+      {}^{\left(b\right)}
+        =613^{\left(d\right)}+1
+    $\break$\displaystyle
+        =614
+      \Rightarrow 2^{-13} \cdot 614
+        = 0.074951171875
+    $,
+  \item liczba epok
+    -- 7 bitów $\left[1, 128\right]$
+    -- \texttt{0110010}$\displaystyle
+      {}^{\left(b\right)}
+        =50^{\left(d\right)}+1
+        =51
+    $,
+  \item wielkość partii
+    -- 10 bitów $\left[1, 1024\right]$
+    -- \texttt{1101001011}$\displaystyle
+      {}^{\left(b\right)}
+        =843^{\left(d\right)}+1
+        =844
+    $.
+\end{nospitemize}
+
+\subsection{Fenotyp -- część listowa -- liczby neuronów}
+\label{subsec:fenotype_list_nnum}
+Części listowe osobnika zależą od
+\textbf{\subref{subfig:gen_parts_MNLI}},
+a~następnie od \textbf{\subref{subfig:gen_parts_LI}}.
+Podobnie jak w~przypadku sekwencyjnej
+części druga z~nich nie tworzy fenotypu.
+Natomiast fenotyp części listowej jest
+też modyfikowany bezpośrednio przez osobnika
+w~celu dostosowania długości powstałych list
+do liczby warstw ukrytych z~części sekwencyjnej.
+
+\tocless\subsubsection{%
+  Budowanie fenotypu
+  (\getsubrefname{subfig:gen_parts_MNLI})%
+}
+Kod binarny zostaje tu podzielony
+na części o~równych długościach.
+Następnie każdy wydzielony kod przechodzi
+przez proces przekształcania.
+Poniżej został wydzielony na elementy
+przykładowy podgenotyp \texttt{01000101101111110001}:
+\begin{nospitemize}
+  \item pierwszy element
+    -- \texttt{0100010110}$\displaystyle
+      {}^{\left(b\right)}
+        =278^{\left(d\right)}+2
+        =280
+    $
+  \item drugi element
+    -- \texttt{1111110001}$\displaystyle
+      {}^{\left(b\right)}
+        =1009^{\left(d\right)}+2
+        =1011 > 724
+    $
+\end{nospitemize}
+
+\begin{figure}
+  \begingroup
+    \def\showcolor#1{{%
+      \raisebox{-1pt}{%
+        \protect\tikz{%
+          \protect\node[
+            rectangle,
+            fill=#1,
+            fill opacity=.3,
+            draw=black,
+            thick,
+          ] (a) {};%
+        }%
+      }%
+    }}
+    \centering
+    \input{img/04_img/correction_of_bin.tikz.tex}
+    \caption{%
+      Korekcja kodu binarnego względem
+      jego maksymalnej dopuszczalnej postacji.
+      Wartość $m_b$ jest pierwszą pozycją,
+      w~której maksymalna postać kodu binarnego
+      ma bit o~większej wartości niż korygowany.
+      Bit ten został pokazany kolorem
+      fioletowym~(\showcolor{blue!75!yellow}).
+      Następnie do $b_m$ są wpisane indeksy mniejsze
+      niż $m_b$ na których to korygowany kod
+      jest większy niż maksymalna postać.
+      Przypadki te zostały oznaczone
+      kolorem czerwonym~(\showcolor{red}).
+      Skorygowany kod został oznaczony
+      kolorem zielonym~(\showcolor{green!30})
+      z~szczególnym uwzględnieniem zmienionych
+      bitów ciemniejszym kolorem~(\showcolor{green})%
+    }
+    \label{fig:bin_corr}
+  \endgroup
+\end{figure}  
+
+Drugi element jest większy niż dopuszczalna wartość,
+więc \texttt{1111110001} zostaje
+skorygowane względem \texttt{1011010010},
+które jest binarną reprezentacją wartości
+$m=v_{\max}-v_{\min}=724-2=722$.
+Korekcja wystąpi w sposób przedstawiony
+na \cref{fig:bin_corr}.
+Drugi element po korekcie będzie miał wartość:
+\texttt{1011010001}$\displaystyle
+  {}^{\left(b\right)}
+    =721^{\left(d\right)}+2
+    =723
+$
+
+\tocless\subsubsection{%
+  Korekta fenotypu
+  (\getsubrefname{subfig:gen_parts_NNI})%
+}
+Osobnik przetwarza fenotyp pod względem długości.
+Jeżeli jest on za długi, to zostają
+wycięte nadmiarowe elementy.
+W~przypadku gdy jest za krótki to jest uzupełniany.
+Proces ten opisany jest w~\cref{subsec:crossover_nni}.
+Poniżej został przedstawiony przykład działania
+\cref{eq:too_short_long} dla otrzymanego fenotypu
+$\left(280, 722\right)$, ziarna generatora $75$
+oraz oczekiwanej długości $4$.
+$$
+  \begin{aligned}
+    n_o-n_d&=4-2=2\\
+    l_o&=\left(
+      280,
+      722,
+      {R\left(75, 2, 2, 724\right)}{\left[0\right]},
+      {R\left(75, 2, 2, 724\right)}{\left[1\right]}
+    \right)\\
+      &=\left(280, 722, 463, 600\right)
+  \end{aligned}
+$$
+
+\subsection{Fenotyp -- część listowa -- typy aktywacji}
+\label{subsec:fenotype_list_tactiv}
+Część listowa typu aktywacji podlega
+tym samym zależnością co opisane
+w~\cref{subsec:fenotype_list_nnum}.
+Różnice występują tu w~parametrach
+własnych tej części listowej,
+czyli w~jej dopuszczalnych wartościach
+minimalnych i~maksymalnych oraz długości listy,
+która będzie zawsze korygowana do wartości
+o~jeden większej niż liczba warstw ukrytych.
+
+\tocless\subsubsection{%
+  Budowanie fenotypu
+  (\getsubrefname{subfig:gen_parts_MNLI})%
+}
+Kod binarny zostaje podzielony
+na części o~równych długościach.
+Następnie każdy wydzielony kod przechodzi
+przez proces przekształcania.
+Poniżej został wydzielony na elementy
+przykładowy podgenotyp \texttt{00100100111001}:
+\begin{nospitemize}
+  \item pierwszy element
+    -- \texttt{00}$\displaystyle
+      {}^{\left(b\right)}
+        =0^{\left(d\right)}+0
+        =0
+    \Rightarrow$ relu
+  \item drugi element
+    -- \texttt{10}$\displaystyle
+      {}^{\left(b\right)}
+        =2^{\left(d\right)}+0
+        =2
+    \Rightarrow$ sigmoid
+  \item trzeci element
+    -- \texttt{01}$\displaystyle
+      {}^{\left(b\right)}
+        =1^{\left(d\right)}+0
+        =1
+    \Rightarrow$ tanh
+  \item czwarty element
+    -- \texttt{00}$\displaystyle
+      {}^{\left(b\right)}
+        =0^{\left(d\right)}+0
+        =0
+    \Rightarrow$ relu
+  \item piąty element
+    -- \texttt{11}$\displaystyle
+      {}^{\left(b\right)}
+        =3^{\left(d\right)}+0
+        =3
+    \Rightarrow$ leaky relu
+  \item szósty element
+    -- \texttt{10}$\displaystyle
+      {}^{\left(b\right)}
+        =1^{\left(d\right)}+0
+        =1
+    \Rightarrow$ sigmoid
+  \item siódmy element
+    -- \texttt{01}$\displaystyle
+      {}^{\left(b\right)}
+        =1^{\left(d\right)}+0
+        =1
+    \Rightarrow$ tanh
+\end{nospitemize}
+
+\tocless\subsubsection{%
+  Korekta fenotypu
+  (\getsubrefname{subfig:gen_parts_NNI})%
+}
+Osobnik przetwarza fenotyp pod względem długości.
+Jeżeli jest on za długi, to wycina nadmiarowe elementy.
+W~przypadku gdy jest za krótki to
+jest uzupełniany do zadanej długości.
+Proces ten został opisany w~\cref{subsec:crossover_nni}.
+Poniżej przedstawiony jest przykład działania
+\cref{eq:too_short_long} dla otrzymanego fenotypu $\left(
+  \text{relu},
+  \text{sigmoid},
+  \text{tanh},
+  \text{relu},
+  \text{leaky relu},
+  \text{sigmoid},
+  \text{tanh}
+\right)$, ziarna generatora $84$
+oraz oczekiwanej długości $4+1=5$.
+$$\begin{aligned}
+  n_o-n_d&=5-7=-2\\
+  l&=\left(
+    \text{relu},
+    \text{sigmoid},
+    \text{tanh},
+    \text{relu},
+    \text{leaky relu},
+    \text{sigmoid},
+    \text{tanh}
+  \right)\\
+  l_o&=\left(
+    \text{relu},
+    \text{sigmoid},
+    \text{tanh},
+    \text{relu},
+    \text{leaky relu}
+  \right)\\
+\end{aligned}$$
+
+\subsection{Fenotyp -- osobnik}
+Osobnik po skonstruowaniu pełnego fenotypu
+podosobników reprezentuje model nienauczonej sieci.
+Dopiero podczas oceny przystosowania
+model jest faktycznie konstruowany.
+Jednakże jeszcze przed badaniem wiadomo jaka będzie
+architektura dzięki jednoznaczności reprezentacji.
+Poniżej została przedstawiona konstrukcja
+dla przykładowych fenotypów podosobników
+z~\cref{%
+  subsec:fenotype_seq,%
+  subsec:fenotype_list_nnum,%
+  subsec:fenotype_list_tactiv%
+}.
+
+Fenotyp podosobnika widocznego na
+\subrefparens{fig:gen_parts}{subfig:gen_parts_MNSI}:
+\begin{nospitemize}
+  \item liczba warstw ukrytych -- $4$,
+  \item ziarno generatora liczby neuronów -- $75$,
+  \item ziarno generatora typów aktywacji -- $84$,
+  \item optymalizator -- SGD,
+  \item wskaźnik uczenia się (learning rate)
+    -- $0.074951171875$,
+  \item liczba epok -- $51$,
+  \item wielkość partii -- $844$.
+\end{nospitemize}
+
+Fenotypy podosoników typu pokazanego na
+\subrefparens{fig:gen_parts}{subfig:gen_parts_MNLI}:
+\begin{nospitemize}
+  \item liczby neuronów
+    -- $\left(280, 722, 463, 600\right)$,
+  \item typów aktywacji -- $\left(
+    \text{relu},
+    \text{sigmoid},
+    \text{tanh},
+    \text{relu},
+    \text{leaky relu}
+  \right)$.
+\end{nospitemize}
+
+\begin{figure}
+  \centering \input{img/04_img/ind_fenotype.tikz.tex}
+  \caption{%
+    Architektura sieci neuronowej
+    dla przykładowych danych
+    z~$n$~atrybutami wejściowymi
+    oraz $m$~wyjściowymi.
+    Model jest w~pełni połączonym
+    wielowarstwowym perceptronem.
+    Ma 4 warstwy o~różnej
+    liczbie neuronów w~warstwach,
+    kolejno $280$, $722$, $463$ i~$600$.
+    Mają one różne funkcje aktywacji,
+    odpowiednio ReLU, Sigmoid, Tanh oraz ReLU.
+    Funkcję aktywacji posiada również
+    warstwa wyjściowa, tu Leaky ReLU.%
+  }
+  \label{fig:ind_fenotype}
+\end{figure}
+
+Powyższy fenotyp daje architekturę
+przedstawioną na \cref{fig:ind_fenotype}.
+W~przykładzie nie została wyspecyfikowana
+ilość neuronów wejściowych ani wyściowych,
+ponieważ nie zostały przyjęte żadne przykładowe dane.
+
+\begin{table}
+  \centering
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+      $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $y_1$ & $y_2$ & $y_3$ & $y_4$ \\
+    \hline
+      $0.767$ & $0.352$ & $0.663$ & $0.876$ & $0.612$
+      & $0.094$ & $0.287$ & $0.218$ & $0.626$ & $0.369$ \\
+      $0.670$ & $0.886$ & $0.535$ & $0.031$ & $0.073$
+      & $0.239$ & $0.519$ & $0.723$ & $0.639$ & $0.717$ \\
+      \vdots & \vdots & \vdots & \vdots &\vdots
+      & \vdots & \vdots & \vdots & \vdots & \vdots\\
+      $0.898$ & $0.884$ & $0.735$ & $0.082$ & $0.453$
+      & $0.533$ & $0.066$ & $0.891$ & $0.066$ & $0.173$ \\
+    \hline
+  \end{tabular}
+  \caption{%
+    Przykładowe dane, gdzie atrybuty wejściowe
+    i~wyjściowe znajdują się w jednej tabeli.
+    Pierwszych jest 6 i~mają następujące nazwy:
+    $x_1$, $x_2$, $x_3$, $x_4$, $x_5$ oraz $x_6$.
+    A~4 atrybuty wyjściowe to:
+    $y_1$, $y_2$, $y_3$ oraz $y_4$.%
+  }
+  \label{tab:example_data}
+\end{table}
+
+Jednakże oznacza to również, że po uruchomieniu programu,
+wiadome jest jakie są wartości $n$~i~$m$,
+ponieważ ilość atrybutów wraz z~samymi
+danymi są podawane przez użytkownika,
+by program mógł uczyć sieci
+i~obliczać ich przystosowanie.
+Jeżeli dane miałyby postać
+pokazaną w~\cref{tab:example_data},
+a~do funkcji zostałoby podany parametr
+liczby atrybutów wejściowych równy
+$6$ lub $-4$, to $n=6 \land m=4$.
+W takim przypadku liczby neuronów kolejno
+we wszystkich warstwach wyglądałyby następująco:
+$6$, $280$, $722$, $463$ i $600$, $4$.
+
+\subsubsection*{Wyjątek}
+Powyżej został opisany przykład konstrukcji
+dla danych o~problematyce regresyjnej.
+W przypadku problematyki klasyfikacyjnej
+warstwa wyjściowa ma zawsze funkcję
+aktywacji typu \texttt{softmax},
+a ostatni element podfenotypu listowego
+typów aktywacji jest ignorowany.

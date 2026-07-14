@@ -31,19 +31,11 @@
 }
 
 % clever_ref with polish ref names
-\usepackage[nameinlink]{cleveref}
-\crefname{table}{tab.}{tab.}
-\crefname{figure}{rys.}{rys.}
-\crefname{chapter}{roz.}{roz.}
-\crefname{section}{roz.}{roz.}
-\crefname{subsection}{roz.}{roz.}
-\crefname{subsubsection}{roz.}{roz.}
-\Crefname{table}{Tabela}{Tabele}
-\Crefname{figure}{Rysunek}{Rysunki}
-\Crefname{chapter}{Rozdział}{Rozdziały}
-\Crefname{section}{Podrozdział}{Podrozdziały}
-\Crefname{subsection}{Podrozdział}{Podrozdziały}
-\Crefname{subsubsection}{Podrozdział}{Podrozdziały}
+\usepackage[
+  nameinlink,
+  nosort, % prevents from automatic change to range
+]{cleveref}
+\input{cleveref_pl.tex}
 
 % superscript cite
 \newcommand{\sscite}[2][]{%
@@ -125,3 +117,29 @@
 % count of chapters
 \usepackage{totcount}
 \regtotcounter{chapter}
+
+% math env aligned to left
+\usepackage{nccmath}
+
+% number up to subsubsection
+\setcounter{secnumdepth}{3}
+
+% attach subsubsection to toc
+\setcounter{tocdepth}{3}
+
+\newcommand{\subrefparens}[2]{%
+  \hyperref[#2]{\ref*{#1}\subref*{#2}}%
+}
+
+\makeatletter
+\def\getsubrefname#1{%
+  \expandafter\getsubrefname@aux#1_\@nil
+}
+\def\getsubrefname@aux#1_#2\@nil{%
+  \if\relax\detokenize{#2}\relax
+    #1%
+  \else
+    \getsubrefname@aux#2\@nil
+  \fi
+}
+\makeatother

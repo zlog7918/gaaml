@@ -1,0 +1,180 @@
+\begin{tikzpicture}[
+    >=Latex,
+    neuron/.style={
+        circle,
+        draw,
+        thick,
+        minimum size=7mm,
+        fill=blue!10,
+    },
+    neuron_dots/.style={
+        font=\LARGE\bfseries,
+    },
+    neuron_num/.style={
+        font=\large,
+    },
+    every node/.style={
+      font=\small,
+    }
+]
+  \makeatletter
+    \DeclareRobustCommand
+      \myvdots{\vbox{\baselineskip4\p@ \lineskiplimit\z@
+        \hbox{.}\vspace{3pt}\hbox{.}\vspace{3pt}\hbox{.}}}
+  \makeatother
+
+  % Input
+  \node[
+    neuron,
+    fill=green!10,
+  ] (I-n) at (0,0) {};
+  \node[left=2mm of I-n.west] {$x_{n-1}$};
+  \node[
+    neuron_dots,
+    above=2mm of I-n,
+  ] (I-d) {\myvdots};
+
+  \foreach \jprev/\j/\txt in {
+    d/3/$x_3$,
+    3/2/$x_2$,
+    2/1/$x_1$,
+    1/0/$x_0$
+  } {
+    \node[
+      neuron,
+      fill=green!10,
+      above=2mm of I-\jprev,
+    ] (I-\j) {};
+    \node[left=2mm of I-\j.west] {\txt};
+  }
+
+  \node[
+    neuron_num,
+    above=4mm of I-0
+  ] (n) {$\boldsymbol{n}$};
+
+  % Hidden layers
+  \coordinate (Ic0-1) at ($ (I-0)!.5!(I-1) $);
+  \coordinate[below=-2mm of I-n] (Ib-n);
+  \foreach \i/\num/\act in {
+    1/{280}/{ReLU},
+    2/{722}/{Sigmoid},
+    3/{463}/{Tanh},
+    4/{600}/{ReLU}
+  } {{
+    \edef\x{\number\numexpr 2*\i\relax}
+    \node[neuron] (H-\i-0) at ($ (Ic0-1)+(\x,0) $) {};
+    \foreach \j in {1,2} {
+      \edef\jprev{\number\numexpr \j-1\relax}
+      \node[
+        neuron,
+        below=2mm of H-\i-\jprev,
+      ] (H-\i-\j) {};
+    }
+    \node[
+      neuron_dots,
+      below=2mm of H-\i-2,
+    ] (H-\i-d) {\myvdots};
+    \node[
+      neuron,
+      below=2mm of H-\i-d,
+    ] (H-\i-n) {};
+
+    \node[
+      neuron_num,
+      anchor=south,
+    ]
+      at (n.south-|H-\i-0)
+      {$\boldsymbol{\num}$}
+    ;
+    \node[anchor=north] at (Ib-n-|H-\i-n) {\act};
+  }}
+
+  % Output
+  \coordinate (H-4c0-1) at ($ (H-4-0)!.5!(H-4-1) $);
+  \node[
+    neuron,
+    fill=red!10,
+  ] (O-0) at ($ (H-4c0-1)+(2,0) $) {};
+  \node[
+    neuron,
+    fill=red!10,
+    below=2mm of O-0,
+  ] (O-1) {};
+  \node[
+    neuron_dots,
+    below=2mm of O-1,
+  ] (O-d) {\myvdots};
+  \node[
+    neuron,
+    fill=red!10,
+    below=2mm of O-d,
+  ] (O-n) {};
+  \node[right=4mm of O-0.east] {$y_0$};
+  \node[right=4mm of O-1.east] {$y_1$};
+  \node[right=4mm of O-n.east] {$y_{m-1}$};
+  \node[anchor=north] at (Ib-n-|O-n) {Leaky ReLU};
+  \node[
+    neuron_num,
+    anchor=south,
+  ]
+    at (n.south-|O-0)
+    {$\boldsymbol{m}$}
+  ;
+
+
+  % Input -> H1
+  \foreach \i in {0,1,2,3,n}
+    \foreach \j in {0,1,2,n}
+      \draw[gray!70] (I-\i.east)--(H-1-\j.west);
+
+  % Hn-1 -> Hn
+  \foreach \L/\R in {1,2,3} {
+    \edef\R{\number\numexpr \L+1\relax}
+    \foreach \i in {0,1,2,n}
+      \foreach \j in {0,1,2,n}
+        \draw[gray!70] (H-\L-\i.east)--(H-\R-\j.west);
+  }
+
+  % H4 -> Output
+  \foreach \i in {0,1,2,n}
+    \foreach \j in {0,1,n}
+      \draw[gray!70] (H-4-\i.east)--(O-\j.west);
+
+  % Output -> y
+  \foreach \i in {0,1,n}
+    \draw[gray!70,->] (O-\i.east) -- ++(10pt, 0);
+
+  % ---
+  % Braces
+  % ---
+  \draw[
+    decorate,
+    decoration={brace,mirror,amplitude=8pt},
+  ]
+    ($ (I-n)!-0.5!(I-n-|H-1-0)+(0.1,-.9) $)
+    --($ (I-n)!0.5!(I-n-|H-1-0)+(-0.1,-.9) $)
+    node[midway,yshift=-0.9cm]
+      {\shortstack{Warstwa\\wejściowa}}
+  ;
+
+  \draw[
+    decorate,
+    decoration={brace,mirror,amplitude=8pt},
+  ]
+    ($ (I-n)!0.5!(I-n-|H-1-0)+(0.1,-.9) $)
+    --($ (I-n-|H-4-0)!0.5!(I-n-|O-0)+(-0.1,-.9) $)
+    node[midway,yshift=-0.9cm]
+      {\shortstack{Warstwy\\ukryte}}
+  ;
+
+  \draw[
+    decorate,
+    decoration={brace,mirror,amplitude=8pt},
+  ]
+    ($ (I-n-|O-0)!0.5!(I-n-|H-4-0)+(0.1,-.9) $)
+    --($ (I-n-|O-0)!-0.5!(I-n-|H-4-0)+(-0.1,-.9) $)
+    node[midway,yshift=-0.9cm]
+      {\shortstack{Warstwa\\wyjściowa}}
+  ;
+\end{tikzpicture}
