@@ -74,19 +74,36 @@ def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int,
 #   # TODO:
 #   # Is possible to switch between tensorflow and torch using:
 #   # krs.config.set_backend()
-def cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, categorial: bool) -> tuple[krs.models.Model, int, int]:
+def cr_net_from_ind(
+  net_ind: NetIndividual,
+  input_size: int,
+  output_size: int,
+  categorial: bool=False,
+) -> tuple[krs.models.Model, int, int]:
 # def cr_net_from_ind(
 #   net_ind: NetIndividual,
 #   input_size: int,
 #   output_size: int,
-#   backend: t.Literal['torch']|t.Literal['tensorflow']='tensorflow',
+#   backend: t.Union[
+#     t.Literal['torch'],
+#     t.Literal['tensorflow']
+#   ]='tensorflow',
 # ) -> tuple[krs.models.Model, int, int]:
 #   if krs.config.backend()!=backend:
 #     swith_backend(backend)
   params, _, _=net_ind.gen
   params=params.fenotype
-  model=__cr_net_from_ind(net_ind, input_size, output_size, categorial)
-  return (model, params[const.BIN_PART_BATCH_NAME], params[const.BIN_PART_EPOCHS_NAME])
+  model=__cr_net_from_ind(
+    net_ind,
+    input_size,
+    output_size,
+    categorial,
+  )
+  return (
+    model,
+    params[const.BIN_PART_BATCH_NAME],
+    params[const.BIN_PART_EPOCHS_NAME],
+  )
 
 def __detect_type_group(arr: np.ndarray) -> str|None:
   flat=arr.flatten()
