@@ -748,6 +748,7 @@
 % oświadczenia o autorstwie i udzielenia licencji BG PW.
 %    \authorship
 %    \licensedthesis
+  \pdfbookmark[1]{\contentsname}{toc}
   \tableofcontents
   \cleardoublepage
   \pagestyle{headings}
