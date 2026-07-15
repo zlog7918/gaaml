@@ -52,8 +52,8 @@ Use trained network
 ## Installation
 Clone the repository and install the package from the project root with selected backend.
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone git@github.com:zlog7918/gaaml.git
+cd gaaml
 ```
 
 ### PyTorch (default)
