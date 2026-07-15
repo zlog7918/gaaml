@@ -148,6 +148,20 @@
 }
 \makeatother
 
+% possibly to use \cref in sections and etc.
+% \usepackage{crossreftools}
+% % This patch must be after loading cleverref and before defining a new theorem
+% \ExplSyntaxOn
+% \makeatletter
+% \clist_map_inline:nn { \@othm, \@xnthm, \@ynthm }
+%   {
+%     \patchcmd #1 { \MakeUppercase } { \text_uppercase:n } { } { \FAILED: }
+%     \patchcmd #1 { \MakeUppercase } { \text_uppercase:n } { } { \FAILED: }
+%     \patchcmd #1 { \MakeLowercase } { \text_lowercase:n } { } { \FAILED: }
+%   }
+% \makeatother
+% \ExplSyntaxOff
+
 % change `\citefield` to harmless `\usebibentry`
 \usepackage{usebib}
 \bibinput{EE-dyplom}
