@@ -80,15 +80,17 @@
 }
 
 % For section and others to have numbers
+% and appear in pdf outline
 % but not appear in toc
-\newcommand{\nocontentsline}[3]{}
+\newcommand{\nocontents}[2]{}
 \newcommand{\tocless}[2]{\bgroup%
-  \let\addcontentsline=\nocontentsline#1{#2}%
+  \let\addtocontents=\nocontents%
+  #1{#2}%
 \egroup}
 \newcommand{\toclesslabel}[3]{\bgroup%
-  \let\addcontentsline=\nocontentsline#1{%
-    #2\label{#3}%
-  }%
+  \let\addtocontents=\nocontents%
+  #1{#2}%
+  \label{#3}%
 \egroup}
 
 % Too big space around itemize:
