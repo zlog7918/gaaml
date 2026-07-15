@@ -147,3 +147,12 @@
   \fi
 }
 \makeatother
+
+% change `\citefield` to harmless `\usebibentry`
+\usepackage{usebib}
+\bibinput{EE-dyplom}
+\pdfstringdefDisableCommands{%
+  \renewcommand\citefield[2]{%
+    \usebibentry{#1}{#2}%
+  }%
+}
