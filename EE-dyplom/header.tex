@@ -129,10 +129,12 @@
 % attach subsubsection to toc
 \setcounter{tocdepth}{3}
 
+% special cases when 1.1(b) is needed instead of 1.1b
 \newcommand{\subrefparens}[2]{%
   \hyperref[#2]{\ref*{#1}\subref*{#2}}%
 }
 
+% gets name of ref from its label (subfig:gp_MN1.1 -> MN1.1)
 \makeatletter
 \def\getsubrefname#1{%
   \expandafter\getsubrefname@aux#1_\@nil
