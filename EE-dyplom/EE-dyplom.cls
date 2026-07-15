@@ -643,7 +643,7 @@
 
   \thispagestyle{empty}
   \begin{center}
-  \includegraphics[width=\textwidth]{\pwheader}
+    \includegraphics[width=\textwidth]{\pwheader}
     \vskip 3em
     \@instytut
     \vskip 3em
