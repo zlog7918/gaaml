@@ -124,31 +124,31 @@ przez kod binarny i~mają to być:
   \item Część sekwencyjna:
     \begin{nospitemize}
       \item liczba warstw ukrytych:
-        5 bitów $\mathbb{Z} \cap \left[1, 32\right]$
+        5 bitów $\mathbb{Z} \cap \left[1, 32\right]$,
       \item ziarno generatora liczby neuronów:
-        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$
+        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$,
       \item ziarno generatora typów aktywacji:
-        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$
+        10 bitów $\mathbb{Z} \cap \left[0, 1023\right]$,
       \item optymalizator:
         1 bit $\mathbb{Z} \cap \left[0, 1\right]$
         (%
           0 {\textrightarrow} SGD,
           1 {\textrightarrow} Adam%
-        )
+        ),
       \item wskaźnik uczenia się (learning rate):
         12 bitów $2^{-13}\left(
           \mathbb{Z} \cap \left[1, 2^{12}\right]
-        \right)$
+        \right)$,
       % TODO: maybe this version
       %   [2^(-13) - 0.5] → [2^(-13) - .25]
       % \item wskaźnik uczenia się (learning rate):
         % 11 bitów $2^{-13}\left(
         %   \mathbb{Z} \cap \left[1, 2^{11}\right]
-        % \right)$
+        % \right)$,
       \item liczba epok:
-        7 bitów $\mathbb{Z} \cap \left[1, 128\right]$
+        7 bitów $\mathbb{Z} \cap \left[1, 128\right]$,
       \item wielkość partii:
-        10 bitów $\mathbb{Z} \cap \left[1, 1024\right]$
+        10 bitów $\mathbb{Z} \cap \left[1, 1024\right]$,
     \end{nospitemize}
   \item Części listowe
     -- generowane po części sekwencyjnej;
@@ -163,7 +163,7 @@ przez kod binarny i~mają to być:
         \\\hspace*{1em}zawiera liczby z~zakresu:
           $\mathbb{Z} \cap \left[2, 724\right]$,
         \\\hspace*{1em}każdy element
-          składa się z~10 bitów.
+          składa się z~10 bitów,
       \item lista typów aktywacji
         warstw ukrytych i~wyjściowej:
           \\\hspace*{1em}liczba elementów -- o~1 większa
@@ -181,6 +181,7 @@ przez kod binarny i~mają to być:
             składa się z~2 bitów.
     \end{nospitemize}
 \end{nospitemize}
+
 Zostało przyjęte ograniczenie by macierz
 wag połączeń w~warstwach ukrytych sieci
 była niewiększa niż $128\text{MB}$.
