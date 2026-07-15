@@ -143,7 +143,7 @@
   \RequirePackage[utf8]{inputenc}
   \DeclareUnicodeCharacter{00B0}{$^{\circ}$}
   \DeclareUnicodeCharacter{00D7}{x}
-  % should'n 00D7 be this?
+  % zlog: should'n 00D7 be this?
   % \DeclareUnicodeCharacter{00D7}{$\times$}
 \fi
 
@@ -692,7 +692,7 @@
   \end{center}
   \@streszczeniepracy
 
-  {\setlength{\parskip}{0pt}
+  {\setlength{\parskip}{0pt} % zlog: protection from parskip package
     \vskip 2em
     \noindent\textbf{Słowa kluczowe: }
     \@slowakluczowe
@@ -711,7 +711,7 @@
   \end{center}
   \@thesisabstract
 
-  {\setlength{\parskip}{0pt}
+  {\setlength{\parskip}{0pt} % zlog: protection from parskip package
     \vskip 2em
     \noindent\textbf{Keywords: }
     \@thesiskeywords
@@ -748,7 +748,7 @@
 % oświadczenia o autorstwie i udzielenia licencji BG PW.
 %    \authorship
 %    \licensedthesis
-  \pdfbookmark[1]{\contentsname}{toc}
+  \pdfbookmark[1]{\contentsname}{toc} % zlog: add toc to pdf outline
   \tableofcontents
   \cleardoublepage
   \pagestyle{headings}
