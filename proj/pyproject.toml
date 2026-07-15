@@ -2,7 +2,7 @@
 name = "gaaml"
 version = "0.1.0"
 description = "Genetic Algorithm-based AutoML"
-authors = [{ name="Szymon Wasążnik", email="zlog@zlog.pl" }]
+authors = [{ name="Szymon Wasążnik", email="zlog@protonmail.com" }]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
