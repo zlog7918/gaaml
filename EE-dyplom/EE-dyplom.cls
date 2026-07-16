@@ -512,7 +512,7 @@
     breaklines,
     breakanywhere=false,
     linenos,
-    firstnumber=1, % 2
+    firstnumber=auto, % 2
     stepnumber=1, % 5
     numbersep=2pt,
     tabsize=2,
