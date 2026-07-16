@@ -499,6 +499,40 @@
 }
 \lstset{style=basiclststyle}
 
+% zlog: added second option of program's listings
+%   (only if shell escape is enabled)
+\ifnum\pdfshellescape=1
+  % Shell escape is enabled.
+  \RequirePackage{minted}
+  % \RequirePackage{fvextra}
+  \setminted{
+    % style=friendly, % choose a Pygments style closest to yours
+    % bgcolor=white,
+    % bgcolor=mietowy!10!white, % background on the number column is also changed
+    breaklines,
+    breakanywhere=false,
+    linenos,
+    firstnumber=1, % 2
+    stepnumber=1, % 5
+    numbersep=2pt,
+    tabsize=2,
+    autogobble,
+    frame=single,
+    framesep=1mm,
+    % framesep=2mm,
+    baselinestretch=1,
+    % xleftmargin=4ex,
+    encoding=utf8,
+    escapeinside=%%
+  }
+% \else
+%   \ifnum\pdfshellescape=2
+%     % Shell escape is restricted.
+%   \else
+%     % Shell escape is disabled.
+%   \fi
+\fi
+
 % -------------------------------------------------------------------
 % Ozdobniki ścieżek plików, menu i klawiszy
 % -------------------------------------------------------------------
