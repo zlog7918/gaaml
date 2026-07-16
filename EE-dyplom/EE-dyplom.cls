@@ -459,7 +459,7 @@
   tabsize=2,
   frame=lrbt,
   frameround=ffff,
-  inputpath=src,
+  % inputpath=src, % zlog: deleted the forcing of src/<path>
   aboveskip=1.46557em,
   belowskip=1em,
   escapeinside={\%*}{*)},
