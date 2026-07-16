@@ -54,16 +54,16 @@
 \ProcessKeyvalOptions*
 
 
-\ifnum\strcmp{\pwthesis}{inz} = 0
+\ifnum\strcmp{\pwthesis}{inz}=0
   \newcommand{\locallang}{PL}
 \fi
-\ifnum\strcmp{\pwthesis}{mgr} = 0
+\ifnum\strcmp{\pwthesis}{mgr}=0
   \newcommand{\locallang}{PL}
 \fi
-\ifnum\strcmp{\pwthesis}{bsc} = 0
+\ifnum\strcmp{\pwthesis}{bsc}=0
   \newcommand{\locallang}{EN}
 \fi
-\ifnum\strcmp{\pwthesis}{msc} = 0
+\ifnum\strcmp{\pwthesis}{msc}=0
   \newcommand{\locallang}{EN}
 \fi
 
@@ -75,7 +75,7 @@
 % \setglossarysection{section}
 % \makeglossaries
 % \loadglsentries{tekst/glossary}
-\ifnum\strcmp{\locallang}{PL} = 0 
+\ifnum\strcmp{\locallang}{PL}=0 
   \newcommand{\acronymstitle}{Wykaz skrótów i~symboli}
 \else
   \newcommand{\acronymstitle}{List of Abbreviations and Symbols}
@@ -121,7 +121,7 @@
 % -------------------------------------------------------------------
 \ifXeTeX
   \RequirePackage{polyglossia}
-  \ifnum\strcmp{\locallang}{PL} = 0 
+  \ifnum\strcmp{\locallang}{PL}=0 
     \setdefaultlanguage{polish}
   \else
     \setdefaultlanguage{english}
@@ -133,7 +133,7 @@
   %\selectlanguage{polish}
 \else
   \RequirePackage[MeX]{polski}
-  \ifnum\strcmp{\locallang}{PL} = 0 
+  \ifnum\strcmp{\locallang}{PL}=0 
     \RequirePackage[english,polish]{babel}
     \selectlanguage{polish}
   \else
@@ -450,7 +450,9 @@
   firstnumber=1, % 2
   stepnumber=1,  % 5
   numbersep=5pt,
-  xleftmargin=4ex,frame=single,framexleftmargin=0ex,
+  xleftmargin=4ex,
+  frame=single,
+  framexleftmargin=0ex,
   showspaces=false,
   showstringspaces=false,
   showtabs=false,
@@ -461,9 +463,9 @@
   aboveskip=1.46557em,
   belowskip=1em,
   escapeinside={\%*}{*)},
-  inputencoding = utf8,
-  extendedchars = true,
-  literate      =
+  inputencoding=utf8,
+  extendedchars=true,
+  literate=
     {á}{{\'a}}1  {é}{{\'e}}1  {í}{{\'i}}1 {ó}{{\'o}}1  {ú}{{\'u}}1
     {Á}{{\'A}}1  {É}{{\'E}}1  {Í}{{\'I}}1 {Ó}{{\'O}}1  {Ú}{{\'U}}1
     {à}{{\`a}}1  {è}{{\`e}}1  {ì}{{\`i}}1 {ò}{{\`o}}1  {ù}{{\`u}}1
@@ -511,7 +513,7 @@
 % -------------------------------------------------------------------
 \RequirePackage{etoolbox}
 %\RequirePackage[titletoc]{appendix}
-\ifnum\strcmp{\locallang}{PL} = 0 
+\ifnum\strcmp{\locallang}{PL}=0 
   \newcommand{\appendiceslisttitle}{Spis załączników}
   \newcommand{\appendixprefix}{Załącznik}
 \else
@@ -596,20 +598,20 @@
   \newcommand{\@longdate}{#1}
 }
 
-\ifnum\strcmp{\pwthesis}{inz} = 0
+\ifnum\strcmp{\pwthesis}{inz}=0
   \newcommand{\frontpageheader}{inzhead.png}
 \fi
-\ifnum\strcmp{\pwthesis}{mgr} = 0
+\ifnum\strcmp{\pwthesis}{mgr}=0
   \newcommand{\frontpageheader}{mgrhead.png}
 \fi
-\ifnum\strcmp{\pwthesis}{bsc} = 0
+\ifnum\strcmp{\pwthesis}{bsc}=0
   \newcommand{\frontpageheader}{bschead.png}
 \fi
-\ifnum\strcmp{\pwthesis}{msc} = 0
+\ifnum\strcmp{\pwthesis}{msc}=0
   \newcommand{\frontpageheader}{mschead.png}
 \fi
 
-\ifnum\strcmp{\locallang}{PL} = 0
+\ifnum\strcmp{\locallang}{PL}=0
   \newcommand{\kieruneklocal}{na~kierunku }
   \newcommand{\specjalnosclocal}{w~specjalności }
   \newcommand{\titlelocal}{\@title }
@@ -617,7 +619,7 @@
   \newcommand{\promotorlocal}{promotor}
   \newcommand{\citylocal}{WARSZAWA }
 \fi
-\ifnum\strcmp{\locallang}{EN} = 0
+\ifnum\strcmp{\locallang}{EN}=0
   \newcommand{\kieruneklocal}{in~the~field~of~study }
   \newcommand{\specjalnosclocal}{and~specialisation }
   \newcommand{\titlelocal}{\@engtitle }
@@ -627,12 +629,12 @@
 \fi
 
 \newcommand{\pwheader}{Head}
-\ifnum\strcmp{\locallang}{PL} = 0
+\ifnum\strcmp{\locallang}{PL}=0
   \g@addto@macro\pwheader\pwfaculty
   \g@addto@macro\pwheader{PL.png}
 \fi
 
-\ifnum\strcmp{\locallang}{EN} = 0
+\ifnum\strcmp{\locallang}{EN}=0
   \g@addto@macro\pwheader\pwfaculty
   \g@addto@macro\pwheader{EN.png}
 \fi
@@ -722,7 +724,7 @@
 % Spięcie stron streszczeń we właściwej
 % kolejności w jedno polecenie.
 \newcommand{\abstractpages}{
-  \ifnum\strcmp{\locallang}{PL} = 0
+  \ifnum\strcmp{\locallang}{PL}=0
     \stronastreszczenia
     \abstractpage
   \else
