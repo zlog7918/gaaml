@@ -516,12 +516,12 @@
     stepnumber=1, % 5
     numbersep=2pt,
     tabsize=2,
-    autogobble,
+    % autogobble,
     frame=single,
     framesep=1mm,
     % framesep=2mm,
     baselinestretch=1,
-    % xleftmargin=4ex,
+    xleftmargin=4ex,
     encoding=utf8,
     escapeinside=%%
   }
