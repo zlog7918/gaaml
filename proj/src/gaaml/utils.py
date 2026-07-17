@@ -205,7 +205,6 @@ def get_fit_func(
     (validation_data,),
     (test_data,),
   )):
-  # if training_data.ndim!=2 or (validation_data is not None and validation_data.ndim!=2) or test_data.ndim!=2:
     raise ValueError('Every data must be 2D array')
   if training_data.shape[1]!=test_data.shape[1]:
     raise ValueError('training_data and test_data do not have the same number of attributes in data or output')
