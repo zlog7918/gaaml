@@ -53,7 +53,7 @@ by użytkownik mógł je potem w~łatwy sposób wgrać,
 a~do drugiego pliku wpisywane są następujące metadane:
 liczba epok, wielkość wsadu,
 backend, liczba warstw ukrytych,
-historia dopasowań podczas kolejnych epok nauki,
+historia strat podczas kolejnych epok nauki,
 dopasowanie walidacyjne oraz dopasowanie testowe.
 
 Obiekt pokoleń tworzy na początku
@@ -304,6 +304,7 @@ Dzięki takiemu podziałowi kod powinien być łatwy
 do zarządzania i~późniejszego rozwijania.
 
 \section{Selekcja}
+\label{sec:selection}
 W~ogólnej sytuacji selekcja będzie odbywała się
 metodą ruletki proporcjonalnej do przystosowania.
 Selekcja musi jednakże odpowiadać na dwa szczególne
@@ -349,6 +350,7 @@ a~najlepsze osobniki są zapisywane w~obiekcie
 pokoleń opisanym w~\cref{sec:generations_class}.  
 
 \section{Krzyżowanie}
+\label{sec:crossover}
 Krzyżowanie będzie odbywało się różnie dla części
 sekwencyjnej i~listowej kodu genetycznego.
 Choć obie składają się z~informacji binarnej,
@@ -457,7 +459,8 @@ jest wybierany z~pełnego zakresu
 (biorąc pod uwagę wszystkie bity listy),
 to punkt podziału drugiej listy jest wybierany
 na podstawie wylosowanego elementu listy,
-by zachować spójność długości list oraz by zapobiec występowaniu ``półelementów''.
+by zachować spójność długości list oraz
+by zapobiec występowaniu ``półelementów''.
 Dodatkowo algorytm pilnuje by lista
 nie miała mniej elementów, niż minimalna liczba,
 a~regulowanie do maksymalnej wartości jest
@@ -754,6 +757,7 @@ można opisać całość matematycznie w~następujący sposób:
 \end{equation}
 
 \section{Mutacja}
+\label{sec:mutate}
 Mutacja będzie odbywała się
 przez odwracanie losowych bitów.
 Decyzja o~mutacji będzie podejmowana
@@ -769,6 +773,7 @@ $\mathbb{Z} \cap \left[0, n-1\right]$,
 gdzie $n$ to długość podgenotypu.
 
 \section{Ocena przystosowania}
+\label{sec:fittness}
 Ocena przystosowania osobnika będzie odbywała się poprzez
 nauczenie określonej liczby razy sieci o~parametrach
 i~z~parametrami wynikającymi z~fenotypu osobnika.
@@ -813,7 +818,8 @@ Aby zapewnić wysoki poziom możliwości
 dopasowania działania biblioteki
 do indywidualnych potrzeb,
 podawany jest do funkcji korygującej cały osobnik.
-Więc w~miejscu $n$ w~\cref{eq:correction_f} jest w~bibliotece osobnik z~którego można
+Więc w~miejscu $n$ w~\cref{eq:correction_f} jest
+w~bibliotece osobnik z~którego można
 uzyskać wszystkie parametry sieci,
 jeżeli ktoś chce również, na przykład,
 stosować kary dla liczby neuronów
@@ -844,6 +850,7 @@ będzie reprezentowana przez kilka epok,
 to zostaną wybrane wagi tej z~najwcześniejszej epoki.
 
 \section{Fenotyp}
+\label{sec:fenotype}
 Jak przedstawiono na \cref{fig:gen_parts}
 genotyp osobnika podzielony jest na trzy części.
 Poniżej zostanie przedstawiony przykład
@@ -1307,7 +1314,8 @@ ponieważ nie zostały przyjęte żadne przykładowe dane.
   \centering
   \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
     \hline
-      $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $y_1$ & $y_2$ & $y_3$ & $y_4$ \\
+      $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$
+      & $y_1$ & $y_2$ & $y_3$ & $y_4$ \\
     \hline
       $0.767$ & $0.352$ & $0.663$ & $0.876$ & $0.612$
       & $0.094$ & $0.287$ & $0.218$ & $0.626$ & $0.369$ \\
