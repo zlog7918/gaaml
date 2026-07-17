@@ -36,25 +36,28 @@ Oraz czy jest to zgodne z~deklaracją
 przy wywołaniu funkcji.
 Ostatecznie definiowana jest funkcja przyjmująca
 tylko osobnika i~ścieżkę do zapisu o~nim informacji.
-Funkcja ta tworzy model, uczy go
-i~oblicza dopasowanie jego odpowiedzi
-do danych walidacyjnych, a~jeżeli
-niedostępne to treningowych, oraz testowych.
-Pierwsza z~odpowiedzi będzie zwana
-dalej dopasowaniem walidacyjnym.
-Dopasowanie, oraz uzyskane po korekcji przystosowanie,
-z~danych testowych nie będzie wykorzystywane
+Funkcja ta tworzy model, uczy go i~oblicza
+błąd dopasowania jego odpowiedzi do tych
+przewidywanych w~danych testowych oraz walidacyjnych,
+a~jeżeli te drugie są niedostępne to treningowych.
+Drugi z~policzonych błędów będzie zwany
+dalej błędem dopasowania walidacyjnego,
+a pierwsze analogicznie błędem dopasowania testowego.
+Błąd oraz uzyskane po korekcji przystosowanie,
+z~danych testowych nie będą wykorzystywane
 do żadnego procesu ewolucji,
-pozwala jedynie na ujrzenie pełnego obrazu,
-jak się ta wartość zmieniała w~czasie.
+pozwalają jedynie na ujrzenie pełnego obrazu,
+jak się ta wartość przystosowania zmieniała w~czasie.
 Następnie przed zwróceniem obydwu dopasowań
 zapisuje wagi nauczonego modelu do pliku
-by użytkownik mógł je potem w~łatwy sposób wgrać,
-a~do drugiego pliku wpisywane są następujące metadane:
-liczba epok, wielkość wsadu,
-backend, liczba warstw ukrytych,
+by użytkownik mógł je potem w~łatwy
+sposób użyć we własnym modelu,
+a~do drugiego pliku wpisywane
+są następujące metadane: liczba epok,
+wielkość wsadu, backend, liczba warstw ukrytych,
 historia strat podczas kolejnych epok nauki,
-dopasowanie walidacyjne oraz dopasowanie testowe.
+błąd dopasowania walidacyjnego
+oraz błąd dopasowania testowego.
 
 Obiekt pokoleń tworzy na początku
 swojego działania obiekt populacji.
@@ -69,6 +72,12 @@ Następnie pobiera wyniki z~populacji i~je zapisuje.
 Podczas tworzenia obiektu populacji od razu
 generowana jest populacja początkowa
 i~obliczana jest dla niej wartość przystosowania.
+Obliczenie przystosowania polega na nauczeniu
+kilku sieci o~tej samej architekturze,
+obliczeniu dla nich błędu dopasowania walidacyjnego,
+przekształceniu ich na przystosowanie walidacyjne
+za pomocą funkcji korygującej,
+a~ostatecznie uśrednieniu uzyskanych wyników.
 Po wywołaniu metody następnej generacji
 jest przeprowadzany jeden pełny obieg
 wnętrza pętli pokazanej
@@ -778,8 +787,8 @@ Ocena przystosowania osobnika będzie odbywała się poprzez
 nauczenie określonej liczby razy sieci o~parametrach
 i~z~parametrami wynikającymi z~fenotypu osobnika.
 Liczba ta będzie określona przez liczbę zrównolegleń.
-Obliczona dokładność walidacyjna zostaje przekształcona
-na przystosowanie za pomocą funkcji
+Obliczony błąd dokładności walidacyjnej zostaje
+przekształcony na przystosowanie za pomocą funkcji
 korygującej $f$ i~uśrednione.
 Dla celów statystycznych przekształcane
 jest również dopasowanie testowe.
@@ -787,16 +796,16 @@ jest również dopasowanie testowe.
 Jeżeli:\\
 $n$ jest liczbą warstw ukrytych,\\
 $n_{\max}$ to maksymalna liczba warstw ukrytych\\
-oraz $d$ jest błądem dopasowania
+oraz $e$ jest błądem dopasowania
   z~przedziału $\mathbb{R}_{+} \cup \left\{0\right\}$,
   gdzie $0$ oznacza brak błędu,
   czyli idealne dopasowanie,\\
 to domyślna postać funkcji $f$ wygląda następująco:
 \begin{equation}
   \label{eq:correction_f}
-  f\left(d, n\right)
+  f\left(e, n\right)
     =\frac{1}{
-      1 + d \left(
+      1 + e \left(
         1
         + 0.2 \frac{n-1}{n_{\max}-1}
       \right)
@@ -828,8 +837,8 @@ w poszczególnych warstwach.
 Jeżeli użytkownik poda tylko
 dane treningowe i~testowe, to:\\
 Uczenie będzie odbywało się tylko na danych treningowych.
-Po zakończeniu uczenia zostanie obliczona
-dokładność na danych treningowych i~testowych,
+Po zakończeniu uczenia zostanie obliczony błąd
+dopasowania na danych treningowych i~testowych,
 z~czego to drugie zostanie zwrócone,
 natomiast nie będzie używane w~procesie ewolucji,
 a~jest w~celach statystycznych.

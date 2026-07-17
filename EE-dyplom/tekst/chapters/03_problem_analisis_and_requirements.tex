@@ -143,14 +143,17 @@ gdzie $n$ oznacza liczbę obliczeń przystosowania.
 W~ramach pojedynczego liczenia tworzona jest
 sieć neuronowa na podstawie genotypu badanego osobnika,
 a~następnie zostaje nauczona na danych treningowych.
-Dopasowanie wyznaczane jest na bazie danych
-walidacyjnych, jeśli zostały dostarczone;
-w~przeciwnym razie wykorzystuje się dane testowe.
+Po skończonym procesie uczenia wyznaczany
+jest walidacyjny błąd dopasowania 
+na podstawie danych walidacyjnych,
+jeśli zostały dostarczone;
+w~przeciwnym razie wykorzystuje się dane treningowe.
 Po uzyskaniu tej wartości jest ona
 przekazywana do funkcji korygującej,
-która zwraca końcowy wynik funkcji przystosowania.
+która zwraca przystosowanie walidacyjne.
 Ostateczna wartość przystosowania osobnika
-stanowi uśrednienie uzyskanych wyników.
+stanowi uśrednienie wszystkich przystosowań
+walidacyjnych danego osobnika.
 
 Po uzyskaniu przystosowań wszystkich
 osobników wykonywane są kolejno operacje
