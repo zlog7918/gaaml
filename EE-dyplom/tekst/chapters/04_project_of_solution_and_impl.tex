@@ -1066,42 +1066,27 @@ przykładowy podgenotyp \texttt{01000101101111110001}:
 \end{nospitemize}
 
 \begin{figure}
-  \begingroup
-    \def\showcolor#1{{%
-      \raisebox{-1pt}{%
-        \protect\tikz{%
-          \protect\node[
-            rectangle,
-            fill=#1,
-            fill opacity=.3,
-            draw=black,
-            thick,
-          ] (a) {};%
-        }%
-      }%
-    }}
-    \centering
-    \input{img/04_img/correction_of_bin.tikz.tex}
-    \caption{%
-      Korekcja kodu binarnego względem
-      jego maksymalnej dopuszczalnej postacji.
-      Wartość $m_b$ jest pierwszą pozycją,
-      w~której maksymalna postać kodu binarnego
-      ma bit o~większej wartości niż korygowany.
-      Bit ten został pokazany kolorem
-      fioletowym~(\showcolor{blue!75!yellow}).
-      Następnie do $b_m$ są wpisane indeksy mniejsze
-      niż $m_b$ na których to korygowany kod
-      jest większy niż maksymalna postać.
-      Przypadki te zostały oznaczone
-      kolorem czerwonym~(\showcolor{red}).
-      Skorygowany kod został oznaczony
-      kolorem zielonym~(\showcolor{green!30})
-      z~szczególnym uwzględnieniem zmienionych
-      bitów ciemniejszym kolorem~(\showcolor{green})%
-    }
-    \label{fig:bin_corr}
-  \endgroup
+  \centering
+  \input{img/04_img/correction_of_bin.tikz.tex}
+  \caption{%
+    Korekcja kodu binarnego względem
+    jego maksymalnej dopuszczalnej postacji.
+    Wartość $m_b$ jest pierwszą pozycją,
+    w~której maksymalna postać kodu binarnego
+    ma bit o~większej wartości niż korygowany.
+    Bit ten został pokazany kolorem
+    fioletowym~(\showcolor{blue!75!yellow}).
+    Następnie do $b_m$ są wpisane indeksy mniejsze
+    niż $m_b$ na których to korygowany kod
+    jest większy niż maksymalna postać.
+    Przypadki te zostały oznaczone
+    kolorem czerwonym~(\showcolor{red}).
+    Skorygowany kod został oznaczony
+    kolorem zielonym~(\showcolor{green!30})
+    z~szczególnym uwzględnieniem zmienionych
+    bitów ciemniejszym kolorem~(\showcolor{green})%
+  }
+  \label{fig:bin_corr}
 \end{figure}  
 
 Drugi element jest większy niż dopuszczalna wartość,

@@ -172,3 +172,18 @@
 
 % define dir of code placement
 \edef\codedir{../proj/src/gaaml}
+
+% way to show some color in box
+\def\showcolor#1{{%
+  \raisebox{-1pt}{%
+    \protect\tikz{%
+      \protect\node[
+        rectangle,
+        fill=#1,
+        fill opacity=.3,
+        draw=black,
+        thick,
+      ] (a) {};%
+    }%
+  }%
+}}
