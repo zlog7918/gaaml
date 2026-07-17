@@ -71,10 +71,10 @@
 % Wykaz symboli i skrótów
 % Pakiet musi być wczytany przed mathspec
 % -------------------------------------------------------------------
-% \RequirePackage[acronym,symbols,nopostdot]{glossaries}
-% \setglossarysection{section}
-% \makeglossaries
-% \loadglsentries{tekst/glossary}
+\RequirePackage[acronym,symbols,nopostdot]{glossaries}
+\setglossarysection{section}
+\makeglossaries
+\loadglsentries{tekst/glossary}
 \ifnum\strcmp{\locallang}{PL}=0 
   \newcommand{\acronymstitle}{Wykaz skrótów i~symboli}
 \else
@@ -802,7 +802,7 @@
   \printglossary[type=symbols,title={}]
   % Alternatywna lista symboli - do użycia tylko w Overleaf
   %\input{tekst/symbols}
-}   %
+}%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Załączniki i ich lista

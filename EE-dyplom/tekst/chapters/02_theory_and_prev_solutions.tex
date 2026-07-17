@@ -77,16 +77,12 @@ dla danych treningowych%
 Obecnie sieci neuronowe są intensywnie
 rozwijanym działem informatyki.
 Z~tego powodu powstało wiele ich typów,
-z~których najczęściej stosowane
-można podzielić na jednokierunkowe
-(ang. \textit{feedforward neural networks})
-oraz rekurencyjne
+z~których najczęściej stosowane można
+podzielić na \gls{FNN} oraz rekurencyjne
 (ang. \textit{recurrent neural networks}).
 Do pierwszej grupy należą między innymi:
-perceptrony wielowarstwowe
-(ang. \textit{multilayer perceptrons}, MLP),
-konwolucyjne sieci neuronowe
-(ang. \textit{convolutional neural networks}, CNN)
+\gls{MLP},
+\gls{CNN}
 oraz transformatory (ang. \textit{transformers}).
 Do drugiej grupy należą sieci RNN, LSTM i~GRU,
 wykorzystywane przede wszystkim
@@ -136,7 +132,7 @@ w~poprzednich warstwach%
 \sscite{goodfellow2016deep}.
 }
 
-Jest to charakterystyczne dla sieci MLP,
+Jest to charakterystyczne dla sieci \gls{MLP},
 w~których połączenia występują tylko
 pomiędzy sąsiadującymi warstwami, co powoduje,
 iż każda warstwa przetwarza dane wyłącznie
@@ -152,12 +148,12 @@ definicję wielowarstwowego perceptronu%
 \sscite{haykin2009neural}.
 \begin{figure}
   \centering
-  \subcaptionbox{FNN\label{subfig:fnn}}{%
+  \subcaptionbox{\gls{FNN}\label{subfig:fnn}}{%
     \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio}
     \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
   }
   \hspace{2cm}
-  \subcaptionbox{FNN -- MLP\label{subfig:fnn_mlp}}{%
+  \subcaptionbox{\gls{MLP}\label{subfig:fnn_mlp}}{%
     \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
     \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
   }
@@ -201,7 +197,7 @@ do modelowania skomplikowanych zależności.
 Dlatego ich konfiguracja jest kluczowym
 obszarem optymalizacji.
 
-Największy wpływ na proces uczenia MLP
+Największy wpływ na proces uczenia \gls{MLP}
 mają następujące parametry:
 \begin{nospitemize}
   \item liczba warstw ukrytych,
@@ -288,14 +284,14 @@ obejmuje funkcje aktywacji, rozłożenie neuronów
 oraz połączenia między nimi%
 \sscite{yao1999evolving}.
 
-Przekładając powyższe na MLP architektura
+Przekładając powyższe na \gls{MLP}, architektura
 odnosi się do funkcji aktywacji, liczby warstw,
 neuronów w~nich i~połączeń.
-W~niniejszej pracy rozważane są wyłącznie
-wielowarstwowe perceptrony (MLP),
-w~których każda warstwa jest
-w~pełni połączona z~warstwą następną.
-Oznacza to, że sposób połączenia neuronów jest
+W~niniejszej pracy rozważane
+są wyłącznie \gls{pMLP}.
+Oznacza to, że każda warstwa jest
+w~pełni połączona z~warstwą następną,
+więc sposób połączenia neuronów jest
 z~góry ustalony i~nie podlega optymalizacji.
 Z~tego powodu liczba połączeń nie stanowi
 niezależnego parametru architektury,
@@ -372,7 +368,8 @@ do następnych pokoleń%
 
 Klasyczny przebieg algorytmu genetycznego
 przedstawia \cref{fig:genetic_flow},
-którego szczególne elementy są omawiane w~poniższych podrozdziałach.
+którego szczególne elementy są omawiane
+w~poniższych podrozdziałach.
 \begin{figure}
   \centering \scalebox{0.9}{%
     \input{img/02_img/genetic_flow.tikz.tex}%
@@ -805,7 +802,7 @@ znaleźć wykorzystywanie algorytmów ewolucyjnych
 do optymalizacji architektury sieci neuronowych.
 Jedną z~takich prac jest \citebook{domashova2021optimal}.
 Jak i~w~niniejszej pracy, zostały w~niej
-wzięte do optymalizacji tylko sieci MLP.
+wzięte do optymalizacji tylko sieci \gls{pMLP}.
 Kod genetyczny przedstawiony jest
 jako trzy liczby oraz dwie listy,
 co zostało uwidocznione na \cref{tab:domashova2021}.
@@ -883,5 +880,5 @@ by bardziej niezależnie ocenić osobników.
 Stanowią one jednak podstawę dla opracowania
 biblioteki przedstawionej w~niniejszej pracy,
 której celem jest automatyczne wyszukiwanie
-optymalnej architektury sieci MLP przy
+optymalnej architektury sieci \gls{pMLP} przy
 wykorzystaniu algorytmu ewolucyjnego.

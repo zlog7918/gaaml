@@ -7,12 +7,13 @@ należy określić dokładne wymagania funkcjonalne
 oraz opisać sposób użytkowania oprocowanej biblioteki.
 
 \section{Cel projektowanego rozwiązania}
-Biblioteka ma umożliwiać automatyczne wyszukiwanie
-architektury sieci MLP za pomocą algorytmu genetycznego.
+Biblioteka ma umożliwiać automatyczne
+wyszukiwanie architektury sieci \gls{MLP}
+za pomocą algorytmu genetycznego.
 By to umożliwić biblioteka udostępnia dwie funkcje:
 \begin{nospitemize}
   \item realizującą automatyczne wyszukiwanie
-    optymalnej architektury MLP,
+    optymalnej architektury \gls{MLP},
   \item tworzącą model sieci na podstawie
     genotypu osobnika
 \end{nospitemize}
@@ -20,8 +21,8 @@ By to umożliwić biblioteka udostępnia dwie funkcje:
 Druga funkcja w~ramach swojego działania umożliwia
 deterministyczne odtworzenie architektury sieci
 na podstawie genotypu osobnika.
-Pierwsza funkcja odpowiada
-za przeprowadzenie całego procesu optymalizacji
+Pierwsza funkcja odpowiada za przeprowadzenie
+całego procesu optymalizacji
 - od wygenerowania populacji początkowej,
 poprzez ewolucję kolejnych pokoleń,
 aż do zwrócenia wyników i~zapisania przebiegu procesu.
@@ -175,15 +176,17 @@ funkcja przechodzi do rysowania wykresu.
 A~ostatecznie funkcja kończy swoje
 działanie zwracając wartości.
 
-\section{Wymagania dotyczące
-funkcji tworzącej model sieci}
+\section{%
+  Wymagania dotyczące funkcji
+  tworzącej model sieci%
+}
 Druga funkcja udostępniana przez bibliotekę
 umożliwia tworzenie modelu sieci neuronowej
 na podstawie genotypu osobnika.
 Obligatoryjnie przyjmuje następujące parametry:
 \begin{nospitemize}
   \item osobnik deterministycznie
-    opisujący architekturę sieci MLP,
+    opisujący architekturę sieci \gls{MLP},
   \item liczba atrybutów wejściowych,
   \item liczba atrybutów wyjściowych,
   \item flaga określająca czy rozwiązywane
