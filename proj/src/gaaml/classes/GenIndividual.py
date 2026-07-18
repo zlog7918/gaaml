@@ -23,8 +23,8 @@ class GenIndividual(Individual["GenIndividual", CPType, bytearray]):
 
   def mutate(self) -> None:
     i=rnd.randint(0, len(self.gen)-1)
-    # self.gen[i]=str(1-int(self.gen[i]))
     self.gen[i]=util.ord0 if self.gen[i]==util.ord1 else util.ord1
+    # self.gen[i]=str(1-int(self.gen[i]))
     # bit='0' if self.gen[i]=='1' else '1'
     # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 

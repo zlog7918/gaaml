@@ -49,8 +49,8 @@ class ListIndividual(Individual["ListIndividual", CPType, bytearray]):
   def mutate(self) -> None:
     if self.gen:
       i=util.randint(0, len(self.gen)-1)
-      # self.gen[i]=1-self.gen[i]
       self.gen[i]=util.ord0 if self.gen[i]==util.ord1 else util.ord1
+      # self.gen[i]=1-self.gen[i]
       # bit='0' if self.gen[i]=='1' else '1'
       # self.gen=f'{self.gen[:i]}{bit}{self.gen[i+1:]}'
 

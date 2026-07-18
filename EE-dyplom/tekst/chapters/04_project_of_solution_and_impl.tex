@@ -1362,3 +1362,507 @@ warstwa wyjściowa ma zawsze funkcję
 aktywacji typu \texttt{softmax},
 a ostatni element podfenotypu listowego
 typów aktywacji jest ignorowany.
+
+\section{Implementacja}
+\label{sec:implementation}
+Implementacja zostanie pokazana odpowiednio
+do poruszanych wcześniej podrozdziałów.
+
+\subsection{%
+  \refbykey{sec:proj_struct}{name}%
+}
+Biblioteka udostępnia dwie funkcje \texttt{cr\_network}
+i~\texttt{cr\_net\_from\_ind} wraz z~stałymi
+\texttt{const} oraz klasy \texttt{Generations}
+i~\texttt{NetIndividual}.
+\inputminted[firstline=4]{python}{\codedir/__init__.py}
+
+Główna funkcja ma nazwę \texttt{cr\_network}.
+Wpierw przetwarza czy są podane dane walidacyjne
+oraz zapewnia, że interface tabeli będzie jednolity
+z~typem \texttt{ndarray}.
+\inputminted[
+  firstline=91,
+  lastline=96,
+  % autogobble,
+]{python}{\codedir/core.py}
+
+Następnie wywoływana jest funkcja \texttt{get\_fit\_func} przygotowująca dane i ich sprawdzanie.
+\inputminted[
+  firstline=98,
+  lastline=105,
+  % autogobble,
+]{python}{\codedir/core.py}
+
+Po powrocie sterowania do głównej
+funkcji tworzy ona obiekt pokoleń i oddelegowuje przeprowadznie ewolucji.
+\inputminted[
+  firstline=141,
+  lastline=142,
+  % autogobble,
+]{python}{\codedir/core.py}
+
+Funkcja \texttt{get\_fit\_func} sprawdza czy tabele są dwuwymiarowe.
+\inputminted[
+  firstline=203,
+  lastline=208,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Następnie czy mają równe ilości atrybutów:
+\inputminted[
+  firstline=209,
+  lastline=212,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Ostatecznie czy dane są typu
+deklarowanego przy uruchomieniu.
+Mogą być regresyjne lub klasyfikacyjne.
+\inputminted[
+  firstline=261,
+  lastline=270,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Zwracana funkcja oceniająca
+dopasowania walidacyjne oraz testowe,
+jest definiowana tak by przyjmować tylko osobnika
+oraz ścieżkę folderu do zapisu danych z uczenia.
+\inputminted[
+  firstline=286,
+  lastline=289,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Funkcja ta tworzy model.
+\inputminted[
+  firstline=290,
+  lastline=295,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Uczy stworzoną sieć.
+\inputminted[
+  firstline=304,
+  lastline=320,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+I oblicza błąd dopasowania walidacyjnego.
+\inputminted[
+  firstline=322,
+  lastline=329,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Oraz liczony jest błąd dopasowania do danych testowych.
+\inputminted[
+  firstline=330,
+  lastline=334,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Ostatecznie przed zwróceniem danych zapisane
+zostają wagi nauczonego modelu.
+\inputminted[
+  firstline=344,
+  lastline=344,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+I~metadane: liczba epok, wielkość wsadu, backend, liczba warstw ukrytych, historia strat podczas kolejnych epok oraz błędy dopasowań walidacyjnych i testowych.
+\inputminted[
+  firstline=345,
+  lastline=358,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Zwrócone zostają obie wartości błędów dopasowania.
+\inputminted[
+  firstline=359,
+  lastline=359,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+\subsection{%
+  \refbykey{sec:generations_class}{name}%
+}
+Obiekt pokoleń tworzy obiekt populacji.
+\inputminted[
+  firstline=19,
+  lastline=19,
+  % autogobble,
+]{python}{\codedir/classes/Generations.py}
+
+Po dostaniu polecenia przeprowadzenia ewolucji sprawdza
+ile jeszcze zostało ich do wykonania.
+\inputminted[
+  firstline=35,
+  lastline=38,
+  % autogobble,
+]{python}{\codedir/classes/Generations.py}
+
+Jeżeli nie została osiągnięta zadana ilość
+\inputminted[
+  firstline=41,
+  lastline=41,
+  % gobble=4,
+]{python}{\codedir/classes/Generations.py}
+to wywoływana jest następna generacja
+i~pobierane są następnie wyniki.
+\inputminted[
+  firstline=45,
+  lastline=47,
+  % gobble=4,
+]{python}{\codedir/classes/Generations.py}
+
+\subsection{%
+  \refbykey{sec:population_class}{name}%
+}
+Obiekt populacji z którym występuje komunikacja powyżej od
+razu podczas jego tworzenia generuje populację początkową.
+\inputminted[
+  firstline=42,
+  lastline=42,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+I obliczane jest przystosowanie
+osobników do niej należących.
+\inputminted[
+  firstline=62,
+  lastline=62,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Podczas liczenia przystosowania taka sama architektura
+sieci jest poddawana uczeniu zadaną ilość razy.
+\inputminted[
+  % firstline=73,
+  firstline=75,
+  lastline=79,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Populacja jest w stanie wygenerować następną generację
+po wywołaniu metody \texttt{next\_generation}.
+Metoda ta wykonuje jedno pełne przejście generacji,
+czyli selekcję, krzyżowanie, mutację
+i~obliczenie przystosowania osobników.
+\inputminted[
+  firstline=167,
+  lastline=176,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+\subsection{%
+  \refbykey{sec:individual_genetic_code}{name}%
+}
+Kod genetyczny osobnika składa się z trzech podosobników:
+\inputminted[
+  firstline=54,
+  lastline=70,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Parametry części sekwencyjnej:
+\inputminted[
+  firstline=12,
+  lastline=23,
+]{python}{\codedir/consts.py}
+
+Parametry części listowej:
+\inputminted[
+  firstline=25,
+  lastline=27,
+]{python}{\codedir/consts.py}
+
+Uwzględnienie jednego elementu
+więcej dla listy typów aktywacji:
+\inputminted[
+  firstline=18,
+  lastline=18,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+\subsection{%
+  \refbykey{sec:selection}{name}%
+}
+Użycie selekcji losowej w~przypadku gdy wszystkie
+wartości przystosowania są równe zero:
+\inputminted[
+  firstline=129,
+  lastline=130,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Żadna wartość nie jest dodana do przystosowań,
+jeżeli żadne nie jest równe 0:
+\inputminted[
+  firstline=132,
+  lastline=136,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Obliczenie wartości do dodania do przystosowań:
+\inputminted[
+  firstline=121,
+  lastline=126,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Obliczenie skumulowanego prawdopodobieństwa
+do ruletki z~możliwymi wartościami
+$\left[0, 1\right]$ wybrania osobników:
+\inputminted[
+  firstline=138,
+  lastline=143,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Wybranie osobników za pomocą ruletki:
+\inputminted[
+  firstline=146,
+  lastline=148,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+\subsection{%
+  \refbykey{sec:crossover}{name}%
+}
+Krzyżowanie jest inaczej realizowane
+przez dwa typy podosobników.
+
+\subsubsection{%
+  \refbykey{subsec:crossover_seq}{name}%
+}
+Losowanie punktu krzyżowania:
+\inputminted[
+  firstline=36,
+  lastline=38,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+Początek krzyżowania:
+\inputminted[
+  firstline=41,
+  lastline=42,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+I~dwa razy wykonuje się poniższe
+z~zamienionymi \texttt{a}~i~\texttt{b}:
+\inputminted[
+  firstline=22,
+  lastline=22,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+\subsubsection{%
+  \refbykey{subsec:crossover_list}{name}%
+}
+Losowanie punktów krzyżowania:
+\inputminted[
+  firstline=66,
+  lastline=81,
+  % autogobble,
+]{python}{\codedir/classes/ListIndividual.py}
+
+Początek krzyżowania:
+\inputminted[
+  firstline=84,
+  lastline=85,
+  % autogobble,
+]{python}{\codedir/classes/ListIndividual.py}
+
+I~dwa razy wykonuje się poniższe
+z~zamienionymi \texttt{a}~i~\texttt{b} oraz zamienioną kolejnością w \texttt{cross\_point}:
+\inputminted[
+  firstline=44,
+  lastline=44,
+  % autogobble,
+]{python}{\codedir/classes/ListIndividual.py}
+
+\subsubsection{%
+  \refbykey{subsec:crossover_ind}{name}%
+}
+Losowanie punktów krzyżowania:
+\inputminted[
+  firstline=125,
+  lastline=132,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Początek krzyżowania:
+\inputminted[
+  firstline=135,
+  lastline=140,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+I~dwa razy wykonuje się poniższe
+z~zamienionymi \texttt{a}~i~\texttt{b} oraz zamienioną kolejnością w dwóch ostatnich częściach \texttt{cross\_point}:
+\inputminted[
+  firstline=77,
+  lastline=85,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Dopasowanie liczby elementów dzieje się w metodzie \texttt{\_update}. Jest to podzielone na dwa etapy. Pierwszy to identyfikacja zbyt krótkich fenotypów i bezpośrednie skrócenie zbyt długich.
+\inputminted[
+  firstline=101,
+  lastline=113,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Drugi to wydłużenie zidentyfikowanych fenotypów.
+\inputminted[
+  firstline=115,
+  lastline=122,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+\subsection{%
+  \refbykey{sec:mutate}{name}%
+}
+Decyzja o~mutacji jest podejmowana względem osobnika:
+\inputminted[
+  firstline=151,
+  lastline=154,
+  % autogobble,
+]{python}{\codedir/classes/Population.py}
+
+Następnie występuje losowanie w~ilu oraz których
+podosobnikach nastąpi mutacja:
+\inputminted[
+  firstline=91,
+  lastline=96,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+W podosobniku następuje kolejne losowanie,
+który bit zostanie zmieniony i~on ma zamienioną wartość.
+Bit o~wartości $1$ staje się $0$ i~odwrotnie.
+
+Dzieje się to tak samo dla podosobnika sekwencyjnego:
+\inputminted[
+  firstline=24,
+  lastline=26,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+Jak i listowego:
+\inputminted[
+  firstline=49,
+  lastline=52,
+  % autogobble,
+]{python}{\codedir/classes/ListIndividual.py}
+
+\subsection{%
+  \refbykey{sec:fittness}{name}%
+}
+W podrozdziale dotyczącym implementacji klasy pokoleń zostało pokazane jak realizuje się kilku-krotne uczenie.
+Funkcja korygująca w kodzie ma postać:
+\inputminted[
+  firstline=17,
+  lastline=23,
+  % autogobble,
+]{python}{\codedir/core.py}
+
+\subsection{%
+  \refbykey{sec:fenotype}{name}%
+}
+Zmiana kodu binarnego na wartość liczbową,
+która jest przedstawiona przez
+\crefrange{math:first_greater_bin}{math:bin_value},
+jest realizowana przez poniższe funkcje:
+\inputminted[
+  firstline=38,
+  lastline=46,
+  % autogobble,
+]{python}{\codedir/classes/_utils.py}
+
+\subsubsection{%
+  \refbykey{subsec:fenotype_seq}{name}%
+}
+Uzyskanie fenotypu w podosobniku sekwencyjnym polega
+na odczytaniu kolejno części kodu binarnego
+respektując długości poszczególnych parametrów:
+\inputminted[
+  firstline=47,
+  lastline=57,
+  % autogobble,
+]{python}{\codedir/classes/MaxIntsIndividual.py}
+
+\subsubsection{%
+  \refbykey{subsec:fenotype_list_nnum}{name}
+  oraz \refbykey{subsec:fenotype_list_tactiv}{name}%
+}
+Uzyskanie fenotypu w podosobniku listowym polega
+na odczytaniu kolejno części kodu binarnego
+respektując długość elementów w danym podosobniku:
+\inputminted[
+  firstline=47,
+  lastline=56,
+  % autogobble,
+]{python}{\codedir/classes/MaxIntsListIndividual.py}
+
+\subsubsection{Fenotyp -- wyjątki}
+Wyjątek stanowią elementy listowych
+podosobników oraz parametry sekwencyjnych,
+których końcowa oczekiwana
+wartość nie jest liczbą całkowitą.
+Te które zaliczają się do tej grupy to optymalizator,
+wskaźnik uczenia się oraz cała lista typów aktywacji.
+Ich wartości na poziomie podfenotypu
+zostają w~postacji liczb całkowitych,
+dopiero podczas tworzenia sieci neuronowej.
+
+\subsubsection{%
+  \refbykey{subsec:fenotype_ind}{name}%
+}
+Stworzenie sieci neuronowej,
+która jest fenotypem osobnika,
+dzieje się przez wywołanie
+poniższej funkcji podając osobnika,
+liczbę parametrów wejściowych i~wyjściowych
+oraz rodzaj rozwiązywanej problematyki przez sieć docelową.
+\inputminted[
+  firstline=77,
+  lastline=82,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Funkcja ta zwraca model sieci
+oraz parametry uczenia odczytane z~osobnika.
+\inputminted[
+  firstline=102,
+  lastline=106,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+By powstał sam model,
+sprawdzany jest wpierw typ problematyki,
+jeżeli jest to klasyfikacja,
+to ostatniej warstwie (wyjściowej)
+zostaje przypisany \texttt{softmax}:
+\inputminted[
+  firstline=57,
+  lastline=58,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+Następnie tworzony jest szkic struktury modelu, wraz z odpowiednimi typami funkcji aktywacyji:
+\inputminted[
+  firstline=60,
+  lastline=63,
+  % autogobble,
+]{python}{\codedir/utils.py}
+
+A ostatecznie model jest tworzony z wskazanym optymalizatorem oraz wskaźnikiem uczenia się.
+\inputminted[
+  firstline=64,
+  lastline=70,
+  % autogobble,
+]{python}{\codedir/utils.py}

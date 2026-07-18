@@ -161,6 +161,19 @@
 % \makeatother
 % \ExplSyntaxOff
 
+% getrefname
+\usepackage{refcount}
+
+% refbykey
+\newcommand{\innerrefbykey}[2]{%
+  \getrefbykeydefault{#1}{#2}{??}%
+}
+\newcommand{\refbykey}[2]{%
+  \hyperref[#1]{%
+    \innerrefbykey{#1}{#2}%
+  }%
+}
+
 % change `\citefield` to harmless `\usebibentry`
 \usepackage{usebib}
 \bibinput{EE-dyplom}
@@ -168,8 +181,25 @@
   \renewcommand\citefield[2]{%
     \usebibentry{#1}{#2}%
   }%
+  \renewcommand\refbykey[2]{%
+    \innerrefbykey{#1}{#2}%
+  }%
 }
 
+% leave it there, as otherwise latex does not
+%   show me commands from it, even though it is in .cls
+\usepackage{minted}
+\let\oldinputminted\inputminted
+\RenewDocumentCommand{\inputminted}{O{}mm}{\begingroup%
+  \ifvmode\vspace{-\parskip}\fi%
+  \leavevmode
+  \newdimen\skiplen
+  \skiplen=-\parskip
+  \advance\skiplen by 2mm
+  \vspace{\skiplen}%
+  \oldinputminted[#1]{#2}{#3}%
+  \vspace{\skiplen}%
+\endgroup}
 % define dir of code placement
 \edef\codedir{../proj/src/gaaml}
 

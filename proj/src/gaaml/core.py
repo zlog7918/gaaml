@@ -15,7 +15,10 @@ IndType=NetIndividual
 RetType=Generations
 
 def fitness_corrector(net_ind: IndType, fit: float) -> float:
-  ret=1/(fit+1)
+  n_m1=net_ind.gen[0].fenotype[const.BIN_PART_LIST_LEN[0]]-1
+  n_max_m1=const.BIN_PART_LIST_LEN[1][2]-1
+  corr=1+n_m1/n_max_m1/5
+  ret=1/(1+corr*fit)
   ret=ret if ret>0 else 0
   return ret
 
