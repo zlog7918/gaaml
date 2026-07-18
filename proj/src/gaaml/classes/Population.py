@@ -137,10 +137,11 @@ class Population(t.Generic[util.IndividualType]):
 
     probs=[]
     _sum=0
-    for p in ((fit+to_add)/self.__fitnesses.sum for fit in self.__fitnesses.arr_v):
+    all_sum=self.__fitnesses.sum+len(self.__fitnesses)*to_add
+    for p in ((fit+to_add)/all_sum for fit in self.__fitnesses.arr_v):
       _sum+=p
       probs.append(_sum)
-    del _sum
+    del _sum, all_sum
 
     i1=util.get_i_in_range(probs, rnd.random())
     i2=util.get_i_in_range(probs, rnd.random())
