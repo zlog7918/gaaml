@@ -64,8 +64,18 @@ historia strat podczas kolejnych epok nauki,
 błąd dopasowania walidacyjnego
 oraz błąd dopasowania testowego.
 
-Obiekt pokoleń tworzy na początku
-swojego działania obiekt populacji.
+\section{Klasa pokoleń}
+\label{sec:generations_class}
+Obiekt pokoleń jest tworzony z~klasy,
+która zapisuje statystykę i~pełny obraz
+przystosowania z~populacji
+oraz posuwa proces ewolucji do przodu
+poprzez wywoływanie kolejnych generacji.
+Powinien umożliwiać zobaczenie obecnego numeru pokolenia.
+Powinien również umożliwiać zobaczenie zapisanej
+statystyki oraz wszystkich obliczonych przystosowań.
+
+Tworzy na początku swojego działania obiekt populacji.
 Następnie po dostaniu polecenia przeprowadzenia
 ewolucji sprawdza ile generacji już było.
 Jeżeli jeszcze nie została osiągnięta zadana ilość
@@ -74,9 +84,24 @@ z~obiektu populacji z~numerem,
 obliczanego w~danym momencie, pokolenia.
 Następnie pobiera wyniki z~populacji i~je zapisuje.
 
-Podczas tworzenia obiektu populacji od razu
-generowana jest populacja początkowa
-i~obliczana jest dla niej wartość przystosowania.
+\section{Klasa populacji}
+\label{sec:population_class}
+Obiekt populacji jest tworzony z~klasy.
+Powinien umożliwiać pobranie statystyk jaki
+jest najlepszy osobnik i~najgorszy z~populacji
+oraz ich wartości wraz ze średnią przystosowań.
+Wartości te są obliczane przez wywoływanie
+funkcji przygotowanej na początku całego procesu.
+Jest ona uruchamiana tyle razy dla każdego osobnika
+ile zostało ustalone przez liczbę obliczeń przystosowania.
+Obiekt populacji ma podawać do tej
+funkcji unikalne ścieżki do folderów,
+które będą się znajdowały wewnątrz głównego
+folderu podanego uprzednio przez użytkownika.
+
+Podczas tworzenia obiektu od razu generowana
+jest populacja początkowa i~obliczane są wartości
+przystosowania osobników należących do niej.
 Obliczenie przystosowania polega na nauczeniu
 kilku sieci o~tej samej architekturze,
 obliczeniu dla nich błędu dopasowania walidacyjnego,
@@ -95,32 +120,6 @@ i~udostępniające metody takie jak mutacja,
 wygenerowanie punktu/punktów do krzyżowania,
 krzyżowanie, zapisanie do pliku
 oraz odczytanie z~pliku.
-
-\section{Klasa pokoleń}
-\label{sec:generations_class}
-Obiekt pokoleń jest tworzony z~klasy,
-która zapisuje statystykę i~pełny obraz
-przystosowania z~populacji
-oraz posuwa proces ewolucji do przodu
-poprzez wywoływanie kolejnych generacji.
-Powinien umożliwiać zobaczenie obecnego numeru pokolenia.
-Powinien również umożliwiać zobaczenie zapisanej
-statystyki oraz wszystkich obliczonych przystosowań.
-
-\section{Klasa populacji}
-\label{sec:population_class}
-Obiekt populacji jest tworzony z~klasy.
-Powinien umożliwiać pobranie statystyk jaki
-jest najlepszy osobnik i~najgorszy z~populacji
-oraz ich wartości wraz ze średnią przystosowań.
-Wartości te są obliczane przez wywoływanie
-funkcji przygotowanej na początku całego procesu.
-Jest ona uruchamiana tyle razy dla każdego osobnika
-ile zostało ustalone przez liczbę obliczeń przystosowania.
-Obiekt populacji ma podawać do tej
-funkcji unikalne ścieżki do folderów,
-które będą się znajdowały wewnątrz głównego
-folderu podanego uprzednio przez użytkownika.
 
 \section{Kod genetyczny osobnika}
 \label{sec:individual_genetic_code}
@@ -180,16 +179,16 @@ przez kod binarny i~mają to być:
           składa się z~10 bitów,
       \item lista typów aktywacji
         warstw ukrytych i~wyjściowej:
-          \\\hspace*{1em}liczba elementów -- o~1 większa
+          \\\hspace*{1em}liczba elementów -- o~$1$ większa
             (uwzględnia warstwę wyjściową):
             $\mathbb{Z} \cap \left[2, 33\right]$,
           \\\hspace*{1em}zawiera liczby z~zakresu:
             $\mathbb{Z} \cap \left[0, 3\right]$
             (%
-              0 \textrightarrow relu,
-              1 \textrightarrow tanh,
-              2 \textrightarrow sigmoid,
-              3 \textrightarrow leaky relu%
+              $0$ {\textrightarrow} relu,
+              $1$ {\textrightarrow} tanh,
+              $2$ {\textrightarrow} sigmoid,
+              $3$ {\textrightarrow} leaky relu%
             ),
           \\\hspace*{1em}każdy element
             składa się z~2 bitów.
@@ -400,6 +399,7 @@ i~łączenia wedle podanych punktów.
 \end{figure}
 
 \subsection{Krzyżowanie -- część sekwencyjna}
+\label{subsec:crossover_seq}
 W~przypadku części sekwencyjnej zostanie
 użyte krzyżowanie jednopunktowe,
 gdzie losowo zostanie wybrany punkt podziału
@@ -460,6 +460,7 @@ pokazują działanie drugiej podoperacji,
 która mając punkt krzyżowania tworzy dwóch potomków.
 
 \subsection{Krzyżowanie -- część listowa}
+\label{subsec:crossover_list}
 W~przypadku części listowej zostanie
 użyte krzyżowanie przeznaczone
 do zmiennej długości genotypu,
@@ -693,7 +694,7 @@ oraz wynik funkcji $R\left(p, k\right)$
 jest również z~zakresu liczb całkowitych.
 
 \subsection{Krzyżowanie -- osobnik}
-\label{subsec:crossover_nni}
+\label{subsec:crossover_ind}
 Krzyżowanie na poziomie osobnika polega
 na delegowaniu zadań do podosobników.
 Podczas pierwszej podoperacji,
@@ -774,8 +775,8 @@ można opisać całość matematycznie w~następujący sposób:
 \label{sec:mutate}
 Mutacja będzie odbywała się
 przez odwracanie losowych bitów.
-Decyzja o~mutacji będzie podejmowana
-na poziomie osobnika,
+Decyzja o~mutacji będzie
+podejmowana względem osobnika,
 jeżeli będzie poddawany mutacji,
 to następnie wystąpi losowanie
 w~których częściach genotypu wystąpi.
@@ -809,12 +810,12 @@ to domyślna postać funkcji $f$ wygląda następująco:
 \begin{equation}
   \label{eq:correction_f}
   f\left(e, n\right)
-    =\frac{1}{
+    =\max{\left\{\frac{1}{
       1 + e \left(
         1
         + 0.2 \frac{n-1}{n_{\max}-1}
       \right)
-    }
+    }, 0\right\}}
 \end{equation}
 Współczynnik $0.2$ został dobrany poprzez eksperymenty.
 Jest on kompromisem między jakością
@@ -934,9 +935,9 @@ Jeżeli nie ma takiego bitu przyjmowane zostaje $l$.
 Następnie w~\cref{math:indexes_of_greater_bins} do
 $b_m$ wpisane są wszystkie indeksy mniejsze niż $m_b$
 na których bity $b$ są większe od $m$.
-Wartość poprawionego kodu $v\left(b'\right)$
-z~\cref{math:corrected_bin} jest na pewno
-mniejsza lub równa $v\left(m\right)$,
+Dzięki temu wartość poprawionego kodu $b'$
+-- czyli $v\left(b'\right)$ -- z~\cref{math:corrected_bin}
+jest na pewno mniejsza lub równa $v\left(m\right)$,
 dodatkowo jeżeli $
   v\left(m\right) \geqslant v\left(b\right)
 $ to $v\left(b\right)=v\left(b'\right)$.
@@ -1116,7 +1117,7 @@ Osobnik przetwarza fenotyp pod względem długości.
 Jeżeli jest on za długi, to zostają
 wycięte nadmiarowe elementy.
 W~przypadku gdy jest za krótki to jest uzupełniany.
-Proces ten opisany jest w~\cref{subsec:crossover_nni}.
+Proces ten opisany jest w~\cref{subsec:crossover_ind}.
 Poniżej został przedstawiony przykład działania
 \cref{eq:too_short_long} dla otrzymanego fenotypu
 $\left(280, 722\right)$, ziarna generatora $75$
@@ -1209,7 +1210,7 @@ Osobnik przetwarza fenotyp pod względem długości.
 Jeżeli jest on za długi, to wycina nadmiarowe elementy.
 W~przypadku gdy jest za krótki to
 jest uzupełniany do zadanej długości.
-Proces ten został opisany w~\cref{subsec:crossover_nni}.
+Proces ten został opisany w~\cref{subsec:crossover_ind}.
 Poniżej przedstawiony jest przykład działania
 \cref{eq:too_short_long} dla otrzymanego fenotypu $\left(
   \text{relu},
@@ -1242,6 +1243,7 @@ $$\begin{aligned}
 \end{aligned}$$
 
 \subsection{Fenotyp -- osobnik}
+\label{subsec:fenotype_ind}
 Osobnik po skonstruowaniu pełnego fenotypu
 podosobników reprezentuje model nienauczonej sieci.
 Dopiero podczas oceny przystosowania
