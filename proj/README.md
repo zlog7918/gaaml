@@ -153,19 +153,19 @@ GAAML supports:
 
 For example, for a problem with six input features and four outputs:
 
-|    x₁ |    x₂ |    x₃ |    x₄ |    x₅ |    x₆ |    y₁ |    y₂ |    y₃ |    y₄ |
-| ----: | ----: | ----: | ----: | ----: | ----: | ----: | ----: | ----: | ----: |
-| 0.767 | 0.352 | 0.663 | 0.876 | 0.612 | 0.094 | 0.287 | 0.218 | 0.626 | 0.369 |
-| 0.670 | 0.886 | 0.535 | 0.031 | 0.073 | 0.239 | 0.519 | 0.723 | 0.639 | 0.717 |
-|     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |
+| $x_1$  | $x_2$  | $x_3$  | $x_4$  | $x_5$  | $x_5$  | $y_1$  | $y_2$  | $y_3$  | $y_4$  |
+| -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: |
+|$0.767$ |$0.352$ |$0.663$ |$0.876$ |$0.612$ |$0.094$ |$0.287$ |$0.218$ |$0.626$ |$0.369$ |
+|$0.670$ |$0.886$ |$0.535$ |$0.031$ |$0.073$ |$0.239$ |$0.519$ |$0.723$ |$0.639$ |$0.717$ |
+|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|
 
 For classification tasks, output columns should use one-hot encoding:
 
-|    x₁ |    x₂ |    x₃ |    x₄ |    x₅ |    x₆ | y₁ | y₂ | y₃ | y₄ |
-| ----: | ----: | ----: | ----: | ----: | ----: | -: | -: | -: | -: |
-| 0.767 | 0.352 | 0.663 | 0.876 | 0.612 | 0.094 |  0 |  0 |  1 |  0 |
-| 0.670 | 0.886 | 0.535 | 0.031 | 0.073 | 0.239 |  1 |  0 |  0 |  0 |
-|     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |     ⋮ |  ⋮ |  ⋮ |  ⋮ |  ⋮ |
+| $x_1$  | $x_2$  | $x_3$  | $x_4$  | $x_5$  | $x_5$  | $y_1$  | $y_2$  | $y_3$  | $y_4$  |
+| -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: |
+|$0.767$ |$0.352$ |$0.663$ |$0.876$ |$0.612$ |$0.094$ |  $0$   |  $0$   |  $1$   |  $0$   |
+|$0.670$ |$0.886$ |$0.535$ |$0.031$ |$0.073$ |$0.239$ |  $1$   |  $0$   |  $0$   |  $0$   |
+|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|$\vdots$|
 
 `number_of_attributes` specifies the number of input features (`x` columns). The remaining columns are treated as output variables.
 If `number_of_attributes` is negative its absolute value specifies number of output variables (`y` columns).
@@ -208,13 +208,13 @@ evaluation of the discovered models.
 The best individual can be obtained using:
 
 ```python
-(max_sol, _), _, _ = ret.get_statistics()
+(max_sol, _), _, _=ret.get_statistics()
 ```
 
 and reconstructed into a trainable neural network:
 
 ```python
-model, batch_size, epoch = g.cr_net_from_ind(
+model, batch_size, epoch=g.cr_net_from_ind(
     max_sol,
     input_num,
     output_num,
