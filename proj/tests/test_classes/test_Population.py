@@ -610,7 +610,7 @@ def test_next_generation(tmp_path: Path) -> None:
     def __init__(self, *args, **kwargs) -> None:
       super().__init__(*args, **kwargs)
       self.reset_count=0
-    def reset(self, total: float | None = None) -> None:
+    def reset(self, total: float|None=None) -> None:
       self.reset_count+=1
       return super().reset(total)
   bar=_tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)

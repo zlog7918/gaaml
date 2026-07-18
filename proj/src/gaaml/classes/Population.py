@@ -70,7 +70,7 @@ class Population(t.Generic[util.IndividualType]):
     ind_i: int,
     ind: util.IndividualType,
   ) -> list[tuple[float, float]]:
-    path = self.__dir.path/f'gen_{gen_num}'/f'ind_{ind_i}'
+    path=self.__dir.path/f'gen_{gen_num}'/f'ind_{ind_i}'
     ind.save_to(path/'model.gen')
     return [
       self.__calc_fitness(ind, path/f'iter_{i}')
