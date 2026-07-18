@@ -511,6 +511,7 @@
     % bgcolor=mietowy!10!white, % background on the number column is also changed
     breaklines,
     breakanywhere=false,
+    breakafter={+,\space},
     linenos,
     firstnumber=auto, % 2
     stepnumber=1, % 5
