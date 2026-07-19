@@ -3,7 +3,7 @@
 Projekt rozwiązania jest ważnym elementem do rozważenia,
 by implementacja nie zawierała błędów.
 Poniżej zostaną przedstawione projekt rozwiązania,
-a następnie implementacja.
+a~następnie implementacja.
 
 \section{Struktura projektu i~przebieg optymalizacji}
 \label{sec:proj_struct}
@@ -47,7 +47,7 @@ przewidywanych w~danych testowych oraz walidacyjnych,
 a~jeżeli te drugie są niedostępne to treningowych.
 Drugi z~policzonych błędów będzie zwany
 dalej błędem dopasowania walidacyjnego,
-a pierwsze analogicznie błędem dopasowania testowego.
+a~pierwsze analogicznie błędem dopasowania testowego.
 Błąd oraz uzyskane po korekcji przystosowanie,
 z~danych testowych nie będą wykorzystywane
 do żadnego procesu ewolucji,
@@ -199,7 +199,7 @@ Zostało przyjęte ograniczenie by macierz
 wag połączeń w~warstwach ukrytych sieci
 była niewiększa niż $128\text{MB}$.
 Każda komórka w~macierzy ma typ \texttt{float}.
-Typ ten może zajmować w zależności
+Typ ten może zajmować w~zależności
 od implementacji zajmuje $64\text{b} = 8\text{B}$
 lub $32\text{b} = 4\text{B}$.
 Jeżeli przyjęta zostanie wersja z~typem
@@ -466,7 +466,7 @@ użyte krzyżowanie przeznaczone
 do zmiennej długości genotypu,
 inspirowane metodą przedstawioną
 w~\citebook[cite={rys. 1}]{goldberg1989messy},
-w której przedstawione jest krzyżowanie dwupunktowe.
+w~której przedstawione jest krzyżowanie dwupunktowe.
 Natomiast jest on inny od opisanego
 w~wspomnianym dokumencie algorytmu,
 ponieważ o~ile pierwszy punkt podziału
@@ -838,7 +838,7 @@ jest w~bibliotece osobnik z~którego można
 uzyskać wszystkie parametry sieci,
 jeżeli ktoś chce również, na przykład,
 stosować kary dla liczby neuronów
-w poszczególnych warstwach.
+w~poszczególnych warstwach.
 
 Jeżeli użytkownik poda tylko
 dane treningowe i~testowe, to:\\
@@ -1100,7 +1100,7 @@ więc \texttt{1111110001} zostaje
 skorygowane względem \texttt{1011010010},
 które jest binarną reprezentacją wartości
 $m=v_{\max}-v_{\min}=724-2=722$.
-Korekcja wystąpi w sposób przedstawiony
+Korekcja wystąpi w~sposób przedstawiony
 na \cref{fig:bin_corr}.
 Drugi element po korekcie będzie miał wartość:
 \texttt{1011010001}$\displaystyle
@@ -1330,7 +1330,7 @@ ponieważ nie zostały przyjęte żadne przykładowe dane.
   \end{tabular}
   \caption{%
     Przykładowe dane, gdzie atrybuty wejściowe
-    i~wyjściowe znajdują się w jednej tabeli.
+    i~wyjściowe znajdują się w~jednej tabeli.
     Pierwszych jest 6 i~mają następujące nazwy:
     $x_1$, $x_2$, $x_3$, $x_4$, $x_5$ oraz $x_6$.
     A~4 atrybuty wyjściowe to:
@@ -1350,17 +1350,17 @@ pokazaną w~\cref{tab:example_data},
 a~do funkcji zostałoby podany parametr
 liczby atrybutów wejściowych równy
 $6$ lub $-4$, to $n=6 \land m=4$.
-W takim przypadku liczby neuronów kolejno
+W~takim przypadku liczby neuronów kolejno
 we wszystkich warstwach wyglądałyby następująco:
-$6$, $280$, $722$, $463$ i $600$, $4$.
+$6$, $280$, $722$, $463$, $600$ i~$4$.
 
 \subsubsection*{Wyjątek}
 Powyżej został opisany przykład konstrukcji
 dla danych o~problematyce regresyjnej.
-W przypadku problematyki klasyfikacyjnej
+W~przypadku problematyki klasyfikacyjnej
 warstwa wyjściowa ma zawsze funkcję
 aktywacji typu \texttt{softmax},
-a ostatni element podfenotypu listowego
+a~ostatni element podfenotypu listowego
 typów aktywacji jest ignorowany.
 
 \section{Implementacja}
@@ -1387,7 +1387,8 @@ z~typem \texttt{ndarray}.
   % autogobble,
 ]{python}{\codedir/core.py}
 
-Następnie wywoływana jest funkcja \texttt{get\_fit\_func} przygotowująca dane i ich sprawdzanie.
+Następnie wywoływana jest funkcja \texttt{get\_fit\_func}
+przygotowująca dane i~ich sprawdzanie.
 \inputminted[
   firstline=98,
   lastline=105,
@@ -1395,14 +1396,16 @@ Następnie wywoływana jest funkcja \texttt{get\_fit\_func} przygotowująca dane
 ]{python}{\codedir/core.py}
 
 Po powrocie sterowania do głównej
-funkcji tworzy ona obiekt pokoleń i oddelegowuje przeprowadznie ewolucji.
+funkcji tworzy ona obiekt pokoleń
+i~oddelegowuje przeprowadznie ewolucji.
 \inputminted[
   firstline=141,
   lastline=142,
   % autogobble,
 ]{python}{\codedir/core.py}
 
-Funkcja \texttt{get\_fit\_func} sprawdza czy tabele są dwuwymiarowe.
+Funkcja \texttt{get\_fit\_func}
+sprawdza czy tabele są dwuwymiarowe.
 \inputminted[
   firstline=203,
   lastline=208,
@@ -1428,7 +1431,7 @@ Mogą być regresyjne lub klasyfikacyjne.
 Zwracana funkcja oceniająca
 dopasowania walidacyjne oraz testowe,
 jest definiowana tak by przyjmować tylko osobnika
-oraz ścieżkę folderu do zapisu danych z uczenia.
+oraz ścieżkę folderu do zapisu danych z~uczenia.
 \inputminted[
   firstline=286,
   lastline=289,
@@ -1449,7 +1452,7 @@ Uczy stworzoną sieć.
   % autogobble,
 ]{python}{\codedir/utils.py}
 
-I oblicza błąd dopasowania walidacyjnego.
+I~oblicza błąd dopasowania walidacyjnego.
 \inputminted[
   firstline=322,
   lastline=329,
@@ -1471,7 +1474,9 @@ zostają wagi nauczonego modelu.
   % autogobble,
 ]{python}{\codedir/utils.py}
 
-I~metadane: liczba epok, wielkość wsadu, backend, liczba warstw ukrytych, historia strat podczas kolejnych epok oraz błędy dopasowań walidacyjnych i testowych.
+I~metadane: liczba epok, wielkość wsadu, backend,
+liczba warstw ukrytych, historia strat podczas kolejnych
+epok oraz błędy dopasowań walidacyjnych i~testowych.
 \inputminted[
   firstline=345,
   lastline=358,
@@ -1520,7 +1525,7 @@ i~pobierane są następnie wyniki.
 \subsection{%
   \refbykey{sec:population_class}{name}%
 }
-Obiekt populacji z którym występuje komunikacja powyżej od
+Obiekt populacji z~którym występuje komunikacja powyżej od
 razu podczas jego tworzenia generuje populację początkową.
 \inputminted[
   firstline=42,
@@ -1528,7 +1533,7 @@ razu podczas jego tworzenia generuje populację początkową.
   % autogobble,
 ]{python}{\codedir/classes/Population.py}
 
-I obliczane jest przystosowanie
+I~obliczane jest przystosowanie
 osobników do niej należących.
 \inputminted[
   firstline=62,
@@ -1545,7 +1550,7 @@ sieci jest poddawana uczeniu zadaną ilość razy.
   % autogobble,
 ]{python}{\codedir/classes/Population.py}
 
-Populacja jest w stanie wygenerować następną generację
+Populacja jest w~stanie wygenerować następną generację
 po wywołaniu metody \texttt{next\_generation}.
 Metoda ta wykonuje jedno pełne przejście generacji,
 czyli selekcję, krzyżowanie, mutację
@@ -1559,7 +1564,7 @@ i~obliczenie przystosowania osobników.
 \subsection{%
   \refbykey{sec:individual_genetic_code}{name}%
 }
-Kod genetyczny osobnika składa się z trzech podosobników:
+Kod genetyczny osobnika składa się z~trzech podosobników:
 \inputminted[
   firstline=54,
   lastline=70,
@@ -1677,7 +1682,8 @@ Początek krzyżowania:
 ]{python}{\codedir/classes/ListIndividual.py}
 
 I~dwa razy wykonuje się poniższe
-z~zamienionymi \texttt{a}~i~\texttt{b} oraz zamienioną kolejnością w \texttt{cross\_point}:
+z~zamienionymi \texttt{a}~i~\texttt{b}
+oraz zamienioną kolejnością w~\texttt{cross\_point}:
 \inputminted[
   firstline=44,
   lastline=44,
@@ -1702,14 +1708,20 @@ Początek krzyżowania:
 ]{python}{\codedir/classes/NetIndividual.py}
 
 I~dwa razy wykonuje się poniższe
-z~zamienionymi \texttt{a}~i~\texttt{b} oraz zamienioną kolejnością w dwóch ostatnich częściach \texttt{cross\_point}:
+z~zamienionymi \texttt{a}~i~\texttt{b}
+oraz zamienioną kolejnością w~dwóch
+ostatnich częściach \texttt{cross\_point}:
 \inputminted[
   firstline=77,
   lastline=85,
   % autogobble,
 ]{python}{\codedir/classes/NetIndividual.py}
 
-Dopasowanie liczby elementów dzieje się w metodzie \texttt{\_update}. Jest to podzielone na dwa etapy. Pierwszy to identyfikacja zbyt krótkich fenotypów i bezpośrednie skrócenie zbyt długich.
+Dopasowanie liczby elementów dzieje
+się w~metodzie \texttt{\_update}.
+Jest to podzielone na dwa etapy.
+Pierwszy to identyfikacja zbyt krótkich
+fenotypów i~bezpośrednie skrócenie zbyt długich.
 \inputminted[
   firstline=101,
   lastline=113,
@@ -1741,7 +1753,7 @@ podosobnikach nastąpi mutacja:
   % autogobble,
 ]{python}{\codedir/classes/NetIndividual.py}
 
-W podosobniku następuje kolejne losowanie,
+W~podosobniku następuje kolejne losowanie,
 który bit zostanie zmieniony i~on ma zamienioną wartość.
 Bit o~wartości $1$ staje się $0$ i~odwrotnie.
 
@@ -1752,7 +1764,7 @@ Dzieje się to tak samo dla podosobnika sekwencyjnego:
   % autogobble,
 ]{python}{\codedir/classes/GenIndividual.py}
 
-Jak i listowego:
+Jak i~listowego:
 \inputminted[
   firstline=49,
   lastline=52,
@@ -1762,8 +1774,9 @@ Jak i listowego:
 \subsection{%
   \refbykey{sec:fittness}{name}%
 }
-W podrozdziale dotyczącym implementacji klasy pokoleń zostało pokazane jak realizuje się kilku-krotne uczenie.
-Funkcja korygująca w kodzie ma postać:
+W~podrozdziale dotyczącym implementacji klasy pokoleń
+zostało pokazane jak realizuje się kilku-krotne uczenie.
+Funkcja korygująca w~kodzie ma postać:
 \inputminted[
   firstline=17,
   lastline=23,
@@ -1786,7 +1799,7 @@ jest realizowana przez poniższe funkcje:
 \subsubsection{%
   \refbykey{subsec:fenotype_seq}{name}%
 }
-Uzyskanie fenotypu w podosobniku sekwencyjnym polega
+Uzyskanie fenotypu w~podosobniku sekwencyjnym polega
 na odczytaniu kolejno części kodu binarnego
 respektując długości poszczególnych parametrów:
 \inputminted[
@@ -1799,9 +1812,9 @@ respektując długości poszczególnych parametrów:
   \refbykey{subsec:fenotype_list_nnum}{name}
   oraz \refbykey{subsec:fenotype_list_tactiv}{name}%
 }
-Uzyskanie fenotypu w podosobniku listowym polega
+Uzyskanie fenotypu w~podosobniku listowym polega
 na odczytaniu kolejno części kodu binarnego
-respektując długość elementów w danym podosobniku:
+respektując długość elementów w~danym podosobniku:
 \inputminted[
   firstline=47,
   lastline=56,
@@ -1853,14 +1866,16 @@ zostaje przypisany \texttt{softmax}:
   % autogobble,
 ]{python}{\codedir/utils.py}
 
-Następnie tworzony jest szkic struktury modelu, wraz z odpowiednimi typami funkcji aktywacyji:
+Następnie tworzony jest szkic struktury modelu,
+wraz z~odpowiednimi typami funkcji aktywacyji:
 \inputminted[
   firstline=60,
   lastline=63,
   % autogobble,
 ]{python}{\codedir/utils.py}
 
-A ostatecznie model jest tworzony z wskazanym optymalizatorem oraz wskaźnikiem uczenia się.
+A~ostatecznie model jest tworzony z~wskazanym
+optymalizatorem oraz wskaźnikiem uczenia się.
 \inputminted[
   firstline=64,
   lastline=70,
