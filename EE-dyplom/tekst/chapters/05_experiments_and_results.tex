@@ -1,65 +1,53 @@
 \chapter{Testy i~wyniki}
 \label{chap:test_and_result}
 \section{Procedura badawcza i~ocena skuteczności}
-W~celu rzetelnej weryfikacji skuteczności zaproponowanego
-algorytmu genetycznego zaplanowano eksperymenty porównawcze
-z~wykorzystaniem metody przeszukiwania
-losowego (ang. \textit{Random Search}).
-Zastosowanie tej metody jako rozwiązania bazowego
-(ang. \textit{baseline}) stanowi standard w~ocenie
-algorytmów metaheurystycznych, pozwalając wykazać,
-że kierunkowy proces optymalizacji ewolucyjnej
-dostarcza rozwiązania o~wyższej jakości niż czysto
-stochastyczna eksploracja przestrzeni poszukiwań.
+Aby poprawnie zweryfikować skuteczność
+rozwiązania przedstawionego w~niniejszej
+pracy zostanie użyty eksperyment porównawczy.
+Jako punkt odniesienia (ang. \textit{baseline})
+zostanie użyte \gls{RS}.
+Pozwoli ona wykazać, że zaproponowana metoda optymalizacji
+pozwala na znalezienie rozwiązania o~jakości wyższej
+niż stochastyczne przeszukiwanie przestrzeni rozwiązań.   
 
 \subsection{Budżet eksperymentów}
-Aby zagwarantować uczciwe warunki
-porównania (ang. \textit{fair comparison}),
-dla obu algorytmów zdefiniowano ścisły
-i~identyczny budżet obliczeniowy.
-Został on wyrażony poprzez maksymalną dopuszczalną
-liczbę ewaluacji modeli sieci neuronowych,
-którą ustalono na $1500$ nauczeń modeli
-sieci na jeden eksperyment.
+W~celu zagwarantowania równych warunków
+obu algorytmom konieczne było przydzielenie
+dla nich takich samych warunków.
+Ze względu na ilość obliczeń koniecznych do wykonania przy
+najbardziej optymalnym z~wyznaczonych zestawie parametrów,
+został wybrany mniej wymagający obliczeniowo
+budżet kosztem trochę mniej optymalnego zbioru.
+Zostały one określone przez liczbę potencjalnych rozwiązań,
+która została ustalona na $500$ osobników.
 
-W~przypadku algorytmu genetycznego budżet ten jest
-realizowany poprzez ewolucję populacji bazowej
-liczącej $50$ osobników przez okres $10$ pokoleń.
-Uczenie każdego modelu będzie odbywało się $3$~razy,
-co daje $50 \times 10 \times 3 = 1500$ nauczonych modeli.
+Metoda \gls{GAAML} wykorzystuje określony budżet poprzez
+populację liczącą $50$ osobników oraz liczbę $10$ pokoleń,
+co daje $50 \times 10 = 500$ architektur.
 
-Dla metody Random Search,
-budżet zostaje wykorzystany do wylosowania,
-wytrenowania i~oceny dokładnie
-$500$ niezależnych architektur.
-Ocena odbywać się będzie przez $3$-krotne uczenie,
-z~czego wynika $500 \times 3 = 300$ nauczonych modeli.
+Natomiast w~przypadku \gls{RS} zostanie wylosowanych
+i~ocenionych dokładnie $500$ niezależnych architektur.
 
-Oba przypadki do treningu pojedynczej sieci
-wykorzystują wyłącznie zbiór treningowy,
-a~wewnątrzprocesowa ocena modelu
-dokonywana jest na zbiorze walidacyjnym.
-Ocena ta będzie polegała na wyznaczenie błędu
-dopasowania i~przystosowania na potrzeby
-selekcji lub zapisu najlepszego wyniku.
+Obie metody będą uczone i~oceniane według
+opisu z~\cref{sec:fittness} dla przypadku,
+gdzie dane walidacyjne są podane.
 
 \subsection{Metryka}
-Końcowym etapem eksperymentu jest weryfikacja rozwiązań,
-które zwyciężyły w~procesie optymalizacji.
-Wykorzystywany jest do tego wydzielony zbiór testowy,
-który przez cały czas trwania algorytmu ewolucyjnego
-oraz przeszukiwania losowego pozostaje niedostępny
-dla procesu optymalizacyjnego.
+Ostatnim etapem jest weryfikacja,
+który z~sposobów przeszukiwania przestrzeni
+rozwiązań okazał się skuteczniejszy.
+Zostanie do tego wykorzystany zbiór testowy.
 
-Podstawową metryką ewaluacji jakości końcowej
-będzie \gls{MSE} obliczony na zbiorze testowym.
-Porównanie ostatecznej wartości \gls{MSE}
-dla najlepszego osobnika wyłonionego
-przez algorytm genetyczny oraz najlepszego
-modelu wytypowanego przez metodę przeszukiwania
-losowego stanowi podstawę do wnioskowania
-o~przydatności i~przewadze zastosowanego
-rozwiązania optymalizacyjnego.
+Porównanie będzie odbywało się przy pomocy \gls{MSE}.
+Funkcja ta daje wartości ze zbioru $\left[0, \infty\right)$.
+Ponieważ określa ona ``odległość''
+jednych danych od drugich, to znaczy,
+że im większa będzie wartość zwrócona,
+tym dane te będą bardziej niedopasowane do oczekiwanych,
+a~wartość $0$ oznacza idealne dopasowanie.
+Oznacza to, że metoda, która będzie miała mniejszą zwróconą
+wartość \gls{MSE} dla najlepszej sieci z~danej metody na
+zbiorze testowym, jest przydatniejsza i~skuteczniejsza.
 
 \section{Przeprowadzenie eksperymentów}
 \section{Wyniki eksperymentów}
