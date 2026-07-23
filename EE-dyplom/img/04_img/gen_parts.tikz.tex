@@ -48,7 +48,7 @@
 
   \node[
     umlclass,
-    below left=1.5cm and -3.2cm of Ind,
+    below left=1.5cm and -3.1cm of Ind,
   ] (SI) {%
     \begin{tabular}{>{\raggedright\arraybackslash}p{4.1cm}}
       \multicolumn{1}{c}{\textbf{Sequential Individual}}
@@ -60,7 +60,7 @@
 
   \node[
     umlclass,
-    below right=1.5cm and -3.2cm of Ind,
+    below right=1.5cm and -3.1cm of Ind,
   ] (LI) {%
     \begin{tabular}{>{\raggedright\arraybackslash}p{3.5cm}}
       \multicolumn{1}{c}{\textbf{List Individual}}
@@ -114,11 +114,14 @@
       fill=white,
       align=center,
       yshift=-5.2mm,
+      xshift=.4pt,
       font=\scriptsize,
     ] {\texttt{%
-      {\textless}tuple{\textless}int, lcpt, lcpt{\textgreater},
+      {\textless}%
+        tuple{\textless}int, lcpt, lcpt{\textgreater},%
     }\\\texttt{%
-      tuple{\textless}MNSI, MNLI, MNLI{\textgreater}{\textgreater}%
+        tuple{\textless}MNSI, MNLI, MNLI{\textgreater}%
+      {\textgreater}%
     }}
     (Ind.south)
   ;
