@@ -103,6 +103,15 @@ folderu podanego uprzednio przez użytkownika.
 Podczas tworzenia obiektu od razu generowana
 jest populacja początkowa i~obliczane są wartości
 przystosowania osobników należących do niej.
+Generowanie osobników do populacji
+początkowej składa się z dwóch etapów.
+Pierwszym z nich jest wygenerowanie części sekwencyjnej,
+które następuje przez wylosowanie zadanej liczby bitów.
+W podobny sposób w drugim etapie
+generowane są części listowe,
+jednakże liczba bitów do wylosowania jest
+określana dzięki parametrowi liczby warstw
+ukrytych z~uprzednio zdobytej części sekwencyjnej.
 Obliczenie przystosowania polega na nauczeniu
 kilku sieci o~tej samej architekturze,
 obliczeniu dla nich błędu dopasowania walidacyjnego,
@@ -1534,8 +1543,49 @@ razu podczas jego tworzenia generuje populację początkową.
   % autogobble,
 ]{python}{\codedir/classes/Population.py}
 
-I~obliczane jest przystosowanie
-osobników do niej należących.
+Generowanie osobników do populacji
+początkowej składa się z~dwóch etapów.
+Pierwszym etapem jest wygenerowanie części sekwencyjnej.
+\inputminted[
+  firstline=54,
+  lastline=54,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Które następuje przez
+wylosowanie zadanej liczby bitów.
+\inputminted[
+  firstline=15,
+  lastline=15,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+Drugi etap generowania rozpoczyna się odczytaniem
+liczby ukrytych warstw dla danego osobnika
+z~wygenerowanej części sekwencyjnej.
+\inputminted[
+  firstline=55,
+  lastline=55,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+A następnie są generowane części listowe.
+\inputminted[
+  firstline=56,
+  lastline=69,
+  % autogobble,
+]{python}{\codedir/classes/NetIndividual.py}
+
+Które odbywa się przez
+wylosowanie zadanej liczby bitów.
+\inputminted[
+  firstline=25,
+  lastline=26,
+  % autogobble,
+]{python}{\codedir/classes/GenIndividual.py}
+
+Następnie obliczane jest przystosowanie
+osobników należących do populacji początkowej.
 \inputminted[
   firstline=62,
   lastline=62,
@@ -1567,7 +1617,7 @@ i~obliczenie przystosowania osobników.
 }
 Kod genetyczny osobnika składa się z~trzech podosobników:
 \inputminted[
-  firstline=54,
+  firstline=70,
   lastline=70,
   % autogobble,
 ]{python}{\codedir/classes/NetIndividual.py}
