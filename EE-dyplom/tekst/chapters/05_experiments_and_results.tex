@@ -1,5 +1,29 @@
 \chapter{Testy i~wyniki}
 \label{chap:test_and_result}
+Eksperymenty są konieczne by wyznaczyć
+optymalne parametry dla algorytmu genetycznego,
+dodatkowo konieczne jest zbadanie czy rozwiązanie daje
+lepsze efekty niż stochastyczne przeszukiwanie przestrzeni.
+Poniższe eksperymenty będą używały wartości
+błędu \gls{MSE} jako elementu porównawczego.
+Można go użyć przy problematyce
+klasyfikacyjnej oraz regresyjnej, dzięki temu,
+że wyjście w~danych z~wyjściem klasyfikacyjnym musi
+być w~formacie $1$~z~$n$ (ang. \textit{one-hot}).
+Taki format powoduje, że jest ``równa odległość''
+dla każdej niepoprawnej odpowiedzi.
+
+\section{Procedura wyznaczenia optymalnych parametrów}
+Parametry, które zostają poddane wyznaczeniu,
+to liczba osobników w~populacji i~generacji,
+współczynnik w~funkcji korygującej
+oraz współczynnik krzyżowania i~mutacji.
+
+Wartość parametru wybierano na podstawie
+najniższej średniej wartości \gls{MSE}.
+
+\tocless\subsection{Wyniki}
+
 \section{Procedura badawcza i~ocena skuteczności}
 Aby poprawnie zweryfikować skuteczność
 rozwiązania przedstawionego w~niniejszej
@@ -50,4 +74,5 @@ wartość \gls{MSE} dla najlepszej sieci z~danej metody na
 zbiorze testowym, jest przydatniejsza i~skuteczniejsza.
 
 \section{Przeprowadzenie eksperymentów}
+
 \section{Wyniki eksperymentów}
