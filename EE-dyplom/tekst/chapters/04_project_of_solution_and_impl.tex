@@ -263,7 +263,9 @@ to nadmiarowe elementy zostaną zignorowane w~fenotypie.
 
 \begin{figure}
   \centering
-  \scalebox{0.93}{\input{img/04_img/gen_parts.tikz.tex}}
+  \resizebox{\textwidth}{!}{%
+    \input{img/04_img/gen_parts.tikz.tex}%
+  }
   {%
     \renewcommand{\thesubfigure}{I}%
     \phantomsubcaption\label{subfig:gen_parts_I}%
@@ -1324,21 +1326,7 @@ ponieważ nie zostały przyjęte żadne przykładowe dane.
 
 \begin{table}
   \centering
-  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-    \hline
-      $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$
-      & $y_1$ & $y_2$ & $y_3$ & $y_4$ \\
-    \hline
-      $0.767$ & $0.352$ & $0.663$ & $0.876$ & $0.612$
-      & $0.094$ & $0.287$ & $0.218$ & $0.626$ & $0.369$ \\
-      $0.670$ & $0.886$ & $0.535$ & $0.031$ & $0.073$
-      & $0.239$ & $0.519$ & $0.723$ & $0.639$ & $0.717$ \\
-      \vdots & \vdots & \vdots & \vdots &\vdots
-      & \vdots & \vdots & \vdots & \vdots & \vdots\\
-      $0.898$ & $0.884$ & $0.735$ & $0.082$ & $0.453$
-      & $0.533$ & $0.066$ & $0.891$ & $0.066$ & $0.173$ \\
-    \hline
-  \end{tabular}
+  \input{tab/tab_04/example_data.tex}
   \caption{
     Przykładowe dane, gdzie atrybuty wejściowe
     i~wyjściowe znajdują się w~jednej tabeli.

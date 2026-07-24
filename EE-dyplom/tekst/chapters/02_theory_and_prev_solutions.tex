@@ -371,10 +371,10 @@ przedstawia \cref{fig:genetic_flow},
 którego szczególne elementy są omawiane
 w~poniższych podrozdziałach.
 \begin{figure}
-  \centering \scalebox{0.9}{%
+  \centering
+  \resizebox{.95\textwidth}{!}{%
     \input{img/02_img/genetic_flow.tikz.tex}%
   }
-  % \centering \input{img/02_img/genetic_flow.tikz.tex}
   \caption{
     Klasyczny przebieg algorytmu genetycznego
     opisany w~\citebook{eiben2015evolutionary}.
@@ -607,7 +607,8 @@ ewolucyjnie sieć do ustawionej
 przez użytkownika maksymalnej
 wielkości sieci (ilości neuronów).
 \begin{figure}
-  \centering \scalebox{0.85}{%
+  \centering
+  \resizebox{.95\textwidth}{!}{%
     \input{img/02_img/miller1989.tikz.tex}%
   }
   \caption{
@@ -807,17 +808,8 @@ Kod genetyczny przedstawiony jest
 jako trzy liczby oraz dwie listy,
 co zostało uwidocznione na \cref{tab:domashova2021}.
 \begin{table}
-  \centering \begin{tabularx}{0.9\textwidth}{%
-    >{\hsize=\dimexpr2\hsize+\tabcolsep}XXXXXXX%
-  }
-    \hline
-    Osobnik & epoki & rozmiar
-      & warstwy & neurony & aktywacje\\\hline
-    Osobnik a & 4 & 912
-      & 2 & [9, 1] & [1, 0]\\
-    Osobnik b & 3 & 686
-      & 3 & [6, 19, 21] & [0, 1, 0]\\\hline
-  \end{tabularx}
+  \centering
+  \input{tab/tab_02/domashova2021.tex}
   \caption{
     Przykładowe kody genetyczne
     z~\citebook[cite={tab. 2}]{domashova2021optimal}.
