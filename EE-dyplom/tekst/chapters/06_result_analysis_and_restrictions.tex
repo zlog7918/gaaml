@@ -12,12 +12,62 @@ procesy uczenia się w~prezentowanej bibliotece.
 
 \subsection{Wyniki}
 \label{subsec:result_analysis}
+Wyniki eksperymentów wykazują, iż biblioteka,
+powstała na potrzeby niniejszej pracy,
+umożliwia skuteczniejsze przeszukiwanie przestrzeni
+rozwiązań niż metoda o~charakterze czysto stochastycznym.
+Osiąga te wyniki również w~mniejszym okresie czasu,
+jeżeli złożoność danych na to pozwala.
+We wszystkich trzech uruchomieniach biblioteka
+\gls{GAAML} uzyskała niższe wartości funkcji \gls{MSE},
+niż stochastyczna metoda \gls{RS}.
+Dodatkowo również najmniej korzystny wynik spośród
+najlepszych w~trzech uruchomieniach był lepszy niż najlepsza
+sieć uzyskana dzięki \gls{RS} w~trzech uruchomieniach. 
+
+Wyniki te są zgodne z~oczekiwaniami
+względem działania algorytmu genetycznego.
+W~przeciwieństwie do wybranej metody stochastycznej,
+algorytm genetyczny wszystkie swoje osobniki -- z~wyjątkiem
+pierwszego pokolenia -- tworzy względem poprzednich.
+W~ten sposób za pomocą selekcji, krzyżowania
+oraz mutacji algorytm stopniowo przeszukuje przestrzeń
+rozwiązań w~kierunku rozwiązań o~wyższym przystosowaniu.
 
 \subsection{Przebieg uczenia}
 \label{subsec:learning_analysis}
+Przebiegi przedstawione na wykresach pokazują,
+że największa poprawa następuje
+w~kilku pierwszych pokoleniach.
+Po osiągnięciu wyższego przystosowania
+stopień poprawy jakości maleje,
+a~w~późniejszych pokoleniach można
+zauważyć nawet pogorszenie jakości.
+Co jest naturalne w~przypadku
+losowej charakterystyki procesów
+oraz braku mechanizmu elitaryzmu.
+
+Ważnym aspektem nauczania jest funkcja korygująca,
+dzięki której preferowane są mniej złożone sieci,
+o~ile pozwala na to złożoność danych,
+czyli nie doprowadzi to do znaczącego
+pogorszenia jakości predykcji.
+W~ten sposób optymalizowane jest
+zagadnienie dokładności modeli
+wraz z~złożonością ich architektury.
 
 \section{Ograniczenia badań}
 \label{sec:restrictions}
+Ważnym aspektem przedstawionych wyników jest,
+iż dotyczą wyłącznie badanego zbioru
+danych oraz przyjętego budżetu.
+Nie można z~tego powodu jednoznacznie stwierdzić,
+że wykazana przewaga będzie w~takim samym stopniu widnieć
+przy innych zagadnieniach z~zakresu uczenia maszynowego.
+Ponadto porównanie zostało dokonane
+wyłączenie z~stochastyczną metodą.
+W następnych badaniach można przeprowadzić testy
+z~innymi metodami optymalizacji architektur.
 
 \section{Podsumowanie analizy}
 \label{sec:summary_analysis}
