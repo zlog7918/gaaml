@@ -149,13 +149,25 @@ definicję wielowarstwowego perceptronu%
 \begin{figure}
   \centering
   \subcaptionbox{\gls{FNN}\label{subfig:fnn}}{%
-    \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio}
-    \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn.drawio.pdf}
+    \immediate\write18{%
+      sh ./img/drawio_to_pdf img/02_img/fnn/fnn.drawio
+    }
+    \includegraphics[
+      trim={0 0 0 0},
+      height=6.5cm,
+      clip,
+    ]{img/02_img/fnn/fnn.drawio.pdf}
   }
   \hspace{2cm}
   \subcaptionbox{\gls{MLP}\label{subfig:fnn_mlp}}{%
-    \immediate\write18{sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio}
-    \includegraphics[trim={0 0 0 0}, height=6.5cm, clip]{img/02_img/fnn/fnn_mlp.drawio.pdf}
+    \immediate\write18{%
+      sh ./img/drawio_to_pdf img/02_img/fnn/fnn_mlp.drawio
+    }
+    \includegraphics[
+      trim={0 0 0 0},
+      height=6.5cm,
+      clip,
+    ]{img/02_img/fnn/fnn_mlp.drawio.pdf}
   }
   \caption{
     Przedstawione dwie sieci neuronowe
@@ -233,18 +245,21 @@ do zadawalającej generalizacji.
 \begin{figure}
   \centering
   \begin{subfigure}{0.3\textwidth}
+    \centering
     \input{img/02_img/fitting/under.tikz.tex}
     \caption{Zbyt prosty model}
     \label{subfig:underfitting}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.3\textwidth}
+    \centering
     \input{img/02_img/fitting/good.tikz.tex}
     \caption{Odpowiedni model}
     \label{subfig:appropriate_capacity}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.3\textwidth}
+    \centering
     \input{img/02_img/fitting/over.tikz.tex}
     \caption{Zbyt złożony model}
     \label{subfig:overfitting}
