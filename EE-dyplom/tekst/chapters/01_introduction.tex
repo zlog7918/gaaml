@@ -135,8 +135,9 @@ W~pracy podjęto próbę odpowiedzi
 na następujące pytania badawcze:
 \begin{nospitemize}
   \item Czy zastosowanie algorytmu genetycznego
-    pozwala uzyskać modele o~jakości porównywalnej
-    lub wyższej niż modele projektowane manualnie?
+    pozwala uzyskać modele o~jakości wyższej
+    niż modele wybrane przez stochastyczną
+    metodę przeszukiwania przestrzeni?
   \item Jak parametry algorytmu genetycznego wpływają
     na skuteczność procesu optymalizacji?
   \item Jak zmienia się czas trwania optymalizacji
@@ -180,16 +181,13 @@ deterministyczny ma doprowadzić
 do danej architektury
 i~parametrów uczenia.
 
-Przeprowadzenie eksperymentów obejmuje
-sprawdzenie czy automatycznie dobrane sieci
-są porównywalnej lub lepszej jakości
-jak wybrane manualnie oraz porównanie
+Przeprowadzenie eksperymentów obejmuje porównanie
 określonych parametrów dla algorytmu genetycznego,
-by wybrać domyślne parametry
-dla algorytmu genetycznego.
-Parametry obejmują liczbę generacji
-i~osobników w~populacji
-oraz współczynnik krzyżowania i~mutacji.
+by wybrać dla niego domyślne parametry oraz sprawdzenie
+czy automatycznie dobrane sieci są lepszej jakości
+jak stworzone przez metodę stochastyczną.
+Parametry obejmują liczbę generacji i~osobników
+w~populacji oraz współczynnik krzyżowania i~mutacji.
 
 \section*{Ograniczenia}
 W~pracy rozważane są wyłącznie
@@ -231,7 +229,7 @@ Niniejsza praca składa się
 z~\total{chapter} rozdziałów.
 Obecny rozdział opisuje cele pracy,
 pytania badawcze, zakres, ograniczenia,
-tezę, a~w~niniejszej sekcji
+tezę oraz w~niniejszej sekcji
 znajduje się informacja o~strukturze dokumentu.
 
 \Cref{chap:theory} zawiera teorię
@@ -250,3 +248,7 @@ i~co biblioteka powinna w~ogólnym zarysie wykonywać.
 \Cref{chap:sol_and_impl} zawiera opis projektu rozwiązania
 i~implementacji. Przedstawia, co biblioteka powinna
 udostępniać i~w~jaki sposób działa implementacja.
+
+\Cref{chap:test_and_result} opisuje metodykę eksperymentów,
+a~następnie pokazuje jakie są ich wyniki i~wstępnie
+je omawia, pod względem charakterystyk wykresów.
