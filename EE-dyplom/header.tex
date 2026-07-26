@@ -207,13 +207,13 @@
 \edef\codedir{../proj/src/gaaml}
 
 % way to show some color in box
-\def\showcolor#1{{%
+\def\showcolor#1#2{{%
   \raisebox{-1pt}{%
     \protect\tikz{%
       \protect\node[
         rectangle,
         fill=#1,
-        fill opacity=.3,
+        fill opacity=#2,
         draw=black,
         thick,
       ] (a) {};%
