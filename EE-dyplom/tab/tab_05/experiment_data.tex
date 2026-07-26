@@ -1,0 +1,38 @@
+{%
+  \makeatletter
+    \DeclareRobustCommand\myvdots{%
+      \vbox{%
+        \baselineskip4\p@%
+        \lineskiplimit\z@%
+        \vspace{3pt}\hbox{.}\hbox{.}\hbox{.}%
+      }%
+    }
+  \makeatother
+  \begin{tabular}{|r|r|r|r|r|r|r|r|r|r|}
+    \hline
+      \multicolumn{1}{|c|}{\textbf{ID}} & \multicolumn{1}{c|}{\textbf{MedInc}} & \multicolumn{1}{c|}{\textbf{HouseAge}} & \multicolumn{1}{c|}{\textbf{AveRooms}} & \multicolumn{1}{c|}{\textbf{AveBedrms}} & \multicolumn{1}{c|}{\textbf{Population}} & \multicolumn{1}{c|}{\textbf{AveOccup}} & \multicolumn{1}{c|}{\textbf{Latitude}} & \multicolumn{1}{c|}{\textbf{Longitude}} & \multicolumn{1}{c|}{\textbf{Price}} \\
+    \hline
+      \textbf{0} & $8.3252$ & $41$ & $6.984127$ & $1.02381$ & $322$ & $2.555556$ & $37.88$ & $-122.23$ & 4.526 \\
+    \cline{1-1}
+      \textbf{1} & $8.3014$ & $21$ & $6.238137$ & $0.97188$ & $2401$ & $2.109842$ & $37.86$ & $-122.22$ & 3.585 \\
+    \cline{1-1}
+      \textbf{2} & $7.2574$ & $52$ & $8.288136$ & $1.073446$ & $496$ & $2.80226$ & $37.85$ & $-122.24$ & 3.521 \\
+    \cline{1-1}
+      \textbf{3} & $5.6431$ & $52$ & $5.817352$ & $1.073059$ & $558$ & $2.547945$ & $37.85$ & $-122.25$ & 3.413 \\
+    \cline{1-1}
+      \textbf{4} & $3.8462$ & $52$ & $6.281853$ & $1.081081$ & $565$ & $2.181467$ & $37.85$ & $-122.25$ & 3.422 \\
+    \hline
+      \textbf{\myvdots\hspace{.125em}} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} & \myvdots\hspace{.25em} \\
+    \hline
+    \textbf{20635} & $1.5603$ & $25$ & $5.045455$ & $1.133333$ & $845$ & $2.560606$ & $39.48$ & $-121.09$ & 0.781 \\
+    \cline{1-1}
+    \textbf{20636} & $2.5568$ & $18$ & $6.114035$ & $1.315789$ & $356$ & $3.122807$ & $39.49$ & $-121.21$ & 0.771 \\
+    \cline{1-1}
+    \textbf{20637} & $1.7$ & $17$ & $5.205543$ & $1.120092$ & $1007$ & $2.325635$ & $39.43$ & $-121.22$ & 0.923 \\
+    \cline{1-1}
+    \textbf{20638} & $1.8672$ & $18$ & $5.329513$ & $1.17192$ & $741$ & $2.123209$ & $39.43$ & $-121.32$ & 0.847 \\
+    \cline{1-1}
+    \textbf{20639} & $2.3886$ & $16$ & $5.254717$ & $1.162264$ & $1387$ & $2.616981$ & $39.37$ & $-121.24$ & 0.894 \\
+    \hline
+  \end{tabular}%
+}

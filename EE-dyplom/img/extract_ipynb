@@ -1,0 +1,104 @@
+#!/bin/sh
+jq=/usr/bin/jq
+
+usage() {
+  printf 'Usage:\n\t%s\n%s' \
+    "$0 code <notebook.ipynb> <output.py> <cell_id>" \
+    "$0 txt <notebook.ipynb> <output.txt> <cell_id> <output_id>" \
+    "$0 image <notebook.ipynb> <output.png> <cell_id> <output_id>" >&2
+  exit 1
+}
+
+err() {
+  printf '%s\n' "$1" >&2
+  exit 1
+}
+
+_assert_code_cell() {
+  "$jq" -e \
+    ".cells[$cell_id].cell_type==\"code\"" \
+    "$ipynb" >/dev/null \
+      || err 'given cell is not code cell'
+  # "$jq" \
+  #   -r ".cells[$cell_id]" \
+  #   "$ipynb"
+}
+
+extract_code() {
+  _assert_code_cell
+
+  "$jq" -r \
+    ".cells[$cell_id].source | join(\"\")" \
+    "$ipynb" >"$outfile"
+}
+
+extract_text() {
+  _assert_code_cell
+
+  "$jq" -e \
+    ".cells[$cell_id].outputs[$output_id] | (
+      .output_type==\"execute_result\"
+      or (
+        .output_type==\"stream\"
+        and .name==\"stdout\"
+      )
+    )" \
+    "$ipynb" >/dev/null \
+      || err 'given output of cell is not text'
+
+  "$jq" -r \
+    ".cells[$cell_id].outputs[$output_id] | select(
+      (.output_type==\"execute_result\") or
+      (.output_type==\"stream\" and .name==\"stdout\")
+    ) | if .output_type == \"execute_result\"
+    then
+      .data[\"text/plain\"] | join(\"\")
+    else
+      .text | join(\"\")
+    end" \
+    "$ipynb" >"$outfile"
+}
+
+extract_image() {
+  _assert_code_cell
+
+  "$jq" -e \
+    ".cells[$cell_id].outputs[$output_id] | (
+      .output_type==\"display_data\"
+      and (.data | has(\"image/png\"))
+    )" \
+    "$ipynb" >/dev/null \
+      || err 'given output of cell is not figure'
+
+  "$jq" -r \
+    ".cells[$cell_id].outputs[$output_id].data[\"image/png\"]" \
+    "$ipynb" \
+    | base64 -d >"$outfile"
+}
+
+[ $# -ge 4 ] && [ $# -le 5 ] || usage
+mode="$1"
+ipynb="$2"
+outfile="$3"
+cell_id="$4"
+mkdir -p "$(dirname "$outfile")"
+
+case "$mode" in
+  code)
+    [ $# -eq 4 ] || usage
+    extract_code
+  ;;
+  txt)
+    [ $# -eq 5 ] || usage
+    output_id=$5
+    extract_text
+  ;;
+  image)
+    [ $# -eq 5 ] || usage
+    output_id=$5
+    extract_image
+  ;;
+  *)
+    usage
+  ;;
+esac
