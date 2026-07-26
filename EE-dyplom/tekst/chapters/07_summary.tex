@@ -1,2 +1,98 @@
 \chapter{Podsumowanie}
 \label{chap:summary}
+
+\section*{Cele projektu}
+Niniejsza praca miała na celu opracowanie biblioteki,
+która wspomaga automatyczny dobór architektury sieci
+\gls{pMLP} wraz z~jej parametrami uczenia.
+W~ramach realizacji tego stworzona została
+biblioteka \acrfull{GAAML} w~języku Python.
+Ten cel oraz wszystkie założone szczegółowe
+cele zostały zrealizowane.
+
+Została zaprojektowana jednoznaczna reprezentacja genetyczna
+struktury sieci wraz z~jej parametrami uczenia.
+Zaimplementowane zostały mechanizmy
+ewolucyjne oraz ewaluacja modeli.
+Dodatkowo biblioteka podczas optymalizacji w~pełni
+archiwizuje badane osobniki wraz z wyuczonymi wagami,
+dzięki czemu późniejsza analiza wyników jest dużo łatwiejsza
+oraz użytkownik może wybrać, który model sieci chce,
+nie tylko ten wyróżniony przez algorytm jako najlepszy.
+
+\section*{Wkład własny}
+Wkład własny w~niniejszą pracę, poza niniejszym dokumentem,
+wyraża się w dostarczonym rozwiązaniu praktycznym
+w~postaci biblioteki \gls{GAAML}.
+Stworzone narzędzie opiera się na autorskim
+sposobie krzyżowania oraz funkcji korygującej
+uwzględniającej złożoność osobnika.
+
+Biblioteka dzięki temu umożliwia
+nienadzorowaną optymalizację,
+a~sama implementacja jest modularna i~elastyczna,
+co pozwala na stosunkowo prostą integrację
+z~istniejącymi projektami czy dalsze jej rozwijanie.
+
+\section*{Streszczenie wyników eksperymentów}
+Testy w~\cref{chap:test_and_result}
+jednoznacznie potwierdziły tezę pracy.
+Algorytm ewolucyjny, operując
+w~tym samym i~z~góry określonym budżecie,
+wykazał się we wszystkich testach większym
+przystosowaniem najlepszego osobnika niż sieci
+powstałe z~metody czysto stochastycznej,
+czyli przeszukiwania losowego.
+
+\section*{Odpowiedzi na pytania badawcze}
+\textbf{%
+  Czy zastosowanie algorytmu genetycznego
+  pozwala uzyskać modele o~jakości wyższej
+  niż modele wybrane przez stochastyczną
+  metodę przeszukiwania przestrzeni?%
+}\\
+Tak, zostało wykazane to przez eksperymenty, w~których algorytm genetyczny wykazał się większą skutecznością i~szybszym działaniem.
+
+\textbf{%
+  Jak parametry algorytmu genetycznego wpływają
+  na skuteczność procesu optymalizacji?%
+}\\
+Parametry algorytmu takie jak prawdopodobieństwo mutacji i krzyżowania definiują jak różnorodne są rozwiązania oraz jak są rozwiązania eksploatowane. Współczynnik korekcyjny bezpośrednio wpływa na to jak ważna jest mała złożoność sieci w~stosunku do trafnych odpowiedzi modelu.
+Liczba osobników w populacji definiowała możliwości jednoczesnej eksploracji algorytmu, a liczba pokoleń wskazywała jak dużo jest dostępnego czasu na poszukiwanie optymalnego rozwiązania.
+
+\textbf{%
+  Jak zmienia się czas trwania optymalizacji
+  w~zależności od rozmiaru populacji i~liczby pokoleń?%
+}\\
+Niniejsze pytanie nie zostało bezpośrednio
+w~niniejszej pracy wykazane,
+natomiast podczas dostrajania parametrów
+najbardziej oczywistym efektem na długość
+uczenia wykazały się liczba osobników w~populacji,
+liczba generacji oraz współczynnik korekcyjny.
+Pozostałe parametry, czyli współczynnik krzyżowania
+oraz mutacji nie miały wyraźnego wpływu na długość procesu.
+Zmniejszanie liczby pokoleń bardziej
+zmniejszało czas trwania procesu,
+natomiast większa liczba populacji dawała większą
+bazę startową do szybszej optymalizacji,
+dzięki czemu pomimo zwiększania liczby osobników w~populacji
+nie zwiększało to proporcjonalnie czasu optymalizacji.
+
+\section*{Ograniczenia projektu}
+Poza wielokrotnie wspominanym długim czasem działania, algorytm z~racji archiwizowania wszystkich wszystkich wag z nauczonych sieci tworzy folder (w podanej lokalizacji) o pojemnościach, które mogą przekraczać $50\text{GB}$.
+
+\section*{Wnioski końcowe i kierunki dalszego rozwoju}
+Podsumowując, przedstawiony projekt stanowi w~pełni funkcjonalne narzędzie, które może służyć do dalszych badań i rozwoju.
+
+Biblioteka \gls{GAAML} może być rozwijana pod wieloma względami:
+\begin{nospitemize}
+  \item zaimplementowanie kompresowanie danych,
+    by archiwizowane dane nie miały tak dużych objętości,
+  \item dodanie obsługiwania architektur rozproszonych,
+  \item umożliwienie zatrzymania procesu optymalizacji
+    oraz go wznowienia,
+  \item umożliwienie wznowienia procesu nawet
+    przy natychmiastowym wyłączeniu komputera
+    na przykład wskutek wyłączenia prądu.
+\end{nospitemize}
