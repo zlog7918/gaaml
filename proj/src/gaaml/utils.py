@@ -352,7 +352,6 @@ def get_fit_func(
           'fit_ret': str(fit_ret.history),
           'evaluation': float(ret),
           'evaluation_on_test_data': float(test_ret),
-          # 'fit_ret_epoch': str(fit_ret.epoch),
         },
         meta,
       )
