@@ -159,16 +159,11 @@ przez kod binarny i~mają to być:
           0 {\textrightarrow} SGD,
           1 {\textrightarrow} Adam%
         ),
+      % 2^(-14)*[1, 2^(12)]==[2^(-14) - .25]
       \item wskaźnik uczenia się (learning rate):
-        12 bitów $2^{-13}\left(
+        12 bitów $2^{-14}\left(
           \mathbb{Z} \cap \left[1, 2^{12}\right]
         \right)$,
-      % TODO: maybe this version
-      %   [2^(-13) - 0.5] → [2^(-13) - .25]
-      % \item wskaźnik uczenia się (learning rate):
-        % 11 bitów $2^{-13}\left(
-        %   \mathbb{Z} \cap \left[1, 2^{11}\right]
-        % \right)$,
       \item liczba epok:
         7 bitów $\mathbb{Z} \cap \left[1, 128\right]$,
       \item wielkość partii:
@@ -1013,23 +1008,17 @@ Poniżej znajduje się rozpisany przykładowy podgenotyp
         =0^{\left(d\right)}+0
         =0
     \Rightarrow$ SGD,
-  % TODO: maybe this version
-  %   2^(-13)*[1 - 2^12] → 2^(-13)[1 - 2^11]
-  % \item wskaźnik uczenia się (learning rate):
-    % -- 11 bitów $
-    %   {2^{-13}} {\cdot} {\left[1, 2^{11}\right]}
-    % $
   \item wskaźnik uczenia się (learning rate)
     -- 12 bitów $
-      {2^{-13}} {\cdot} {\left[1, 2^{12}\right]}
+      {2^{-14}} {\cdot} {\left[1, 2^{12}\right]}
     $
     -- \texttt{001001100101}$\displaystyle
       {}^{\left(b\right)}
         =613^{\left(d\right)}+1
     $\break$\displaystyle
         =614
-      \Rightarrow 2^{-13} \cdot 614
-        = 0.074951171875
+      \Rightarrow 2^{-14} \cdot 614
+        = 0.037475586
     $,
   \item liczba epok
     -- 7 bitów $\left[1, 128\right]$

@@ -61,7 +61,7 @@ def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int,
   seq.add(krs.layers.Input(shape=(input_size,)))
   for n, t in zip((*layer_sizes, output_size), layer_types):
     seq.add(krs.layers.Dense(n, activation=__keras_activation_types[t]))
-  learning_rate=params[const.BIN_PART_LEARNING_RATE_NAME]/(2<<13)
+  learning_rate=params[const.BIN_PART_LEARNING_RATE_NAME]/(1<<14)
   seq.compile(
     __keras_optimalization_types[params[const.BIN_PART_OPTIMIZER_NAME]](
       learning_rate=learning_rate
