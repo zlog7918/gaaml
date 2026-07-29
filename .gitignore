@@ -21,35 +21,3 @@ pip-delete-this-directory.txt
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
-
-# pre_tex
-tmp/
-
-# tex
-*.acn
-*.acr
-*.alg
-*.app
-*.aux
-*.bbl
-*.bbl-SAVE-ERROR
-*.bcf
-*.blg
-*.toc
-*.glg
-*.glo
-*.gls
-*.ist
-*.lof
-*.log
-*.lot
-*.out
-*.pdf
-*.slg
-*.slo
-*.sls
-*.swp
-*.run.xml
-*.synctex.gz
-*.synctex(busy)
-_minted-*/
