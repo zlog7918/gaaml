@@ -35,8 +35,8 @@ class NetIndividual(Individual["NetIndividual", CPType, tuple[_MII, _MILI, _MILI
   ) -> None: ...
   def __init__(
     self,
-    a: "_MII.EntryType|_NI",
-    b: "_MII.EntryType|_NI",
+    a: t.Union[_MII.EntryType, _NI],
+    b: t.Union[_MII.EntryType, _NI],
     type_seed: _MII.EntryType|None=None,
     gen_schema: GenSchemaType|None=None,
     /, *,

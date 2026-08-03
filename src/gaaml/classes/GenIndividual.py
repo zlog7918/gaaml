@@ -10,7 +10,13 @@ class GenIndividual(Individual["GenIndividual", CPType, bytearray]):
   def __init__(self, num_gens: int, /) -> None: ...
   @t.overload
   def __init__(self: _GI, a: _GI, b: _GI, /, *, cross_point: CPType) -> None: ...
-  def __init__(self: _GI, a: "int|_GI", b: "_GI|None"=None, /, *, cross_point: CPType|None=None) -> None:
+  def __init__(
+    self: _GI,
+    a: t.Union[int, _GI],
+    b: t.Union[_GI, None]=None,
+    /,*,
+    cross_point: CPType|None=None,
+  ) -> None:
     if isinstance(a, int):
       super().__init__(util.int_to_bin(rnd.getrandbits(a), a))
       return
