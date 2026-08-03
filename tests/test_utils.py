@@ -123,7 +123,7 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
       (724, 4), # h_n->o
       (4,), # +w_o^
     ]),
-  ]
+  ],
 )
 @mark__test_cr_net_from_ind
 def test_cr_net_from_ind(
@@ -392,7 +392,7 @@ mark__test___detect_type_group=pytest.mark.parametrize(
     ([['afsd', 'gsgrs'], ['fsdfd', 'fsdfdbdgffs']], None, 'str'), # one column with only strings
     # ([['afsd', 'gsgrs'], ['fsdfd', 'fsdfdbdgffs']], np.object_, 'str'), # one column with only strings
     ([['afsd', 'gsgrs'], ['fsdfd', 'fsdfdbdgffs']], np.dtypes.ObjectDType, 'str'), # one column with only strings
-  ]
+  ],
 )
 @mark__test___detect_type_group
 def test___detect_type_group(data: list[list[t.Any]], dtype: type[np.dtype]|None, exp_type: str|None):
@@ -431,7 +431,7 @@ mark__test___is_categorial=pytest.mark.parametrize(
     ([[0., 5.], [2., 4.]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
     ([[True, True], [True, False]], None, False), # multicolumn with any other combination
     ([[True, True], [True, False]], np.dtypes.ObjectDType, False), # multicolumn with any other combination
-  ]
+  ],
 )
 @mark__test___is_categorial
 def test___is_categorial(data: list[list[t.Any]], dtype: type[np.dtype]|None, exp_is_categorial: bool|None):
@@ -647,7 +647,7 @@ mark__test_get_fit_func=pytest.mark.parametrize(
       '0000001001  0000000110',
       '10 01 00',
     )),
-  ]
+  ],
 )
 @mark__test_get_fit_func
 def test_get_fit_func(
@@ -690,15 +690,16 @@ def test_get_fit_func(
     number_of_attributes,
     categorial=is_categorial,
   )
-  _ret=ret(ni, tmp_path)
+  val_f, test_f=ret
+  val_ret=val_f(ni, tmp_path)
+  test_ret=test_f(ni, tmp_path)
 
   # results
-  assert isinstance(ret, t.Callable)
-  assert isinstance(_ret, tuple)
-  _ret, _test_ret=_ret
-  assert isinstance(float(_ret), float)
-  assert isinstance(float(_test_ret), float)
-  # assert _ret==pytest.approx(expected_fit)
+  assert isinstance(ret, tuple)
+  assert isinstance(val_f, t.Callable)
+  assert isinstance(test_f, t.Callable)
+  assert isinstance(float(val_ret), float)
+  assert isinstance(float(test_ret), float)
   assert (tmp_path/'model_meta.data').exists()
   assert (tmp_path/'model.weights.h5').exists()
 
@@ -711,7 +712,7 @@ mark__test_error_get_fit_func_not_2D_arr=pytest.mark.parametrize(
     (np.zeros((8, 7, 3)), np.zeros((8, 7)), np.zeros((8, 7)), -1),
     (np.zeros((8, 7)), np.zeros((8, 7, 3)), np.zeros((8, 7)), -1),
     (np.zeros((8, 7)), np.zeros((8, 7)), np.zeros((8, 7, 3)), -1),
-  ]
+  ],
 )
 @mark__test_error_get_fit_func_not_2D_arr
 def test_error_get_fit_func_not_2D_arr(
@@ -744,7 +745,7 @@ mark__test_error_get_fit_func_not_same_training_vs_test=pytest.mark.parametrize(
     (np.zeros((8, 7)), None, np.zeros((8, 6)), -2),
     (np.zeros((8, 7)), np.zeros((10, 6)), np.zeros((8, 6)), -2),
     (np.zeros((8, 7)), np.zeros((10, 7)), np.zeros((8, 6)), -2),
-  ]
+  ],
 )
 @mark__test_error_get_fit_func_not_same_training_vs_test
 def test_error_get_fit_func_not_same_training_vs_test(
@@ -775,7 +776,7 @@ mark__test_error_get_fit_func_not_same_validation=pytest.mark.parametrize(
     (np.zeros((8, 6)), np.zeros((8, 8)), np.zeros((8, 6)), -2),
     (np.zeros((8, 6)), np.zeros((8, 5)), np.zeros((8, 6)), -2),
     (np.zeros((8, 6)), np.zeros((8, 5)), np.zeros((8, 6)), -3),
-  ]
+  ],
 )
 @mark__test_error_get_fit_func_not_same_validation
 def test_error_get_fit_func_not_same_validation(
@@ -867,7 +868,7 @@ mark__test_error_get_fit_func_not_valid_type=pytest.mark.parametrize(
       [2, 2, 2, False], # defaulted to first being greater
       [4, 6.5, False, True],
     ], -2, True),
-  ]
+  ],
 )
 @mark__test_error_get_fit_func_not_valid_type
 def test_error_get_fit_func_not_valid_type(
@@ -967,7 +968,7 @@ mark__test_error_get_fit_func_conv_not_correct=pytest.mark.parametrize(
       [2, 2, '.5'],
       [4, 6.5, '1'],
     ], -1, True), # was accepted previously, however has been simplified
-  ]
+  ],
 )
 @mark__test_error_get_fit_func_conv_not_correct
 def test_error_get_fit_func_conv_not_correct(

@@ -1,7 +1,7 @@
 import typing as t
 from tqdm.auto import tqdm
 from . import _utils as util
-from .Population import Population
+from .Population import FRT, Population
 
 class Generations(t.Generic[util.IndividualType]):
   _P=t.ParamSpec('_P')
@@ -19,7 +19,7 @@ class Generations(t.Generic[util.IndividualType]):
     self.__pop=pop_factory(*args, **kwargs)
     self.__gpo=generations_progress_output
     self.__max_num_gen=max_num_gen
-    self.__save_of_fits: list[list[list[tuple[float, float]]]]=[[]]*(self.__max_num_gen+1)
+    self.__save_of_fits: list[list[list[FRT]]]=[[]]*(self.__max_num_gen+1)
     self.__maxs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__avgs: list[float]=[.0]*(self.__max_num_gen+1)
     self.__mins: list[float]=[.0]*(self.__max_num_gen+1)
@@ -85,5 +85,5 @@ class Generations(t.Generic[util.IndividualType]):
       ),
     )
 
-  def get_save_of_fits(self) -> list[list[list[tuple[float, float]]]]:
+  def get_save_of_fits(self) -> list[list[list[FRT]]]:
     return self.__save_of_fits[:self.__curr_generations+1]

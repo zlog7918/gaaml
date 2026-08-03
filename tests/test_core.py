@@ -48,7 +48,7 @@ mark__test_fitness=pytest.mark.parametrize(
     ('0 0  1 0  1 1  0 0 1 0 0', .2),
     ('0 0  1 0  1 1  0 0 1 0 1', 1/6),
     ('0 0  1 0  1 1  0 0 1 1 0', 1/7),
-  ]
+  ],
 )
 @mark__test_fitness
 def test_fitness(ni_str: str, expected_fit: float) -> None:
@@ -74,7 +74,7 @@ def test_fitness(ni_str: str, expected_fit: float) -> None:
 
 mark__test_cr_network=pytest.mark.parametrize(
   'number_of_generations',
-  [1, 2, 5]
+  [1, 2, 5],
 )
 @mark__test_cr_network
 def test_cr_network(
@@ -103,12 +103,15 @@ def test_cr_network(
   )
 
   # results
-  assert isinstance(ret, _G)
-  assert ret.curr_generations==number_of_generations
+  assert isinstance(ret, tuple)
+  generations, test_fit=ret
+  assert isinstance(generations, _G)
+  assert generations.curr_generations==number_of_generations
+  assert isinstance(test_fit, float)
 
 mark__test_cr_network_plot=pytest.mark.parametrize(
   'number_of_generations',
-  [1, 2, 5]
+  [1, 2, 5],
 )
 @mark__test_cr_network_plot
 def test_cr_network_plot(
@@ -142,8 +145,11 @@ def test_cr_network_plot(
   )
 
   # results
-  assert isinstance(ret, _G)
-  assert ret.curr_generations==number_of_generations
+  assert isinstance(ret, tuple)
+  generations, test_fit=ret
+  assert isinstance(generations, _G)
+  assert generations.curr_generations==number_of_generations
+  assert isinstance(test_fit, float)
   assert mock_plt.figure_calls==3
   assert len(mock_plt.figures)==3
   assert mock_plt.plot_calls==3
@@ -155,7 +161,7 @@ def test_cr_network_plot(
 
 mark__test_cr_network_plot_0_in_fitnesses=pytest.mark.parametrize(
   'number_of_generations',
-  [1, 2, 5]
+  [1, 2, 5],
 )
 @mark__test_cr_network_plot_0_in_fitnesses
 def test_cr_network_plot_0_in_fitnesses(
@@ -189,8 +195,11 @@ def test_cr_network_plot_0_in_fitnesses(
   )
 
   # results
-  assert isinstance(ret, _G)
-  assert ret.curr_generations==number_of_generations
+  assert isinstance(ret, tuple)
+  generations, test_fit=ret
+  assert isinstance(generations, _G)
+  assert generations.curr_generations==number_of_generations
+  assert isinstance(test_fit, float)
   assert mock_plt.figure_calls==3
   assert len(mock_plt.figures)==3
   assert mock_plt.plot_calls==3
@@ -202,7 +211,7 @@ def test_cr_network_plot_0_in_fitnesses(
 
 mark__test_error_cr_network_0generations=pytest.mark.parametrize(
   'number_of_generations',
-  [0, -1, -2]
+  [0, -1, -2],
 )
 @mark__test_error_cr_network_0generations
 def test_error_cr_network_0generations(

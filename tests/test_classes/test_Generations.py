@@ -46,7 +46,7 @@ class DummyPop(_P[DummyInd]):
     fitnesses_progress_output: tqdm,
     individual_factory: t.Callable[[], DummyInd],
   ) -> None:
-    calc_fitness_func: t.Callable[[DummyInd, Path], tuple[float, float]]=lambda ind, dir: (ind.gen, rnd.random())
+    calc_fitness_func: t.Callable[[DummyInd, Path], float]=lambda ind, dir: ind.gen
     super().__init__(
       pop_num,
       individual_factory,
@@ -210,17 +210,13 @@ def statistics_asserts(
   assert min_of_min==pytest.approx(exp_min_of_min)
 
 def hist_asserts(
-  ret: list[list[list[tuple[float, float]]]],
+  ret: list[list[list[float]]],
   *,
   exp_ret: list[list[list[float]]],
 ) -> None:
   assert isinstance(ret, list)
   assert len(ret)==len(exp_ret)
-  assert np.array([[
-    [fit[0] for fit in _r]
-      for _r in
-    r
-  ] for r in ret])==pytest.approx(np.array(exp_ret))
+  assert np.array(ret)==pytest.approx(np.array(exp_ret))
 
 def create_gens(
   number_of_generations: int,
@@ -253,15 +249,16 @@ def create_gens(
   )
   return gens, bar1, bar2
 
-@pytest.mark.parametrize(
+mark__test_create=pytest.mark.parametrize(
   ('pop_num', 'expected_max_avg_min'),
   [
     (9, ([4], [2.], [0.])),
     (2, ([.5], [.25], [0.])),
     (5, ([2], [1], [0.])),
     (8, ([3.5], [1.75], [0.])),
-  ]
+  ],
 )
+@mark__test_create
 def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
@@ -283,15 +280,16 @@ def test_create(pop_num: int, expected_max_avg_min: tuple[list[float], list[floa
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_get_statistics_on_start=pytest.mark.parametrize(
   ('pop_num', 'expected_max_avg_min'),
   [
     (9, ([4], [2.], [0.])),
     (2, ([.5], [.25], [0.])),
     (5, ([2], [1], [0.])),
     (8, ([3.5], [1.75], [0.])),
-  ]
+  ],
 )
+@mark__test_get_statistics_on_start
 def test_get_statistics_on_start(pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
@@ -342,7 +340,7 @@ mark__test_get_save_of_fits_on_start=pytest.mark.parametrize(
       [3.0],
       [3.5],
     ]]),
-  ]
+  ],
 )
 @mark__test_get_save_of_fits_on_start
 def test_get_save_of_fits_on_start(
@@ -362,7 +360,7 @@ def test_get_save_of_fits_on_start(
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_go_through_generations_all_the_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7], [.25, .35, .45], [.0, .1, .2])),
@@ -371,8 +369,9 @@ def test_get_save_of_fits_on_start(
     (2, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (None, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (3, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
-  ]
+  ],
 )
+@mark__test_go_through_generations_all_the_way
 def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
@@ -390,7 +389,7 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_get_statistics_after_all_the_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7], [.25, .35, .45], [.0, .1, .2])),
@@ -399,8 +398,9 @@ def test_go_through_generations_all_the_way(go_num_generations: int|None, pop_nu
     (2, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (None, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (3, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
-  ]
+  ],
 )
+@mark__test_get_statistics_after_all_the_way
 def test_get_statistics_after_all_the_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=2
@@ -453,7 +453,7 @@ mark__test_get_save_of_fits_after_all_the_way=pytest.mark.parametrize(
       [[0.1], [0.6], [1.1]],
       [[0.2], [0.7], [1.2]],
     ]),
-  ]
+  ],
 )
 @mark__test_get_save_of_fits_after_all_the_way
 def test_get_save_of_fits_after_all_the_way(
@@ -470,25 +470,22 @@ def test_get_save_of_fits_after_all_the_way(
   ret=gens.get_save_of_fits()
 
   # results
-  print([[
-    [fit[0] for fit in _r]
-      for _r in
-    r
-  ] for r in ret])
+  print(ret)
   num_generations_asserts(gens, curr_generation=number_of_generations)
   hist_asserts(ret, exp_ret=expected_hist)
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_go_through_generations_part_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7], [.25, .35, .45], [.0, .1, .2])),
     (1, 2, ([.5, .6], [.25, .35], [.0, .1])),
     (2, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (1, 9, ([4., 4.1], [2., 2.1], [.0, .1])),
-  ]
+  ],
 )
+@mark__test_go_through_generations_part_way
 def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
@@ -506,15 +503,16 @@ def test_go_through_generations_part_way(go_num_generations: int, pop_num: int, 
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_get_statistics_after_part_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7], [.25, .35, .45], [.0, .1, .2])),
     (1, 2, ([.5, .6], [.25, .35], [.0, .1])),
     (2, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
     (1, 9, ([4., 4.1], [2., 2.1], [.0, .1])),
-  ]
+  ],
 )
+@mark__test_get_statistics_after_part_way
 def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
@@ -534,7 +532,7 @@ def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, ex
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_go_through_generations_after_going_part_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7, .8], [.25, .35, .45, .55], [.0, .1, .2, .3])),
@@ -543,8 +541,9 @@ def test_get_statistics_after_part_way(go_num_generations: int, pop_num: int, ex
     (2, 9, ([4., 4.1, 4.2, 4.3], [2., 2.1, 2.2, 2.3], [.0, .1, .2, .3])),
     (None, 9, ([4., 4.1, 4.2, 4.3], [2., 2.1, 2.2, 2.3], [.0, .1, .2, .3])),
     (1, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
-  ]
+  ],
 )
+@mark__test_go_through_generations_after_going_part_way
 def test_go_through_generations_after_going_part_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
@@ -565,7 +564,7 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_get_statistics_after_part_way_after_going_part_way=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     (2, 2, ([.5, .6, .7, .8], [.25, .35, .45, .55], [.0, .1, .2, .3])),
@@ -574,8 +573,9 @@ def test_go_through_generations_after_going_part_way(go_num_generations: int|Non
     (2, 9, ([4., 4.1, 4.2, 4.3], [2., 2.1, 2.2, 2.3], [.0, .1, .2, .3])),
     (None, 9, ([4., 4.1, 4.2, 4.3], [2., 2.1, 2.2, 2.3], [.0, .1, .2, .3])),
     (1, 9, ([4., 4.1, 4.2], [2., 2.1, 2.2], [.0, .1, .2])),
-  ]
+  ],
 )
+@mark__test_get_statistics_after_part_way_after_going_part_way
 def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: int|None, pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=3
@@ -599,7 +599,7 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_go_through_generations_multiple=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     ((1,), 2, ([.5, .6, .7, .8], [.25, .35, .45, .55], [.0, .1, .2, .3])),
@@ -616,8 +616,9 @@ def test_get_statistics_after_part_way_after_going_part_way(go_num_generations: 
     ((2, 1), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
     ((1, 1, 1), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
     ((3,), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
-  ]
+  ],
 )
+@mark__test_go_through_generations_multiple
 def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
@@ -638,7 +639,7 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_get_statistics_after_multiple=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [
     ((1,), 2, ([.5, .6, .7, .8], [.25, .35, .45, .55], [.0, .1, .2, .3])),
@@ -655,8 +656,9 @@ def test_go_through_generations_multiple(go_num_generations: tuple[int, ...], po
     ((2, 1), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
     ((1, 1, 1), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
     ((3,), 9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
-  ]
+  ],
 )
+@mark__test_get_statistics_after_multiple
 def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
@@ -680,7 +682,7 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_error_go_through_generations_after_going_to_the_end=pytest.mark.parametrize(
   ('go_num_generations', 'pop_num', 'expected_max_avg_min'),
   [(g, pn, emam) for g, (pn, emam) in itertools.product((
     (1, None),
@@ -695,8 +697,9 @@ def test_get_statistics_after_multiple(go_num_generations: tuple[int, ...], pop_
   ),(
     (2, ([.5, .6, .7, .8, .9, 1.], [.25, .35, .45, .55, .65, .75], [.0, .1, .2, .3, .4, .5])),
     (9, ([4., 4.1, 4.2, 4.3, 4.4, 4.5], [2., 2.1, 2.2, 2.3, 2.4, 2.5], [.0, .1, .2, .3, .4, .5])),
-  ))]
+  ))],
 )
+@mark__test_error_go_through_generations_after_going_to_the_end
 def test_error_go_through_generations_after_going_to_the_end(go_num_generations: tuple[int|None, ...], pop_num: int, expected_max_avg_min: tuple[list[float], list[float], list[float]]) -> None:
   # values
   number_of_generations=5
@@ -718,10 +721,11 @@ def test_error_go_through_generations_after_going_to_the_end(go_num_generations:
   bar_asserts(bar2, pop_num)
   bar_asserts(bar1, gens.curr_generations)
 
-@pytest.mark.parametrize(
+mark__test_invalid_num_gen=pytest.mark.parametrize(
   'number_of_generations',
-  [0, -1, -2]
+  [0, -1, -2],
 )
+@mark__test_invalid_num_gen
 def test_invalid_num_gen(number_of_generations: int) -> None:
   # values
   float_iter=range(9)

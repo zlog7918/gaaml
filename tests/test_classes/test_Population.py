@@ -57,8 +57,7 @@ def gen_i_path_asserts(root_dir: Path, gen_i: int, gi_s: list[_GI]):
   assert gen_dir.exists()
   _gen_i_path_asserts(gen_dir, list(gi_s))
 
-
-@pytest.mark.parametrize(
+mark__test_crossover=pytest.mark.parametrize(
   ('seed', 'flag'),
   [*zip(range(10), (
     False, # 0.8444218515250481
@@ -71,8 +70,9 @@ def gen_i_path_asserts(root_dir: Path, gen_i: int, gi_s: list[_GI]):
     True, # 0.32383276483316237
     True, # 0.2267058593810488
     True, # 0.46300735781502145
-  ))]
+  ))],
 )
+@mark__test_crossover
 def test_crossover(seed: int, flag: bool) -> None:
   # values
   input_len=4
@@ -92,7 +92,7 @@ def test_crossover(seed: int, flag: bool) -> None:
   assert (cgi1 is gi1)^flag
   assert (cgi2 is gi2)^flag
 
-@pytest.mark.parametrize(
+mark__test_mutate=pytest.mark.parametrize(
   ('seed', 'flag'),
   [*zip(range(20), (
     False, # 0.8444218515250481
@@ -115,8 +115,9 @@ def test_crossover(seed: int, flag: bool) -> None:
     False, # 0.5219839097124932
     True, # 0.18126486333322134
     False, # 0.6771258268002703
-  ))]
+  ))],
 )
+@mark__test_mutate
 def test_mutate(seed: int, flag: bool) -> None:
   # values
   input_len=4
@@ -132,23 +133,23 @@ def test_mutate(seed: int, flag: bool) -> None:
   assert isinstance(mgi, _GI)
   assert mgi is gi
   assert (mgi.gen==oryg_gen)!=flag
-
-@pytest.mark.parametrize(
+mark__test_calc_to_add=pytest.mark.parametrize(
   ('values', 'exp_to_add'),
   [
     (([0], [1]), .01),
     (([1], [3, 5]), .01),
     (([11, 7, 6], [4], [1, 5]), .03),
     (([140], [510], [753]), 1.4),
-  ]
+  ],
 )
+@mark__test_calc_to_add
 def test_calc_to_add(values: tuple[list[float], ...], exp_to_add: float) -> None:
   # values
   # private access: calc_avg_from_fittnesses=P.__calc_avg_from_fittnesses
-  calc_avg_from_fittnesses=t.cast(t.Callable[[list[tuple[float, float]]], float],P._Population__calc_avg_from_fittnesses) # type: ignore
-  handle=MAMH[list[tuple[float, float]]](5, calc_avg_from_fittnesses)
+  calc_avg_from_fittnesses=t.cast(t.Callable[[list[float]], float],P._Population__calc_avg_from_fittnesses) # type: ignore
+  handle=MAMH[list[float]](5, calc_avg_from_fittnesses)
   for v in values:
-    handle.append(list(map(lambda x: (x, rnd.random()),v)))
+    handle.append(v)
 
   # test
   to_add=P._calc_to_add(handle)
@@ -190,8 +191,8 @@ def test_create(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -234,7 +235,7 @@ def test_create(
         min_v<=fit
         and fit<=max_v
         and fit==exp_fit
-      for (fit,_) in fits
+      for fit in fits
     )
       for fits, exp_fit in
     zip(pop.fitnesses_all, exp_fitnesses)
@@ -246,7 +247,7 @@ mark__test_set_dir=pytest.mark.parametrize(
   [
     lambda p: str(p),
     lambda p: p,
-  ]
+  ],
 )
 @mark__test_set_dir
 def test_set_dir(
@@ -271,8 +272,8 @@ def test_set_dir(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -295,7 +296,7 @@ mark__test_set_dir_after_cr_with_path=pytest.mark.parametrize(
     (lambda p: str(p/'dir1'), lambda p: (p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: str(p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
-  ]
+  ],
 )
 @mark__test_set_dir_after_cr_with_path
 def test_set_dir_after_cr_with_path(
@@ -321,8 +322,8 @@ def test_set_dir_after_cr_with_path(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -349,7 +350,7 @@ mark__test_set_dir_after_set_dir=pytest.mark.parametrize(
     (lambda p: str(p/'dir1'), lambda p: (p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: str(p/'dir2')),
     (lambda p: (p/'dir1'), lambda p: (p/'dir2')),
-  ]
+  ],
 )
 @mark__test_set_dir_after_set_dir
 def test_set_dir_after_set_dir(
@@ -375,8 +376,8 @@ def test_set_dir_after_set_dir(
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -403,8 +404,8 @@ def test_population_returns_copy() -> None:
   bit,min_v,max_v=4, 1, 11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -438,8 +439,8 @@ def test_get_max_avg_min() -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -469,10 +470,10 @@ def test_selection_sum_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=7
-    return 0 if ret<0 else ret, rnd.random()
+    return 0 if ret<0 else ret
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '0100', # fit: 4+1=5 -> 5-7=-2 -> 0
@@ -517,10 +518,10 @@ def test_selection_sum_not_zero() -> None:
   pop_num=3
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
-    return 0 if ret<0 else ret, rnd.random()
+    return 0 if ret<0 else ret
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
@@ -561,10 +562,10 @@ def test_selection_no_zero() -> None:
   pop_num=5
   bit,min_v,max_v=4,1,11
   input_len=bit
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
     ret=util.correct_gen_to_min_max(ind.gen, min_v, max_v)
     ret-=3
-    return 0 if ret<0 else ret, rnd.random()
+    return 0 if ret<0 else ret
   def __cr_ind() -> t.Generator[_GI, None, None]:
     for gi_gen in (
       '1000', # fit: 8+1=9 -> 9-3=6
@@ -602,8 +603,8 @@ def test_next_generation(tmp_path: Path) -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   class _tqdm(tqdm):
@@ -631,10 +632,11 @@ def test_next_generation(tmp_path: Path) -> None:
     gen_i_path_asserts(tmp_path, i, _pop)
   bar_asserts(bar, pop_num)
 
-@pytest.mark.parametrize(
+mark__test_multi_vs_single_thread_consistency=pytest.mark.parametrize(
   'workers',
-  [1, 2, 4]
+  [1, 2, 4],
 )
+@mark__test_multi_vs_single_thread_consistency
 def test_multi_vs_single_thread_consistency(workers: int) -> None:
   # values
   pop_num=5
@@ -654,8 +656,8 @@ def test_multi_vs_single_thread_consistency(workers: int) -> None:
   gi1, gi2, gi3, gi4, gi5=(x for x in __cr_ind())
   _cr_ind=(x for x in (gi1, gi2, gi3, gi4, gi5))
   cr_ind: t.Callable[[], _GI]=lambda: next(_cr_ind)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -675,8 +677,8 @@ def test_error_change_population() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -697,8 +699,8 @@ def test_error_change_fitnesses() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)
@@ -719,8 +721,8 @@ def test_error_change_fitnesses_all() -> None:
   bit,min_v,max_v=4,1,11
   input_len=bit
   cr_ind: t.Callable[[], _GI]=lambda: _GI(input_len)
-  def calc_fitness_func(ind: _GI, dir: Path) -> tuple[float, float]:
-    return util.correct_gen_to_min_max(ind.gen, min_v, max_v), rnd.random()
+  def calc_fitness_func(ind: _GI, dir: Path) -> float:
+    return util.correct_gen_to_min_max(ind.gen, min_v, max_v)
   crossover_rate=.8
   mutation_rate=.1
   bar=tqdm(total=pop_num, desc='Calculated fitnesses', position=0, mininterval=0)

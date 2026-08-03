@@ -12,7 +12,7 @@ from .classes.Generations import Generations
 from .classes.NetIndividual import NetIndividual
 
 IndType=NetIndividual
-RetType=Generations
+RetType=tuple[Generations, float]
 
 def fitness_corrector(net_ind: IndType, fit: float) -> float:
   n_m1=net_ind.gen[0].fenotype[const.BIN_PART_LIST_LEN[0]]-1
@@ -88,6 +88,7 @@ def cr_network(
   output_progress: bool=True,
   plot: bool=False,
 ) -> RetType:
+  save_dir_path=Path(save_dir_path)
   training_data=np.asarray(training_data)
   validation_data, test_data=(
     (None, np.asarray(_validation_data))
@@ -95,7 +96,7 @@ def cr_network(
     (np.asarray(_validation_data), np.asarray(_test_data))
   )
   del _validation_data, _test_data
-  fit_func=util.get_fit_func(
+  fit_func, test_fit_func=util.get_fit_func(
     training_data,
     validation_data,
     test_data,
@@ -121,14 +122,7 @@ def cr_network(
         const.NEURON_TYPE,
       ),
     ),
-    lambda net_ind, dir: t.cast(
-      tuple[float, float],
-      tuple(
-        fitness_func(net_ind, r)
-          for r in
-        fit_func(net_ind, dir)
-      )
-    ),
+    lambda net_ind, dir: fitness_func(net_ind, fit_func(net_ind, dir)),
     cross_rate,
     mutation_rate
   ), {
@@ -143,6 +137,17 @@ def cr_network(
   if bar1 is not None and bar2 is not None:
     bar2.close()
     bar1.close()
+
+  fits=np.array(generations.get_save_of_fits())
+  fits: np.ndarray=fits.mean(axis=2)
+  fit_idx=np.unravel_index(fits.max(), fits.shape)
+  gen_i, ind_i=fit_idx[0], fit_idx[1]
+  ind_path=save_dir_path/f'gen_{gen_i}'/f'ind_{ind_i}'
+  max_sol=IndType.load_from(ind_path/'model.gen')
+  test_fits=[]
+  for path in (p for p in ind_path.iterdir() if p.name.startswith('iter_')):
+    test_fits.append(fitness_func(max_sol, test_fit_func(max_sol, path)))
+  test_fit=sum(test_fits)/len(test_fits)
 
   if plot:
     (
@@ -169,4 +174,4 @@ def cr_network(
       plt.title(title)
       plt.show()
 
-  return generations
+  return generations, test_fit

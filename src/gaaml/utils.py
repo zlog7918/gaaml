@@ -171,7 +171,10 @@ def get_fit_func(
   *,
   stoping_patiance: int=...,
   categorial: bool=False,
-) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+) -> tuple[
+  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[NetIndividual, Path], float],
+]: ...
 @t.overload
 def get_fit_func(
   training_data: np.ndarray,
@@ -180,7 +183,10 @@ def get_fit_func(
   number_of_attributes: int,
   *,
   categorial: bool=False,
-) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+) -> tuple[
+  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[NetIndividual, Path], float],
+]: ...
 @t.overload
 def get_fit_func(
   training_data: np.ndarray,
@@ -190,7 +196,10 @@ def get_fit_func(
   *,
   stoping_patiance: int=...,
   categorial: bool=False,
-) -> t.Callable[[NetIndividual, Path], tuple[float, float]]: ...
+) -> tuple[
+  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[NetIndividual, Path], float],
+]: ...
 def get_fit_func(
   training_data: np.ndarray,
   validation_data: np.ndarray|None,
@@ -199,7 +208,10 @@ def get_fit_func(
   *,
   stoping_patiance: int=const.STOPING_PATIANCE,
   categorial: bool=False,
-) -> t.Callable[[NetIndividual, Path], tuple[float, float]]:
+) -> tuple[
+  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[NetIndividual, Path], float],
+]:
   if any(data.ndim!=2 for data in __into_tuple(
     (training_data,),
     (validation_data,),
@@ -286,7 +298,7 @@ def get_fit_func(
   def f(
     net_ind: NetIndividual,
     dir: Path,
-  ) -> tuple[float, float]:
+  ) -> float:
     model, batch_size, epochs=cr_net_from_ind(
       net_ind,
       input_size,
@@ -327,11 +339,6 @@ def get_fit_func(
       ),
       verbose=0, # type: ignore
     )
-    test_ret=model.evaluate(
-      test_data_x,
-      test_data_y,
-      verbose=0, # type: ignore
-    )
 
     # get_weights() and save_weights() throw warning
     with warnings.catch_warnings():
@@ -351,9 +358,33 @@ def get_fit_func(
           'hidden_len': hidden_len,
           'fit_ret': str(fit_ret.history),
           'evaluation': float(ret),
-          'evaluation_on_test_data': float(test_ret),
         },
         meta,
       )
-    return ret, test_ret
-  return f
+    return ret
+  def test_f(
+    net_ind: NetIndividual,
+    dir: Path,
+  ) -> float:
+    model, _, _=cr_net_from_ind(
+      net_ind,
+      input_size,
+      output_size,
+      categorial,
+    )
+    # load_weights() throw warning
+    with warnings.catch_warnings():
+      warnings.filterwarnings(
+        'ignore',
+        # message='__array__ implementation doesn\'t accept a copy keyword',
+        category=DeprecationWarning,
+      )
+      model.load_weights(dir/'model.weights.h5')
+
+    test_ret=model.evaluate(
+      test_data_x,
+      test_data_y,
+      verbose=0, # type: ignore
+    )
+    return test_ret
+  return f, test_f
