@@ -19,7 +19,7 @@ mark__test_create=pytest.mark.parametrize(
         (lambda p: ((str(p),), kwargs), False),
       ))
     )
-  ]
+  ],
 )
 @mark__test_create
 def test_create(
@@ -57,7 +57,7 @@ mark__test_create_create_dir=pytest.mark.parametrize(
       lambda p: p/'dir'/'sub',
       lambda p: str(p/'dir'/'sub'),
     )
-  ]
+  ],
 )
 @mark__test_create_create_dir
 def test_create_create_dir(
@@ -92,7 +92,7 @@ mark__test_create_resume_non_empty_dir=pytest.mark.parametrize(
   [
     lambda p: str(p),
     lambda p: p,
-  ]
+  ],
 )
 @mark__test_create_resume_non_empty_dir
 def test_create_resume_non_empty_dir(
@@ -124,7 +124,7 @@ mark__test_is_tmp=pytest.mark.parametrize(
     ((lambda p: (None,)), True),
     ((lambda p: (str(p),)), False),
     ((lambda p: (p,)), False),
-  ]
+  ],
 )
 @mark__test_is_tmp
 def test_is_tmp(
@@ -157,7 +157,7 @@ mark__test_path_setter=pytest.mark.parametrize(
       lambda p: p/'dir2',
       lambda p: str(p/'dir2'),
     )
-  ]
+  ],
 )
 @mark__test_path_setter
 def test_path_setter(
@@ -197,7 +197,7 @@ mark__test_temp_dir_is_deleted_on_reassignment=pytest.mark.parametrize(
       lambda p: _fp2p2s(p),
       lambda p: str(_fp2p2s(p)),
     )
-  ]
+  ],
 )
 @mark__test_temp_dir_is_deleted_on_reassignment
 def test_temp_dir_is_deleted_on_reassignment(
@@ -235,7 +235,7 @@ mark__test_not_tmp_dir_is_cleaned_on_reassignment=pytest.mark.parametrize(
       lambda p: _fp2p2s(p),
       lambda p: str(_fp2p2s(p)),
     )
-  ]
+  ],
 )
 @mark__test_not_tmp_dir_is_cleaned_on_reassignment
 def test_not_tmp_dir_is_cleaned_on_reassignment(
@@ -274,7 +274,7 @@ mark__test_dir_is_created_on_assignment=pytest.mark.parametrize(
       lambda p: p/'new_dir',
       lambda p: str(p/'new_dir'),
     )
-  ]
+  ],
 )
 @mark__test_dir_is_created_on_assignment
 def test_dir_is_created_on_assignment(
@@ -311,7 +311,7 @@ mark__test_path_setter_moves_contents=pytest.mark.parametrize(
     (lambda p: str(p/'src'), lambda p: p/'dst'),
     (lambda p: p/'src', lambda p: str(p/'dst')),
     (lambda p: p/'src', lambda p: p/'dst'),
-  ]
+  ],
 )
 @mark__test_path_setter_moves_contents
 def test_path_setter_moves_contents(
@@ -366,7 +366,7 @@ mark__test_path_setter_same_path=pytest.mark.parametrize(
   [
     lambda p: str(p/'dir'),
     lambda p: p/'dir',
-  ]
+  ],
 )
 @mark__test_path_setter_same_path
 def test_path_setter_same_path(
@@ -426,7 +426,7 @@ mark__test_error_create_path_is_file=pytest.mark.parametrize(
   [
     lambda p: str(p/'t.txt'),
     lambda p: p/'t.txt',
-  ]
+  ],
 )
 @mark__test_error_create_path_is_file
 def test_error_create_path_is_file(
@@ -450,7 +450,7 @@ mark__test_error_create_resume_path_is_file=pytest.mark.parametrize(
   [
     lambda p: str(p/'t.txt'),
     lambda p: p/'t.txt',
-  ]
+  ],
 )
 @mark__test_error_create_resume_path_is_file
 def test_error_create_resume_path_is_file(
@@ -479,7 +479,7 @@ mark__test_error_create_if_directory_not_empty=pytest.mark.parametrize(
       lambda p: p,
       lambda p: str(p),
     )
-  ]
+  ],
 )
 @mark__test_error_create_if_directory_not_empty
 def test_error_create_if_directory_not_empty(
@@ -511,7 +511,7 @@ mark__test_error_path_setter_path_is_file=pytest.mark.parametrize(
       lambda p: p/'t.txt',
       lambda p: str(p/'t.txt'),
     )
-  ]
+  ],
 )
 @mark__test_error_path_setter_path_is_file
 def test_error_path_setter_path_is_file(
@@ -545,7 +545,7 @@ mark__test_error_path_setter_if_directory_not_empty=pytest.mark.parametrize(
       lambda p: p/'dir2',
       lambda p: str(p/'dir2'),
     )
-  ]
+  ],
 )
 @mark__test_error_path_setter_if_directory_not_empty
 def test_error_path_setter_if_directory_not_empty(
@@ -575,7 +575,7 @@ mark__test_error_path_setter_directory_is_inside_current_dir=pytest.mark.paramet
     (lambda p: str(p/'dir'), lambda p: p/'dir'/'sub'),
     (lambda p: p/'dir', lambda p: str(p/'dir'/'sub')),
     (lambda p: p/'dir', lambda p: p/'dir'/'sub'),
-  ]
+  ],
 )
 @mark__test_error_path_setter_directory_is_inside_current_dir
 def test_error_path_setter_directory_is_inside_current_dir(
@@ -603,7 +603,7 @@ mark__test_error_change_is_tmp=pytest.mark.parametrize(
     lambda p: (None,),
     lambda p: (str(p),),
     lambda p: (p,),
-  ]
+  ],
 )
 @mark__test_error_change_is_tmp
 def test_error_change_is_tmp(

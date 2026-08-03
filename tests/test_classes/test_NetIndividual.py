@@ -13,7 +13,7 @@ mark__test_type_len_modifier=pytest.mark.parametrize(
     (7, 8),
     (16, 17),
     (1, 2),
-  ]
+  ],
 )
 @mark__test_type_len_modifier
 def test_type_len_modifier(l: int, exp_l: int) -> None:
@@ -778,7 +778,7 @@ mark__test_error_not_same_conf_on_get_cp=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_get_cp
 def test_error_not_same_conf_on_get_cp(
@@ -828,7 +828,7 @@ mark__test_error_not_same_gen_size_on_get_cp=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_gen_size_on_get_cp
 def test_error_not_same_gen_size_on_get_cp(
@@ -904,7 +904,7 @@ mark__test_error_not_same_conf_on_create=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_create
 def test_error_not_same_conf_on_create(
@@ -955,7 +955,7 @@ mark__test_error_not_same_gen_size_on_create=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_gen_size_on_create
 def test_error_not_same_gen_size_on_create(
@@ -1033,7 +1033,7 @@ mark__test_error_not_same_conf_on_crossover=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 0, 2))),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (2, 1, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_crossover
 def test_error_not_same_conf_on_crossover(
@@ -1084,7 +1084,7 @@ mark__test_error_not_same_gen_size_on_crossover=pytest.mark.parametrize(
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, (4, 2, 7), t_schema)),
     lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, (3, 0, 3))),
     # lambda layers_len, num_seed, type_seed, g_schema, n_schema, t_schema: (layers_len, num_seed, type_seed, (g_schema, n_schema, t_schema)),
-  ]
+  ],
 )
 @mark__test_error_not_same_gen_size_on_crossover
 def test_error_not_same_gen_size_on_crossover(
@@ -1142,7 +1142,7 @@ mark__test_error_outside_range_on_create=pytest.mark.parametrize(
     lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
     lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
     # lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, 1)),
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_create
 def test_error_outside_range_on_create(
@@ -1201,7 +1201,7 @@ mark__test_error_outside_range_on_crossover=pytest.mark.parametrize(
     lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (NI.type_len_modifier(len1)*t_bit+1, 1)),
     lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, NI.type_len_modifier(len2)*t_bit+1)),
     # lambda len1, len2, gen0_bit, n_bit, t_bit: (1, (1, 1), (1, 1)),
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_crossover
 def test_error_outside_range_on_crossover(
@@ -1358,7 +1358,7 @@ mark__test_error_too_short_on_create_from_two=pytest.mark.parametrize(
     (1, (1, 1), (1, 7)),
     (1, (1, 1), (1, 5)),
     # (1, (1, 1), (1, 1)),
-  ]
+  ],
 )
 @mark__test_error_too_short_on_create_from_two
 def test_error_too_short_on_create_from_two(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:
@@ -1428,7 +1428,7 @@ mark__test_error_too_short_on_crossover=pytest.mark.parametrize(
     (1, (1, 1), (7, 3)),
     (1, (1, 1), (7, 1)),
     (1, (1, 1), (5, 1)),
-  ]
+  ],
 )
 @mark__test_error_too_short_on_crossover
 def test_error_too_short_on_crossover(cp: tuple[int, tuple[int, int], tuple[int, int]]) -> None:

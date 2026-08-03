@@ -97,7 +97,7 @@ mark__test_create_from_two=pytest.mark.parametrize(
     (3, '1 0  0 0 1'),
     (4, '1 0  0 1 1'),
     (5, '1 0  0 1 0'),
-  ]
+  ],
 )
 @mark__test_create_from_two
 def test_create_from_two(cp: int, expected_str: str) -> None:
@@ -148,7 +148,7 @@ mark__test_crossover=pytest.mark.parametrize(
     (3, ('1 0  0 0 1', '1 1  1 1 0')),
     (4, ('1 0  0 1 1', '1 1  1 0 0')),
     (5, ('1 0  0 1 0', '1 1  1 0 1')),
-  ]
+  ],
 )
 @mark__test_crossover
 def test_crossover(cp: int, expected_strs: tuple[str, str]) -> None:
@@ -199,7 +199,7 @@ mark__test_update_fenotype=pytest.mark.parametrize(
     ('1 0  0 1 1', {'x': 3, 'y': 3}),
     ('1 0  1 0 0', {'x': 3, 'y': 4}),
     ('1 0  1 0 1', {'x': 3, 'y': 5}),
-  ]
+  ],
 )
 @mark__test_update_fenotype
 def test_update_fenotype(b_str: str, expected: dict[str, int]) -> None:
@@ -254,7 +254,7 @@ mark__test_get_fenotype=pytest.mark.parametrize(
     ('1 0  0 1 1', {'x': 3, 'y': 3}),
     ('1 0  1 0 0', {'x': 3, 'y': 4}),
     ('1 0  1 0 1', {'x': 3, 'y': 5}),
-  ]
+  ],
 )
 @mark__test_get_fenotype
 def test_get_fenotype(b_str: str, expected: dict[str, int]) -> None:
@@ -394,7 +394,7 @@ mark__test_error_not_same_conf_on_get_cp=pytest.mark.parametrize(
     (('x', (2, 1, 4)), ('y', (3, 0, 4))),
     (('x', (3, 1, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_get_cp
 def test_error_not_same_conf_on_get_cp(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
@@ -419,7 +419,7 @@ mark__test_error_not_same_conf_on_crossover=pytest.mark.parametrize(
     (('x', (2, 1, 4)), ('y', (3, 0, 4))),
     (('x', (3, 1, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_crossover
 def test_error_not_same_conf_on_crossover(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
@@ -445,7 +445,7 @@ mark__test_error_not_same_conf_on_create=pytest.mark.parametrize(
     (('x', (2, 1, 4)), ('y', (3, 0, 4))),
     (('x', (3, 1, 4)), ('y', (3, 0, 5))),
     (('x', (2, 1, 4)), ('y', (4, 0, 5))),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_create
 def test_error_not_same_conf_on_create(schema2: tuple[tuple[str, tuple[int, int, int]], tuple[str, tuple[int, int, int]]]) -> None:
@@ -467,7 +467,7 @@ mark__test_error_outside_range_on_create=pytest.mark.parametrize(
   [
     -1,
     6,
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_create
 def test_error_outside_range_on_create(cp: int) -> None:
@@ -493,7 +493,7 @@ mark__test_error_outside_range_on_crossover=pytest.mark.parametrize(
   [
     -1,
     6,
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_crossover
 def test_error_outside_range_on_crossover(cp: int) -> None:
@@ -607,7 +607,7 @@ mark__test_error_load_invalid_model=pytest.mark.parametrize(
       'gen': {'invalid': True},
       'schema': [['x', 2, 1, 4]],
     },
-  ]
+  ],
 )
 @mark__test_error_load_invalid_model
 def test_error_load_from_format_invalid_model(saved: dict[str, object]) -> None:

@@ -7,7 +7,7 @@ from gaaml.classes.MaxAvgMinHolder import (
 
 mark__test___f2f=pytest.mark.parametrize(
   'v',
-  [3, 5., 2., 65., 2., 6]
+  [3, 5., 2., 65., 2., 6],
 )
 @mark__test___f2f
 def test___f2f(v: float) -> None:
@@ -309,7 +309,7 @@ mark__test_empty_raises_on_properties=pytest.mark.parametrize(
     MAMH.max_v,
     MAMH.min_v,
     MAMH.avg,
-  ]
+  ],
 )
 @mark__test_empty_raises_on_properties
 def test_empty_raises_on_properties(prop: property) -> None:

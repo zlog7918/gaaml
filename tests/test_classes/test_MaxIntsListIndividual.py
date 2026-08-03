@@ -98,7 +98,7 @@ mark__test_create_from_two=pytest.mark.parametrize(
     ((6, 0), '0 1 1  1 1 1  1 1 0  0 1 0  0 0 1', [4, 6, 5, 3, 2]),
     ((6, 3), '0 1 1  1 1 1  0 1 0  0 0 1', [4, 6, 3, 2]),
     ((6, 9), '0 1 1  1 1 1', [4, 6]),
-  ]
+  ],
 )
 @mark__test_create_from_two
 def test_create_from_two(
@@ -147,7 +147,7 @@ mark__test_create_from_two_too_long=pytest.mark.parametrize(
     ((4, 1), '0 1 1  1 1 0  0 1 0', [4, 5, 3]), # '0 1 1  1 1 0  0 1 0  0 0 1'
     ((6, 0), '0 1 1  1 1 1  1 1 0', [4, 6, 5]), # '0 1 1  1 1 1  1 1 0  0 1 0  0 0 1'
     ((6, 3), '0 1 1  1 1 1  0 1 0', [4, 6, 3]), # '0 1 1  1 1 1  0 1 0  0 0 1'
-  ]
+  ],
 )
 @mark__test_create_from_two_too_long
 def test_create_from_two_too_long(
@@ -200,7 +200,7 @@ mark__test_crossover=pytest.mark.parametrize(
     # ((6, 0), '0 1 1  1 1 1  1 1 0  0 1 0  0 0 1', '', [4, 6, 5, 3, 2], []), # throws error
     ((6, 3), '0 1 1  1 1 1  0 1 0  0 0 1', '1 1 0', [4, 6, 3, 2], [5]),
     ((6, 9), '0 1 1  1 1 1', '1 1 0  0 1 0  0 0 1', [4, 6], [5, 3, 2]),
-  ]
+  ],
 )
 @mark__test_crossover
 def test_crossover(
@@ -255,7 +255,7 @@ mark__test_crossover_too_long=pytest.mark.parametrize(
     ((4, 1), '0 1 1  1 1 0  0 1 0', '1 1 1', [4, 5, 3], [6]), # ('0 1 1  1 1 0  0 1 0  0 0 1', '1 1 1')
     ((1, 7), '0 0 1', '1 1 0  0 1 0  0 1 1', [2], [5, 3, 4]), # ('0 0 1', '1 1 0  0 1 0  0 1 1  1 1 1')
     ((6, 3), '0 1 1  1 1 1  0 1 0', '1 1 0', [4, 6, 3], [5]), # ('0 1 1  1 1 1  0 1 0  0 0 1', '1 1 0')
-  ]
+  ],
 )
 @mark__test_crossover_too_long
 def test_crossover_too_long(
@@ -310,7 +310,7 @@ mark__test_get_fenotype=pytest.mark.parametrize(
     ('0 0 0  1 1 0  1 1 1', [1, 5, 6]),
     ('0 0 1  1 0 0  1 0 1', [2, 5, 6]),
     ('0 1 1  0 1 0  0 0 0', [4, 3, 1]),
-  ]
+  ],
 )
 @mark__test_get_fenotype
 def test_get_fenotype(
@@ -488,7 +488,7 @@ mark__test_error_not_same_conf_on_get_cp=pytest.mark.parametrize(
     ((3, 7), (3, 2, 6)),
     ((3, 7), (3, 1, 5)),
     ((3, 7), (3, 1, 7)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_get_cp
 def test_error_not_same_conf_on_get_cp(
@@ -595,7 +595,7 @@ mark__test_error_not_same_conf_on_crossover=pytest.mark.parametrize(
     ((3, 7), (3, 2, 6)),
     ((3, 7), (3, 1, 5)),
     ((3, 7), (3, 1, 7)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_crossover
 def test_error_not_same_conf_on_crossover(
@@ -706,7 +706,7 @@ mark__test_error_not_same_conf_on_create=pytest.mark.parametrize(
     ((3, 7), (3, 2, 6)),
     ((3, 7), (3, 1, 5)),
     ((3, 7), (3, 1, 7)),
-  ]
+  ],
 )
 @mark__test_error_not_same_conf_on_create
 def test_error_not_same_conf_on_create(
@@ -818,7 +818,7 @@ mark__test_error_too_short_on_create_from_two=pytest.mark.parametrize(
     (2, 8),
     (3, 9),
     (0, 9),
-  ]
+  ],
 )
 @mark__test_error_too_short_on_create_from_two
 def test_error_too_short_on_create_from_two(cp: tuple[int, int]) -> None:
@@ -859,7 +859,7 @@ mark__test_error_too_short_on_crossover=pytest.mark.parametrize(
     (5, 2),
     (6, 3),
     (6, 0),
-  ]
+  ],
 )
 @mark__test_error_too_short_on_crossover
 def test_error_too_short_on_crossover(cp: tuple[int, int]) -> None:
@@ -892,7 +892,7 @@ mark__test_error_outside_range_on_create=pytest.mark.parametrize(
     (7, 1),
     (1, 10),
     (2, -1),
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_create
 def test_error_outside_range_on_create(cp: tuple[int, int]) -> None:
@@ -925,7 +925,7 @@ mark__test_error_outside_range_on_crossover=pytest.mark.parametrize(
     (7, 1),
     (1, 10),
     (2, -1),
-  ]
+  ],
 )
 @mark__test_error_outside_range_on_crossover
 def test_error_outside_range_on_crossover(cp: tuple[int, int]) -> None:
@@ -960,7 +960,7 @@ mark__test_error_offset_on_create=pytest.mark.parametrize(
     (1, 8),
     (0, 7),
     (2, 7),
-  ]
+  ],
 )
 @mark__test_error_offset_on_create
 def test_error_offset_on_create(cp: tuple[int, int]) -> None:
@@ -995,7 +995,7 @@ mark__test_error_offset_on_crossover=pytest.mark.parametrize(
     (1, 8),
     (0, 7),
     (2, 7),
-  ]
+  ],
 )
 @mark__test_error_offset_on_crossover
 def test_error_offset_on_crossover(cp: tuple[int, int]) -> None:
