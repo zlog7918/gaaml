@@ -89,7 +89,7 @@ def test_cr_network(
   monkeypatch.setattr(
     util,
     "get_fit_func",
-    lambda *args, **kwargs: lambda x, dir: (1, ),
+    lambda *args, **kwargs: ((lambda x, dir: 1.), (lambda dir: 1.)),
   )
 
   # test
@@ -126,7 +126,7 @@ def test_cr_network_plot(
   monkeypatch.setattr(
     util,
     "get_fit_func",
-    lambda *args, **kwargs: lambda x, dir: (0, ),
+    lambda *args, **kwargs: ((lambda x, dir: 0), (lambda dir: 1.)),
   )
 
   training_data=np.zeros((2, 2))
@@ -176,7 +176,7 @@ def test_cr_network_plot_0_in_fitnesses(
   monkeypatch.setattr(
     util,
     "get_fit_func",
-    lambda *args, **kwargs: lambda x, dir: (float('inf'), ),
+    lambda *args, **kwargs: ((lambda x, dir: float('inf')), (lambda dir: 1.)),
   )
 
   training_data=np.zeros((2, 2))
@@ -223,11 +223,13 @@ def test_error_cr_network_0generations(
   training_data=np.zeros((2, 2))
   test_data=np.zeros((2, 2))
   population_size=10
+  def raise_err_if_used(*args, **kwargs):
+    raise Exception('Should not happen')
   monkeypatch.setattr(
     util,
     "get_fit_func",
-    lambda *args, **kwargs: lambda x, dir: (1, ),
-  ) # first population also has calculated fittness (before generations obj is created)
+    lambda *args, **kwargs: (raise_err_if_used, raise_err_if_used),
+  ) # inner funcs not used
 
   # test
   with pytest.raises(ValueError) as excinfo:

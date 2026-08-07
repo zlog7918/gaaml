@@ -15,8 +15,14 @@ IndType=NetIndividual
 RetType=tuple[Generations, float]
 
 def fitness_corrector(net_ind: IndType, fit: float) -> float:
-  n_m1=net_ind.gen[0].fenotype[const.BIN_PART_LIST_LEN[0]]-1
-  n_max_m1=const.BIN_PART_LIST_LEN[1][2]-1
+  n_m1=net_ind.gen[0].fenotype[net_ind.layers_len_name]-1
+  # priv access: net_ind.gen[0].__schema
+  n_max_m1=[
+    max_v for n, (_, _, max_v) in t.cast(
+      tuple[tuple[str, tuple[int, int, int]], ...],
+      net_ind.gen[0]._MaxIntsIndividual__schema, # type: ignore
+    ) if n==net_ind.layers_len_name
+  ][0]
   corr=1+n_m1/n_max_m1/5
   ret=1/(1+corr*fit)
   ret=ret if ret>0 else 0
@@ -140,13 +146,13 @@ def cr_network(
 
   fits=np.array(generations.get_save_of_fits())
   fits: np.ndarray=fits.mean(axis=2)
-  fit_idx=np.unravel_index(fits.max(), fits.shape)
+  fit_idx=np.unravel_index(fits.argmax(), fits.shape)
   gen_i, ind_i=fit_idx[0], fit_idx[1]
   ind_path=save_dir_path/f'gen_{gen_i}'/f'ind_{ind_i}'
   max_sol=IndType.load_from(ind_path/'model.gen')
   test_fits=[]
   for path in (p for p in ind_path.iterdir() if p.name.startswith('iter_')):
-    test_fits.append(fitness_func(max_sol, test_fit_func(max_sol, path)))
+    test_fits.append(fitness_func(max_sol, test_fit_func(path)))
   test_fit=sum(test_fits)/len(test_fits)
 
   if plot:

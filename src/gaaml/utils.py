@@ -173,7 +173,7 @@ def get_fit_func(
   categorial: bool=False,
 ) -> tuple[
   t.Callable[[NetIndividual, Path], float],
-  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[Path], float],
 ]: ...
 @t.overload
 def get_fit_func(
@@ -185,7 +185,7 @@ def get_fit_func(
   categorial: bool=False,
 ) -> tuple[
   t.Callable[[NetIndividual, Path], float],
-  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[Path], float],
 ]: ...
 @t.overload
 def get_fit_func(
@@ -198,7 +198,7 @@ def get_fit_func(
   categorial: bool=False,
 ) -> tuple[
   t.Callable[[NetIndividual, Path], float],
-  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[Path], float],
 ]: ...
 def get_fit_func(
   training_data: np.ndarray,
@@ -210,7 +210,7 @@ def get_fit_func(
   categorial: bool=False,
 ) -> tuple[
   t.Callable[[NetIndividual, Path], float],
-  t.Callable[[NetIndividual, Path], float],
+  t.Callable[[Path], float],
 ]:
   if any(data.ndim!=2 for data in __into_tuple(
     (training_data,),
@@ -297,7 +297,7 @@ def get_fit_func(
     _validation_data=__conv_to_tensor(_validation_data)
   def f(
     net_ind: NetIndividual,
-    dir: Path,
+    save_dir: Path,
   ) -> float:
     model, batch_size, epochs=cr_net_from_ind(
       net_ind,
@@ -347,15 +347,15 @@ def get_fit_func(
         # message='__array__ implementation doesn\'t accept a copy keyword',
         category=DeprecationWarning,
       )
-      hidden_len=len(model.get_weights())//2-1
-      model.save_weights(dir/'model.weights.h5')
-    with open(dir/'model_meta.data', 'x') as meta:
+      krs.saving.save_model(model, save_dir/'model.keras')
+    
+    with open(save_dir/'model_meta.data', 'x') as meta:
       json.dump(
         {
           'epoch': epochs,
           'batch': batch_size,
           'backend': krs.config.backend(),
-          'hidden_len': hidden_len,
+          'hidden_len': len(model.weights)//2-1,
           'fit_ret': str(fit_ret.history),
           'evaluation': float(ret),
         },
@@ -363,23 +363,10 @@ def get_fit_func(
       )
     return ret
   def test_f(
-    net_ind: NetIndividual,
-    dir: Path,
+    save_dir: Path,
   ) -> float:
-    model, _, _=cr_net_from_ind(
-      net_ind,
-      input_size,
-      output_size,
-      categorial,
-    )
-    # load_weights() throw warning
-    with warnings.catch_warnings():
-      warnings.filterwarnings(
-        'ignore',
-        # message='__array__ implementation doesn\'t accept a copy keyword',
-        category=DeprecationWarning,
-      )
-      model.load_weights(dir/'model.weights.h5')
+    model=krs.saving.load_model(save_dir/'model.keras')
+    assert isinstance(model, krs.Sequential)
 
     test_ret=model.evaluate(
       test_data_x,

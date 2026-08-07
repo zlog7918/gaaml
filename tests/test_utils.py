@@ -692,7 +692,7 @@ def test_get_fit_func(
   )
   val_f, test_f=ret
   val_ret=val_f(ni, tmp_path)
-  test_ret=test_f(ni, tmp_path)
+  test_ret=test_f(tmp_path)
 
   # results
   assert isinstance(ret, tuple)
@@ -701,7 +701,7 @@ def test_get_fit_func(
   assert isinstance(float(val_ret), float)
   assert isinstance(float(test_ret), float)
   assert (tmp_path/'model_meta.data').exists()
-  assert (tmp_path/'model.weights.h5').exists()
+  assert (tmp_path/'model.keras').exists()
 
 mark__test_error_get_fit_func_not_2D_arr=pytest.mark.parametrize(
   ('training_data', 'validation_data', 'test_data', 'number_of_attributes'),
