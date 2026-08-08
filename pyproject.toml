@@ -1,6 +1,6 @@
 [project]
 name = "gaaml"
-version = "0.1.1"
+version = "0.1.2"
 description = "Genetic Algorithm-based AutoML"
 authors = [{ name="Szymon Wasążnik", email="zlog@protonmail.com" }]
 readme = "README.md"

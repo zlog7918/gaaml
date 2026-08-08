@@ -7,15 +7,15 @@ from .MaxIntsIndividual import (
   MaxIntsIndividual as _MII,
 )
 from .MaxIntsListIndividual import (
-  MaxIntsListIndividual as _MILI,
   CPType as MILI_CPType,
+  MaxIntsListIndividual as _MILI,
 )
 
 CPType: t.TypeAlias=tuple[MII_CPType, MILI_CPType, MILI_CPType]
 class NetIndividual(Individual["NetIndividual", CPType, tuple[_MII, _MILI, _MILI]]):
   _NI: t.TypeAlias="NetIndividual"
   GenSchemaType: t.TypeAlias=tuple[_MII.GenSchemaType, util.BitSize_Min_Max, util.BitSize_Min_Max]
-  type_len_modifier: t.Callable[[int], int]=staticmethod(lambda x: x+1)
+  type_len_modifier: t.Callable[[int], int]=staticmethod(lambda x: x)
   @t.overload
   def __init__(
     self,

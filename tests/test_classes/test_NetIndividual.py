@@ -9,10 +9,10 @@ from gaaml.classes.MaxIntsListIndividual import MaxIntsListIndividual as _MILI
 mark__test_type_len_modifier=pytest.mark.parametrize(
   ('l', 'exp_l'),
   [
-    (4, 5),
-    (7, 8),
-    (16, 17),
-    (1, 2),
+    (4, 4),
+    (7, 7),
+    (16, 16),
+    (1, 1),
   ],
 )
 @mark__test_type_len_modifier
@@ -207,16 +207,16 @@ def test_create_from_two() -> None:
                      ↑
   cp1:2,5
 
-  bits_t1: 1 1  0 1
-                 ↑
-  bits_t2: 1 0  0 1  0 0
+  bits_t1: 1 1
             ↑
-  cp1:3,1
+  bits_t2: 1 0  0 0
+                 ↑
+  cp1:1,3
 
   expected:
   bits0: 0 1  0 1  0 0  0 0  0 1 1
   bits_n: 1 1 1
-  bits_t: 1 1  0 0  0 1  0 0
+  bits_t: 1 0
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -241,21 +241,21 @@ def test_create_from_two() -> None:
   # setup
   ni1.gen[0]._gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
   ni1.gen[1]._gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2]._gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[2]._gen._gen=bytearray('1 1'.replace(' ', '').encode())
   ni2.gen[0]._gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
   ni2.gen[1]._gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2]._gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
+  ni2.gen[2]._gen._gen=bytearray('1 0  0 0'.replace(' ', '').encode())
 
   for cp, (exp_str0, exp_str1, exp_str2), (exp_feno0, exp_feno1, exp_feno2) in (
     (
-      (1, (2, 5), (3, 1)), (
+      (1, (2, 5), (1, 3)), (
         '0 1  0 1  0 0  0 0  0 1 1',
         '1 1 1',
-        '1 1  0 0  0 1  0 0',
+        '1 0',
       ), (
         {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
         [7, 3], # one more: len->2, filled in by random with num_seed(1)->3
-        [3, 0, 1], # one less: len->2 -> 2+2=4
+        [2, 3], # one more: len->2, filled in by random with num_seed(0)->3
       )
     ),
   ):
@@ -295,21 +295,21 @@ def test_crossover() -> None:
                      ↑
   cp1:2,5
 
-  bits_t1: 1 1  0 1
+  bits_t1: 1 1
             ↑
-  bits_t2: 1 0  0 1  0 0
-                 ↑
-  cp1:1,3
+  bits_t2: 1 0  0 1
+            ↑
+  cp1:1,1
 
   expected:
   child1:
   bits0: 0 1  0 1  0 0  0 0  0 1 1
   bits_n: 1 1 1
-  bits_t: 1 1  0 0
+  bits_t: 1 0  0 1
   child2:
   bits0: 0 0  1 0  1 1  1 0  1 0 1
   bits_n: 0 1 0  0 0 0
-  bits_t: 1 0  0 1  0 1
+  bits_t: 1 1
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -334,10 +334,10 @@ def test_crossover() -> None:
   # setup
   ni1.gen[0]._gen._gen=bytearray('0 0  1 0  1 1  1 0  1 0 1'.replace(' ', '').encode())
   ni1.gen[1]._gen._gen=bytearray('1 1 0'.replace(' ', '').encode())
-  ni1.gen[2]._gen._gen=bytearray('1 1  0 1'.replace(' ', '').encode())
+  ni1.gen[2]._gen._gen=bytearray('1 1'.replace(' ', '').encode())
   ni2.gen[0]._gen._gen=bytearray('0 1  0 1  0 0  0 0  0 1 1'.replace(' ', '').encode())
   ni2.gen[1]._gen._gen=bytearray('0 1 0  0 0 1'.replace(' ', '').encode())
-  ni2.gen[2]._gen._gen=bytearray('1 0  0 1  0 0'.replace(' ', '').encode())
+  ni2.gen[2]._gen._gen=bytearray('1 0  0 1'.replace(' ', '').encode())
 
   for (
     cp,
@@ -351,27 +351,27 @@ def test_crossover() -> None:
     )
   ) in (
     (
-      (1, (2, 5), (1, 3)), (
+      (1, (2, 5), (1, 1)), (
         (
           '0 1  0 1  0 0  0 0  0 1 1',
           '1 1 1',
-          '1 1  0 0',
+          '1 0  0 1',
         ),
         (
           {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
           [7, 3], # one more: len->2, filled in by random with num_seed(1)->3
-          [3, 0, 3], # one more: len->2, filled in by random with type_seed(0)->3
+          [2, 1], # good
         ),
       ), (
         (
           '0 0  1 0  1 1  1 0  1 0 1',
           '0 1 0  0 0 0',
-          '1 0  0 1  0 1',
+          '1 1',
         ),
         (
           {len_name: 1, num_seed_name: 2, type_seed_name: 3, x_name: 3, y_name: 5},
           [4], # one less: len->1
-          [2, 1], # one less: len->1 -> 1+1=2
+          [3], # good
         ),
       )
     ),
@@ -410,7 +410,7 @@ def test_update_fenotype() -> None:
   bits0: 0 1  1 0  1 1  1 0  1 1 0
 
   bits_n: 0 1 0  0 0 1
-  bits_t: 1 0  0 1  0 0
+  bits_t: 1 0  0 1
 
   expected:
   fenotype0: {
@@ -421,7 +421,7 @@ def test_update_fenotype() -> None:
     y: 6+0=6 -> 6->4 -> 4+0=4
   }
   fenotype1: [2+2->4, 1+2->3]
-  fenotype2: [2+0->2, 1+0->1, 0+0->0]
+  fenotype2: [2+0->2, 1+0->1]
   """
   # values
   layers_len=('len', (2, 1, 4))
@@ -451,7 +451,7 @@ def test_update_fenotype() -> None:
       ), (
         {len_name: 2, num_seed_name: 1, type_seed_name: 0, x_name: 1, y_name: 3},
         ([7, 3], True), # one more: len->2, filled in by random with num_seed(1)->3
-        ([2, 3, 0], True), # one less: len->2 -> 2+1=3
+        ([2, 3], True), # three less: len->2
       )
     ),
     (
@@ -461,8 +461,8 @@ def test_update_fenotype() -> None:
         '1 0  1 1',
       ), (
         {len_name: 4, num_seed_name: 1, type_seed_name: 1, x_name: 2, y_name: 3},
-        ([7, 7, 5, 2], False),
-        ([2, 3, 1, 0, 2], True), # three more: len->4 -> 4+1=5, filled in by random with num_seed(1)->[1, 0, 2]
+        ([7, 7, 5, 2], False), # good
+        ([2, 3, 1, 0], True), # two more: len->4, filled in by random with num_seed(1)->[1, 0]
       )
     ),
   ):
@@ -1353,10 +1353,9 @@ mark__test_error_too_short_on_create_from_two=pytest.mark.parametrize(
     (1, (1, 4), (1, 1)),
     (1, (2, 5), (1, 1)),
     (1, (3, 6), (1, 1)),
-    (1, (1, 1), (4, 8)),
-    (1, (1, 1), (3, 7)),
+    (1, (1, 1), (2, 8)),
     (1, (1, 1), (1, 7)),
-    (1, (1, 1), (1, 5)),
+    (1, (1, 1), (0, 6)),
     # (1, (1, 1), (1, 1)),
   ],
 )
@@ -1415,19 +1414,17 @@ mark__test_error_too_short_on_crossover=pytest.mark.parametrize(
     (1, (1, 4), (1, 1)),
     (1, (2, 5), (1, 1)),
     (1, (3, 6), (1, 1)),
-    (1, (1, 1), (4, 8)),
-    (1, (1, 1), (3, 7)),
+    (1, (1, 1), (2, 8)),
     (1, (1, 1), (1, 7)),
-    (1, (1, 1), (1, 5)),
+    (1, (1, 1), (0, 6)),
     # second too short
     (1, (3, 0), (1, 1)),
     (1, (4, 1), (1, 1)),
     (1, (5, 2), (1, 1)),
     (1, (6, 3), (1, 1)),
-    (1, (1, 1), (8, 4)),
-    (1, (1, 1), (7, 3)),
+    (1, (1, 1), (8, 2)),
     (1, (1, 1), (7, 1)),
-    (1, (1, 1), (5, 1)),
+    (1, (1, 1), (6, 0)),
   ],
 )
 @mark__test_error_too_short_on_crossover

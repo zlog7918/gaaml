@@ -28,7 +28,7 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
     ), False, 78, 343, krs.optimizers.Adam, [
       krs.activations.sigmoid, # 2
       krs.activations.tanh, # 1
-      krs.activations.leaky_relu, # 3
+      krs.activations.linear, # regression
     ], [
       (2, 587), # i->1h
       (587,), # +w^
@@ -40,11 +40,11 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
     ((2, 4), (
       '00001  0101000111  0010111011  1  111100000011  0011010  1100110100',
       '1101001001  0011101110',
-      '10 01 11',
+      '10 01',
     ), True, 27, 821, krs.optimizers.Adam, [
       krs.activations.sigmoid, # 2
       krs.activations.tanh, # 1
-      krs.activations.softmax, # last is replaced with softmax
+      krs.activations.softmax, # classification
     ], [
       (2, 587), # i->1h
       (587,), # +w^
@@ -60,7 +60,7 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
     ), False, 70, 789, krs.optimizers.Adam, [
       krs.activations.sigmoid, # 2
       krs.activations.relu, # 0
-      krs.activations.leaky_relu, # 3
+      krs.activations.linear, # regression
     ], [
       (50, 587), # i->1h
       (587,), # +w^
@@ -77,7 +77,7 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
       krs.activations.sigmoid, # 2
       krs.activations.tanh, # 1
       krs.activations.leaky_relu, # 3
-      krs.activations.sigmoid, # 2
+      krs.activations.linear, # regression
     ], [
       (5, 587), # i->1h
       (587,), # +w^
@@ -89,14 +89,14 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
       (4,), # +w^
     ]),
     ((5, 4), (
-      '00010  0101000111  0010111011  0  111100000011  1010011  0010011001',
+      '00010  0101000111  0011000001  0  111100000011  1010011  0010011001',
       '1101001001  0011101110',
-      '10 01 11',
+      '10 01',
     ), True, 84, 154, krs.optimizers.SGD, [
       krs.activations.sigmoid, # 2
       krs.activations.tanh, # 1
       krs.activations.leaky_relu, # 3
-      krs.activations.softmax, # last is replaced with softmax
+      krs.activations.softmax, # classification
     ], [
       (5, 587), # i->1h
       (587,), # +w^
@@ -110,10 +110,12 @@ mark__test_cr_net_from_ind=pytest.mark.parametrize(
     ((2, 4), (
       '11111  0101000111  0010111011  0  111100000011  0110100  1100110100',
       '1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111  1111111111',
-      '00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00',
+      '00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00',
     ), False, 53, 821, krs.optimizers.SGD, [
       krs.activations.relu, # 0
-    ]*33, [
+    ]*32+[
+      krs.activations.linear, # regression
+    ], [
       (2, 724), # i->h_1
       (724,), # +w_1^
       *([

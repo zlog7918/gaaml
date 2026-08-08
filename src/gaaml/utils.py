@@ -15,7 +15,6 @@ __keras_activation_types: dict[int, t.Callable]={
   1: krs.activations.tanh,
   2: krs.activations.sigmoid,
   3: krs.activations.leaky_relu,
-  -1: krs.activations.softmax,
 }
 
 __keras_optimalization_types: dict[int, type[krs.optimizers.Optimizer]]={
@@ -54,13 +53,16 @@ __conv_to_tensor=__cr_func_to_conv_to_tensor()
 def __cr_net_from_ind(net_ind: NetIndividual, input_size: int, output_size: int, categorial: bool) -> krs.models.Model:
   params, layer_sizes, layer_types=net_ind.gen
   params, layer_sizes, layer_types=params.fenotype, layer_sizes.fenotype, layer_types.fenotype
-  if categorial:
-    layer_types[-1]=-1
 
   seq=krs.models.Sequential()
   seq.add(krs.layers.Input(shape=(input_size,)))
-  for n, t in zip((*layer_sizes, output_size), layer_types):
+  for n, t in zip(layer_sizes, layer_types):
     seq.add(krs.layers.Dense(n, activation=__keras_activation_types[t]))
+  seq.add(krs.layers.Dense(output_size, activation=(
+    krs.activations.softmax
+      if categorial else
+    krs.activations.linear
+  )))
   learning_rate=params[const.BIN_PART_LEARNING_RATE_NAME]/(1<<14)
   seq.compile(
     __keras_optimalization_types[params[const.BIN_PART_OPTIMIZER_NAME]](
@@ -222,7 +224,6 @@ def get_fit_func(
     raise ValueError('training_data and test_data do not have the same number of attributes in data or output')
   if validation_data is not None and training_data.shape[1]!=validation_data.shape[1]:
     raise ValueError('validation_data does not have the same number of attributes in data or output as training_data and test_data')
-  # print(training_data)
   _training_data=training_data[:,:number_of_attributes], training_data[:,number_of_attributes:]
   training_data_x, training_data_y=(
     np.asarray(
@@ -234,7 +235,6 @@ def get_fit_func(
       dtype=np.dtypes.Int8DType if categorial else np.dtypes.Float64DType,
     ),
   )
-  # assert _training_data[0].all(training_data_x)
   assert (_training_data[0]==training_data_x).all()
   assert (_training_data[1]==training_data_y).all()
   del _training_data, training_data
@@ -255,7 +255,6 @@ def get_fit_func(
     assert (__validation_data[1]==_validation_data[1]).all()
     del __validation_data
   del validation_data
-
   _test_data=test_data[:,:number_of_attributes], test_data[:,number_of_attributes:]
   test_data_x, test_data_y=(
     np.asarray(
@@ -306,7 +305,7 @@ def get_fit_func(
       categorial,
     )
 
-    # get_weights() and save_weights() throw warning
+    # get_weights(), save_weights(), save_model() and fit() throw warning
     with warnings.catch_warnings():
       warnings.filterwarnings(
         'ignore',
@@ -340,7 +339,7 @@ def get_fit_func(
       verbose=0, # type: ignore
     )
 
-    # get_weights() and save_weights() throw warning
+    # get_weights(), save_weights(), save_model() and fit() throw warning
     with warnings.catch_warnings():
       warnings.filterwarnings(
         'ignore',
@@ -348,7 +347,8 @@ def get_fit_func(
         category=DeprecationWarning,
       )
       krs.saving.save_model(model, save_dir/'model.keras')
-    
+
+    ret=float(ret)
     with open(save_dir/'model_meta.data', 'x') as meta:
       json.dump(
         {
@@ -357,7 +357,7 @@ def get_fit_func(
           'backend': krs.config.backend(),
           'hidden_len': len(model.weights)//2-1,
           'fit_ret': str(fit_ret.history),
-          'evaluation': float(ret),
+          'evaluation': ret,
         },
         meta,
       )
@@ -373,5 +373,6 @@ def get_fit_func(
       test_data_y,
       verbose=0, # type: ignore
     )
+    test_ret=float(test_ret)
     return test_ret
   return f, test_f

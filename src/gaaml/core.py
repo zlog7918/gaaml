@@ -16,10 +16,10 @@ RetType=tuple[Generations, float]
 
 def fitness_corrector(net_ind: IndType, fit: float) -> float:
   n_m1=net_ind.gen[0].fenotype[net_ind.layers_len_name]-1
-  # priv access: net_ind.gen[0].__schema
   n_max_m1=[
     max_v for n, (_, _, max_v) in t.cast(
       tuple[tuple[str, tuple[int, int, int]], ...],
+      # priv access: net_ind.gen[0].__schema
       net_ind.gen[0]._MaxIntsIndividual__schema, # type: ignore
     ) if n==net_ind.layers_len_name
   ][0]
