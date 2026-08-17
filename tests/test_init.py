@@ -122,7 +122,7 @@ def test_cr_network_plot(
   assert mock_plt.plot_calls==3
   assert mock_plt.show_calls==3
   for k in mock_plt.figures.keys():
-    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+2)
+    assert mock_plt.figures[k]['xlim']==(0, number_of_generations+1)
 
 mark__test_error_cr_network_0generations=pytest.mark.parametrize(
   'number_of_generations',
